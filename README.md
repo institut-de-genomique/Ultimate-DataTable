@@ -10,6 +10,10 @@
 
 > [Demo](http://institut-de-genomique.github.io/Ultimate-DataTable/)
 
+##Documentation
+
+> [Doc](http://ultimate-datatable.readthedocs.org/en/latest/)
+
 ## Quick start
 ###  Dependencies
 > The Ultimate DataTable need the folowing components to be fully fonctionnal :
