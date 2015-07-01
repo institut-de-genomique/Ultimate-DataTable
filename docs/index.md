@@ -11,7 +11,7 @@ You can [fork this project in GitHub](http://github.com/) to help us out !
 
 
 ## Quick start
-[![Simple datatable example](images/simple.png)](../demo/simple.html)
+[![Simple datatable example](images/simple.png)](http://institut-de-genomique.github.io/Ultimate-DataTable/)
 ###  Dependencies
 > The Ultimate DataTable need the folowing components to be fully fonctionnal :
 <ul>
