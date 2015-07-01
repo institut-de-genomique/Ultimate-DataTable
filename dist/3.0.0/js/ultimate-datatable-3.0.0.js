@@ -51,7 +51,8 @@ angular.module('ultimateDataTableServices', []).
 							search : {
 								active:true,
 								mode:'remote', //or local but not implemented
-								url:undefined
+								url:undefined,
+								showLocalSearch:false
 							},
 							pagination:{
 								active:true,
@@ -3083,7 +3084,7 @@ run(function($templateCache) {
   		    		+			'<div udt-cell-header/>'
   		    		+		'</td>'
   		    		+	'</tr>'
-  		    		+	'<tr ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
+  		    		+	'<tr ng-repeat="value in udtTable.displayResult|filter:udtTable.searchTerm:false" ng-click="udtTableFunctions.select(value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
   		    		+		'<td ng-repeat="col in udtTable.config.columns" ng-if="!udtTable.isHide(col.id)" ng-class="udtTableFunctions.getTdClass(value.data, col, this)">'
   		    		+		'<div udt-cell/>'
   		    		+		'</td>'
@@ -3221,9 +3222,11 @@ run(function($templateCache) {
   		    		+		'</li>'
   		    		+	'</ul>'
   		    		+'</div>'
-  		    		
   		    		+'<div class="btn-group" ng-if="udtTable.isShowOtherButtons()" udt-compile="udtTable.config.otherButtons.template"></div>'
   		    		+'</div>'
+              + '<div class="form-group col-md-2" ng-if="udtTable.config.search.showLocalSearch === true">'
+              +   '<input class="form-control" type="text" ng-model="udtTable.searchTerm.data.$">'
+              + '</div>'
   		    		+'<div class="btn-toolbar pull-right" name="udt-toolbar-results"  ng-if="udtTable.isShowToolbarResults()">'
   		    		+	'<button class="btn btn-info" disabled="disabled" ng-if="udtTable.config.showTotalNumberRecords">{{udtTableFunctions.messagesDatatable(\'datatable.totalNumberRecords\', udtTableFunctions.getTotalNumberRecords())}}</button>'
   		    		+'</div>'

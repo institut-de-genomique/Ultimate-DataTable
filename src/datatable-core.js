@@ -48,7 +48,8 @@ angular.module('ultimateDataTableServices', []).
 							search : {
 								active:true,
 								mode:'remote', //or local but not implemented
-								url:undefined
+								url:undefined,
+								showLocalSearch:false
 							},
 							pagination:{
 								active:true,
