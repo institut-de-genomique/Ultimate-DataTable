@@ -4,7 +4,7 @@
 
 ##Versions
 > **Current stable version** : 3.0.0<br>
-**Latest version** : 1.0.0
+**Latest version** : 3.0.0
 
 ##Demo
 
