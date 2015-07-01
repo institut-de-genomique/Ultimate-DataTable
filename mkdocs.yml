@@ -1,0 +1,8 @@
+site_name: Ultimate DataTable
+pages:
+- Home: index.md
+- Configuration: configuration.md
+- Columns configuration: columns-configuration.md
+- Errors: errors.md
+- Customization: customization.md
+- About: about.md
