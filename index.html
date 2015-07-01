@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Ultimate-datatable by institut-de-genomique</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Ultimate-datatable</h1>
+        <h2></h2>
+        <a href="https://github.com/institut-de-genomique/Ultimate-DataTable" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="welcome-to-the-ultimate-datatable-documentation" class="anchor" href="#welcome-to-the-ultimate-datatable-documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to the Ultimate DataTable documentation</h1>
+
+<blockquote>
+<p>This <a href="http://www.angularjs.org">AngularJS</a> directive generate a HTML table with build-in fonctionnality like save, edit, remove, pagination etc...
+You can <a href="http://github.com/">fork this project in GitHub</a> to help us out !</p>
+
+<p><strong>Keep in mind that this documentation is a work in progress</strong></p>
+</blockquote>
+
+<h2>
+<a id="versions" class="anchor" href="#versions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Versions</h2>
+
+<blockquote>
+<p><strong>Current stable version</strong> : 3.0.0<br>
+<strong>Latest version</strong> : 3.0.0</p>
+</blockquote>
+
+<h2>
+<a id="quick-start" class="anchor" href="#quick-start" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick start</h2>
+
+<p><a href="../demo/simple.html"><img src="images/simple.png" alt="Simple datatable example"></a></p>
+
+<h3>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h3>
+
+<blockquote>
+<p>The Ultimate DataTable need the folowing components to be fully fonctionnal :</p>
+
+<ul>
+    <li>The Ultimate DataTable js file</li>
+    <li>The Ultimate DataTable css file</li>
+    <li>[AngularJS](https://angularjs.org/)</li>
+    <li>[Jquery](https://jquery.com/)</li>
+    <li>[Bootstrap CSS and Javascript (3.x)](http://getbootstrap.com/)</li>
+    <li>[Font Awesome](http://fortawesome.github.io/Font-Awesome/)</li>
+</ul>
+
+<h3>
+<a id="html" class="anchor" href="#html" aria-hidden="true"><span class="octicon octicon-link"></span></a>HTML</h3>
+
+<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">body</span> <span class="pl-e">ng-app</span>=<span class="pl-s"><span class="pl-pds">"</span>ngAppDemo<span class="pl-pds">"</span></span>&gt;
+ &lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>container-fluid<span class="pl-pds">"</span></span>&gt;
+    &lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>row<span class="pl-pds">"</span></span>&gt;
+        &lt;<span class="pl-ent">h1</span> <span class="pl-e">align</span>=<span class="pl-s">center</span>&gt;Simple Ultimate DataTable exemple&lt;/<span class="pl-ent">h1</span>&gt;&lt;<span class="pl-ent">br</span>&gt;
+        &lt;<span class="pl-ent">div</span> <span class="pl-e">ng-controller</span>=<span class="pl-s"><span class="pl-pds">"</span>ngAppDemoController<span class="pl-pds">"</span></span>&gt;
+            &lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>col-md-12 col-lg-12<span class="pl-pds">"</span></span> <span class="pl-e">ultimate-datatable</span>=<span class="pl-s"><span class="pl-pds">"</span>datatable<span class="pl-pds">"</span></span>&gt;
+            &lt;/<span class="pl-ent">div</span>&gt;
+        &lt;/<span class="pl-ent">div</span>&gt;
+    &lt;/<span class="pl-ent">div</span>&gt;
+ &lt;/<span class="pl-ent">div</span>&gt;
+&lt;/<span class="pl-ent">body</span>&gt;</pre></div>
+</blockquote>
+
+<h3>
+<a id="javascript" class="anchor" href="#javascript" aria-hidden="true"><span class="octicon octicon-link"></span></a>Javascript</h3>
+
+<div class="highlight highlight-javascript"><pre>angular.module(<span class="pl-s"><span class="pl-pds">'</span>ngAppDemo<span class="pl-pds">'</span></span>, [<span class="pl-s"><span class="pl-pds">'</span>ultimateDataTableServices<span class="pl-pds">'</span></span>]).controller(<span class="pl-s"><span class="pl-pds">'</span>ngAppDemoController<span class="pl-pds">'</span></span>, [<span class="pl-s"><span class="pl-pds">'</span>$scope<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>datatable<span class="pl-pds">'</span></span>,<span class="pl-k">function</span>(<span class="pl-smi">$scope</span>,<span class="pl-smi">datatable</span>) {
+
+    <span class="pl-c">//Simple example of configuration</span>
+        <span class="pl-k">var</span> datatableConfig <span class="pl-k">=</span> {
+            <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">"</span>simple_datatable<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>columns<span class="pl-pds">"</span></span><span class="pl-k">:</span>[
+                {
+                    <span class="pl-s"><span class="pl-pds">"</span>header<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>,
+                    <span class="pl-s"><span class="pl-pds">"</span>property<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>,
+                    <span class="pl-s"><span class="pl-pds">"</span>order<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">true</span>,
+                    <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span>,
+                    <span class="pl-s"><span class="pl-pds">"</span>edit<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">true</span>
+                },
+                {
+                    <span class="pl-s"><span class="pl-pds">"</span>header<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">"</span>test2<span class="pl-pds">"</span></span>,
+                    <span class="pl-s"><span class="pl-pds">"</span>property<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">"</span>test2<span class="pl-pds">"</span></span>,
+                    <span class="pl-s"><span class="pl-pds">"</span>order<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">true</span>,
+                    <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span>
+                }
+            ],
+            <span class="pl-s"><span class="pl-pds">"</span>edit<span class="pl-pds">"</span></span><span class="pl-k">:</span>{
+                <span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">true</span>,
+                <span class="pl-s"><span class="pl-pds">"</span>columnMode<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">true</span>
+            },
+            <span class="pl-s"><span class="pl-pds">"</span>pagination<span class="pl-pds">"</span></span><span class="pl-k">:</span>{
+                <span class="pl-s"><span class="pl-pds">"</span>mode<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>local<span class="pl-pds">'</span></span>
+            },
+            <span class="pl-s"><span class="pl-pds">"</span>order<span class="pl-pds">"</span></span><span class="pl-k">:</span>{
+                <span class="pl-s"><span class="pl-pds">"</span>mode<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>local<span class="pl-pds">'</span></span>
+            },
+            <span class="pl-s"><span class="pl-pds">"</span>remove<span class="pl-pds">"</span></span><span class="pl-k">:</span>{
+                <span class="pl-s"><span class="pl-pds">"</span>active<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">true</span>,
+                <span class="pl-s"><span class="pl-pds">"</span>mode<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>local<span class="pl-pds">'</span></span>
+            }
+        };
+
+        <span class="pl-c">//Simple exemple of data</span>
+        <span class="pl-k">var</span> datatableData <span class="pl-k">=</span> [{<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">"</span>test2<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1000</span>},{<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">"</span>test2<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1000</span>},{<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">"</span>test2<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1000</span>},
+        {<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">"</span>test2<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1000</span>},{<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">"</span>test2<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1000</span>},{<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">"</span>test2<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1000</span>},
+        {<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">"</span>test2<span class="pl-pds">"</span></span><span class="pl-k">:</span><span class="pl-c1">1000</span>}];
+
+        <span class="pl-c">//Init the datatable with his configuration</span>
+        $scope.datatable <span class="pl-k">=</span> datatable(datatableConfig);
+        <span class="pl-c">//Set the data to the datatable</span>
+        $scope.datatable.setData(datatableData);
+}]);</pre></div>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/institut-de-genomique/Ultimate-DataTable/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/institut-de-genomique/Ultimate-DataTable/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/institut-de-genomique/Ultimate-DataTable"></a> is maintained by <a href="https://github.com/institut-de-genomique">institut-de-genomique</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
