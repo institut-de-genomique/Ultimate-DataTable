@@ -20,7 +20,7 @@ You can [fork this project in GitHub](https://github.com/institut-de-genomique/U
 	<li><a href="https://angularjs.org/">AngularJS</a></li>
 	<li><a href="https://jquery.com/">Jquery</a></li>
 	<li><a href="http://getbootstrap.com/">Bootstrap CSS and Javascript (3.x)</a></li>
-	<li><a href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</li>
+	<li><a href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</a></li>
 </ul>
 ```html
  <link rel="stylesheet" href="http://institut-de-genomique.github.io/Ultimate-DataTable/js/bootstrap/css/bootstrap-3.3.4.min.css">
