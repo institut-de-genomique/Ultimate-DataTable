@@ -1,7 +1,7 @@
 # Welcome to the Ultimate DataTable project page
 
 > This [AngularJS](http://www.angularjs.org) directive generate a HTML table with build-in fonctionnality like save, edit, remove, pagination etc...
-You can [fork this project in GitHub](http://github.com/) to help us out !
+You can [fork this project in GitHub](https://github.com/institut-de-genomique/Ultimate-DataTable/) to help us out !
 
 > **Keep in mind that this documentation is a work in progress**
 
