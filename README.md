@@ -8,7 +8,7 @@
 
 ##Demo
 
-> Url demo
+> [Demo](http://institut-de-genomique.github.io/Ultimate-DataTable/)
 
 ## Quick start
 ###  Dependencies
@@ -16,10 +16,10 @@
 <ul>
 	<li>The Ultimate DataTable js file</li>
 	<li>The Ultimate DataTable css file</li>
-	<li>[AngularJS](https://angularjs.org/)</li>
-	<li>[Jquery](https://jquery.com/)</li>
-	<li>[Bootstrap CSS and Javascript (3.x)](http://getbootstrap.com/)</li>
-	<li>[Font Awesome](http://fortawesome.github.io/Font-Awesome/)</li>
+	<li><a href="https://angularjs.org/">AngularJS</a></li>
+	<li><a href="https://jquery.com/">Jquery</a></li>
+	<li><a href="http://getbootstrap.com/">Bootstrap CSS and Javascript (3.x)</a></li>
+	<li><a href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</li>
 </ul>
 ### HTML
 ```html
