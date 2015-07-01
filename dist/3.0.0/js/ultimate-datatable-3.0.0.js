@@ -4,7 +4,7 @@
 "use strict";
 
 angular.module('ultimateDataTableServices', []).
-    	factory('datatable', ['$http', '$filter', '$parse', '$compile', '$sce', '$window', '$q','udtI18n', function($http, $filter, $parse, $compile, $sce, $window, $q, udtI18n){ //service to manage datatable
+    	factory('datatable', ['$http', '$filter', '$parse', '$window', '$q','udtI18n', function($http, $filter, $parse, $window, $q, udtI18n){ //service to manage datatable
     		var constructor = function(iConfig){
 				var datatable = {
 						configDefault:{
