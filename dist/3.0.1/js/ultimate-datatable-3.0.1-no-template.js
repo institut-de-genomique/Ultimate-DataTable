@@ -322,6 +322,9 @@ angular.module('ultimateDataTableServices', []).
 								//Create new line already selected
 								var line = {edit:false, selected:true, trClass:undefined, group:false};
 								this.displayResult.unshift({data:{}, line:line});
+								if(this.config.pagination.numberRecordsPerPage < this.displayResult.length){
+									this.displayResult.splice(this.config.pagination.numberRecordsPerPage,(this.displayResult.length+1)-this.config.pagination.numberRecordsPerPage);
+								}
 								this.allResult.unshift({});
 								this.totalNumberRecords++;
 								
@@ -330,6 +333,8 @@ angular.module('ultimateDataTableServices', []).
 									this.displayResult = this.addGroup(this.displayResult);					
 								}
 								
+								this.computePaginationList();
+
 								//setEdit
 								this.setEdit();
 							}
