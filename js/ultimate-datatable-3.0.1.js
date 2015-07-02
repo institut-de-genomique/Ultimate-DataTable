@@ -1,10 +1,10 @@
-/*! ultimate-datatable version 3.0.0 2015-07-01 
+/*! ultimate-datatable version 3.0.1 2015-07-02 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
 
 angular.module('ultimateDataTableServices', []).
-    	factory('datatable', ['$http', '$filter', '$parse', '$compile', '$sce', '$window', '$q','udtI18n', function($http, $filter, $parse, $compile, $sce, $window, $q, udtI18n){ //service to manage datatable
+    	factory('datatable', ['$http', '$filter', '$parse', '$window', '$q','udtI18n', function($http, $filter, $parse, $window, $q, udtI18n){ //service to manage datatable
     		var constructor = function(iConfig){
 				var datatable = {
 						configDefault:{
@@ -322,6 +322,9 @@ angular.module('ultimateDataTableServices', []).
 								//Create new line already selected
 								var line = {edit:false, selected:true, trClass:undefined, group:false};
 								this.displayResult.unshift({data:{}, line:line});
+								if(this.config.pagination.numberRecordsPerPage < this.displayResult.length){
+									this.displayResult.splice(this.config.pagination.numberRecordsPerPage,(this.displayResult.length+1)-this.config.pagination.numberRecordsPerPage);
+								}
 								this.allResult.unshift({});
 								this.totalNumberRecords++;
 								
@@ -330,6 +333,8 @@ angular.module('ultimateDataTableServices', []).
 									this.displayResult = this.addGroup(this.displayResult);					
 								}
 								
+								this.computePaginationList();
+
 								//setEdit
 								this.setEdit();
 							}
@@ -1135,12 +1140,6 @@ angular.module('ultimateDataTableServices', []).
 		    					this.config.save.error = 0;
 		    					this.config.save.start = false;
 		    					this.setSpinner(false);
-								
-								this.loadUrlColumnProperty();
-			    				this.computeGroup();
-			    				this.sortAllResult();
-			    				this.computePaginationList();
-								this.computeDisplayResult();
 		    				}
 	    					
 		    			},
