@@ -1132,12 +1132,6 @@ angular.module('ultimateDataTableServices', []).
 		    					this.config.save.error = 0;
 		    					this.config.save.start = false;
 		    					this.setSpinner(false);
-								
-								this.loadUrlColumnProperty();
-			    				this.computeGroup();
-			    				this.sortAllResult();
-			    				this.computePaginationList();
-								this.computeDisplayResult();
 		    				}
 	    					
 		    			},
