@@ -3,8 +3,8 @@
 > This [AngularJS](http://www.angularjs.org) directive generate a HTML table with build-in fonctionnality like save, edit, remove, pagination etc...
 
 ##Versions
-> **Current stable version** : 3.0.0<br>
-**Latest version** : 3.0.0
+> **Current stable version** : 3.0.1<br>
+**Latest version** : 3.0.1
 
 ##Demo
 
