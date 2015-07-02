@@ -6,8 +6,8 @@ You can [fork this project in GitHub](https://github.com/institut-de-genomique/U
 > **Keep in mind that this documentation is a work in progress**
 
 ##Versions
-> **Current stable version** : 3.0.0<br>
-**Latest version** : 3.0.0
+> **Current stable version** : 3.0.1<br>
+**Latest version** : 3.0.1
 
 
 ## Quick start
