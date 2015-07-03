@@ -314,6 +314,9 @@ angular.module('ultimateDataTableServices', []).
 								for(var i=0;i<this.displayResult.length;i++){
 									this.saveLocal(this.displayResult[i].data, i);
 								}
+								
+								this.setPageNumber({number:0, clazz:''});
+
 								//Deselect all lines
 								this.selectAll(false);
 								//Create new line already selected
