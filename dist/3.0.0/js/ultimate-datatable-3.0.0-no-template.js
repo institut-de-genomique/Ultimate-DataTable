@@ -237,7 +237,29 @@ angular.module('ultimateDataTableServices', []).
 		    				this.config.pagination.pageNumber = 0;
 							this._search(angular.copy(params));							
     					},
-    					
+						/**
+    					 * local search
+    					 */
+    					searchLocal : function(searchTerms){
+							//Set the properties "" or null to undefined because we don't want to filter this
+							for(var p in searchTerms) {
+								if(searchTerms[p] != undefined && (searchTerms[p] === undefined || searchTerms[p] === null || searchTerms[p] === "")){
+									searchTerms[p] = undefined;
+								}
+							}
+							
+							console.log(searchTerms);
+							var _allResult = angular.copy(this.allResult);
+							this.allResult = $filter('filter')(this.allResult, searchTerms, false);
+							
+							this.totalNumberRecords = this.allResult.length;
+		    				this.computeGroup();
+		    				this.sortAllResult();
+		    				this.computePaginationList();
+		    				this.computeDisplayResult();
+							
+							this.allResult = _allResult;
+						},
     					//search functions
     					/**
 		    			 * Internal Search function to populate the datatable
