@@ -3105,7 +3105,7 @@ run(function($templateCache) {
   		    		+			'<div udt-cell-header/>'
   		    		+		'</td>'
   		    		+	'</tr>'
-  		    		+	'<tr ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
+  		    		+	'<tr ng-repeat="value in udtTable.displayResult|filter:udtTable.searchTerm:false" ng-click="udtTableFunctions.select(value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
   		    		+		'<td ng-repeat="col in udtTable.config.columns" ng-if="!udtTable.isHide(col.id)" ng-class="udtTableFunctions.getTdClass(value.data, col, this)">'
   		    		+		'<div udt-cell/>'
   		    		+		'</td>'
