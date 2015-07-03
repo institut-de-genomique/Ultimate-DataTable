@@ -51,7 +51,8 @@ angular.module('ultimateDataTableServices', []).
 							search : {
 								active:true,
 								mode:'remote', //or local but not implemented
-								url:undefined
+								url:undefined,
+								showLocalSearch:false
 							},
 							pagination:{
 								active:true,
@@ -236,7 +237,31 @@ angular.module('ultimateDataTableServices', []).
 		    				this.config.pagination.pageNumber = 0;
 							this._search(angular.copy(params));							
     					},
-    					
+						/**
+    					 * local search
+    					 */
+    					searchLocal : function(searchTerms){
+							//Set the properties "" or null to undefined because we don't want to filter this
+							for(var p in searchTerms) {
+								if(searchTerms[p] != undefined && (searchTerms[p] === undefined || searchTerms[p] === null || searchTerms[p] === "")){
+									searchTerms[p] = undefined;
+								}
+							}
+							
+							console.log(searchTerms);
+							var _allResult = angular.copy(this.allResult);
+							_allResult = $filter('filter')(this.allResult, searchTerms, false);
+							
+							this._getAllResult = function(){return _allResult;};
+							
+							this.totalNumberRecords = _allResult.length;
+		    				this.sortAllResult();
+		    				this.computePaginationList();
+		    				this.computeDisplayResult();
+						},
+						_getAllResult : function(){
+							return this.allResult;
+						},
     					//search functions
     					/**
 		    			 * Internal Search function to populate the datatable
@@ -280,7 +305,8 @@ angular.module('ultimateDataTableServices', []).
 		    				this.computeGroup();
 		    				this.sortAllResult();
 		    				this.computePaginationList();
-		    				this.computeDisplayResult();		    				
+		    				this.computeDisplayResult();
+							this._getAllResult = function(){return this.allResult;};		    				
 		    			},
 		    			/**
 		    			 * Return all the data
@@ -305,7 +331,8 @@ angular.module('ultimateDataTableServices', []).
 			    				this.computeGroup();
 			    				this.sortAllResult();
 			    				this.computePaginationList();
-			    				this.computeDisplayResult();			    				
+			    				this.computeDisplayResult();
+								this._getAllResult = function(){return this.allResult;};		
 			    			}
 		    			},
 						/**
@@ -548,10 +575,10 @@ angular.module('ultimateDataTableServices', []).
 			    				this.displayResult = displayResultTmp;		
 		    				} else{
 			    				if(configPagination.active && !this.isRemoteMode(configPagination.mode)){
-			    					_displayResult = angular.copy(this.allResult.slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
+			    					_displayResult = angular.copy(this._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
 			    							(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage)));
 			    				}else{ //to manage all records or server pagination
-			    					_displayResult = angular.copy(this.allResult);		    					
+			    					_displayResult = angular.copy(this._getAllResult());		    					
 			    				}
 			    				
 			    				var displayResultTmp = [];
@@ -897,6 +924,7 @@ angular.module('ultimateDataTableServices', []).
 		    			 */
 		    			setEdit : function(column){	
 		    				if(this.config.edit.active){
+								this._getAllResult = function(){return this.allResult;};
 		    					this.config.edit.columns = {};
 			    				var find = false;
 			    				for(var i = 0; i < this.displayResult.length; i++){

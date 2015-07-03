@@ -51,7 +51,8 @@ angular.module('ultimateDataTableServices', []).
 							search : {
 								active:true,
 								mode:'remote', //or local but not implemented
-								url:undefined
+								url:undefined,
+								showLocalSearch:false
 							},
 							pagination:{
 								active:true,
@@ -236,7 +237,31 @@ angular.module('ultimateDataTableServices', []).
 		    				this.config.pagination.pageNumber = 0;
 							this._search(angular.copy(params));							
     					},
-    					
+						/**
+    					 * local search
+    					 */
+    					searchLocal : function(searchTerms){
+							//Set the properties "" or null to undefined because we don't want to filter this
+							for(var p in searchTerms) {
+								if(searchTerms[p] != undefined && (searchTerms[p] === undefined || searchTerms[p] === null || searchTerms[p] === "")){
+									searchTerms[p] = undefined;
+								}
+							}
+							
+							console.log(searchTerms);
+							var _allResult = angular.copy(this.allResult);
+							_allResult = $filter('filter')(this.allResult, searchTerms, false);
+							
+							this._getAllResult = function(){return _allResult;};
+							
+							this.totalNumberRecords = _allResult.length;
+		    				this.sortAllResult();
+		    				this.computePaginationList();
+		    				this.computeDisplayResult();
+						},
+						_getAllResult : function(){
+							return this.allResult;
+						},
     					//search functions
     					/**
 		    			 * Internal Search function to populate the datatable
@@ -280,7 +305,8 @@ angular.module('ultimateDataTableServices', []).
 		    				this.computeGroup();
 		    				this.sortAllResult();
 		    				this.computePaginationList();
-		    				this.computeDisplayResult();		    				
+		    				this.computeDisplayResult();
+							this._getAllResult = function(){return this.allResult;};		    				
 		    			},
 		    			/**
 		    			 * Return all the data
@@ -305,7 +331,8 @@ angular.module('ultimateDataTableServices', []).
 			    				this.computeGroup();
 			    				this.sortAllResult();
 			    				this.computePaginationList();
-			    				this.computeDisplayResult();			    				
+			    				this.computeDisplayResult();
+								this._getAllResult = function(){return this.allResult;};		
 			    			}
 		    			},
 						/**
@@ -548,10 +575,10 @@ angular.module('ultimateDataTableServices', []).
 			    				this.displayResult = displayResultTmp;		
 		    				} else{
 			    				if(configPagination.active && !this.isRemoteMode(configPagination.mode)){
-			    					_displayResult = angular.copy(this.allResult.slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
+			    					_displayResult = angular.copy(this._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
 			    							(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage)));
 			    				}else{ //to manage all records or server pagination
-			    					_displayResult = angular.copy(this.allResult);		    					
+			    					_displayResult = angular.copy(this._getAllResult());		    					
 			    				}
 			    				
 			    				var displayResultTmp = [];
@@ -897,6 +924,7 @@ angular.module('ultimateDataTableServices', []).
 		    			 */
 		    			setEdit : function(column){	
 		    				if(this.config.edit.active){
+								this._getAllResult = function(){return this.allResult;};
 		    					this.config.edit.columns = {};
 			    				var find = false;
 			    				for(var i = 0; i < this.displayResult.length; i++){
@@ -3085,7 +3113,7 @@ run(function($templateCache) {
   		    		+			'<div udt-cell-header/>'
   		    		+		'</td>'
   		    		+	'</tr>'
-  		    		+	'<tr ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
+  		    		+	'<tr ng-repeat="value in udtTable.displayResult|filter:udtTable.searchTerm:false" ng-click="udtTableFunctions.select(value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
   		    		+		'<td ng-repeat="col in udtTable.config.columns" ng-if="!udtTable.isHide(col.id)" ng-class="udtTableFunctions.getTdClass(value.data, col, this)">'
   		    		+		'<div udt-cell/>'
   		    		+		'</td>'
@@ -3223,9 +3251,11 @@ run(function($templateCache) {
   		    		+		'</li>'
   		    		+	'</ul>'
   		    		+'</div>'
-  		    		
   		    		+'<div class="btn-group" ng-if="udtTable.isShowOtherButtons()" udt-compile="udtTable.config.otherButtons.template"></div>'
   		    		+'</div>'
+              + '<div class="form-group col-md-2" ng-if="udtTable.config.search.showLocalSearch === true">'
+              +   '<input class="form-control" type="text" ng-model="searchTerms.$" ng-change="udtTable.searchLocal(searchTerms)">'
+              + '</div>'
   		    		+'<div class="btn-toolbar pull-right" name="udt-toolbar-results"  ng-if="udtTable.isShowToolbarResults()">'
   		    		+	'<button class="btn btn-info" disabled="disabled" ng-if="udtTable.config.showTotalNumberRecords">{{udtTableFunctions.messagesDatatable(\'datatable.totalNumberRecords\', udtTableFunctions.getTotalNumberRecords())}}</button>'
   		    		+'</div>'

@@ -177,11 +177,7 @@ run(function($templateCache) {
   		    		+'<div class="btn-group" ng-if="udtTable.isShowOtherButtons()" udt-compile="udtTable.config.otherButtons.template"></div>'
   		    		+'</div>'
               + '<div class="form-group col-md-2" ng-if="udtTable.config.search.showLocalSearch === true">'
-<<<<<<< HEAD
               +   '<input class="form-control" type="text" ng-model="searchTerms.$" ng-change="udtTable.searchLocal(searchTerms)">'
-=======
-              +   '<input class="form-control" type="text" ng-model="udtTable.searchTerm.data.$">'
->>>>>>> 4478b20a8302220d8985e6e4c1ba043c477e08b3
               + '</div>'
   		    		+'<div class="btn-toolbar pull-right" name="udt-toolbar-results"  ng-if="udtTable.isShowToolbarResults()">'
   		    		+	'<button class="btn btn-info" disabled="disabled" ng-if="udtTable.config.showTotalNumberRecords">{{udtTableFunctions.messagesDatatable(\'datatable.totalNumberRecords\', udtTableFunctions.getTotalNumberRecords())}}</button>'
