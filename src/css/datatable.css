@@ -59,3 +59,12 @@
     /*width: 100%;*/
     z-index: 1040;
 }
+
+.datatable .input-compact {
+	height:28px;
+}
+
+.datatable .angular-highlight {
+	background-color:	rgba(89,186,238,0.4);
+	font-weight:		bold;
+}

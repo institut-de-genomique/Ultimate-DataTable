@@ -18,6 +18,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save":"Sauvegarder",
 							"datatable.button.add":"Ajouter",
 							"datatable.button.remove":"Supprimer",
+							"datatable.button.searchLocal":"Rechercher",
+							"datatable.button.resetSearchLocal":"Annuler",
 							"datatable.button.length" : "Taille ({0})",
 							"datatable.totalNumberRecords" : "{0} Résultat(s)",
 							"datatable.button.exportCSV" : "Export CSV",
@@ -52,6 +54,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save":"Save",
 							"datatable.button.add":"Add",
 							"datatable.button.remove":"Remove",
+							"datatable.button.searchLocal":"Search",
+							"datatable.button.resetSearchLocal":"Cancel",
 							"datatable.button.length" : "Size ({0})",
 							"datatable.totalNumberRecords" : "{0} Result(s)",
 							"datatable.button.exportCSV" : "CSV Export",
@@ -70,7 +74,7 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup" : "Group All selected lines",
 							"datatable.button.basicExportCSV" : "Export all lines",
 							"datatable.button.groupedExportCSV" : "Export only grouped lines",
-							"datatable.button.showOnlyGroups" : "See only group"	
+							"datatable.button.showOnlyGroups" : "See only group"
 						}
 					},
 					

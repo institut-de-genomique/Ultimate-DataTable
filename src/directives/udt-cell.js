@@ -50,7 +50,7 @@ directive("udtCell", function(){
 	    				}else{
 	    					editElement = "Edit Not Defined for col.type !";
 	    				}		    						    				
-	    				return '<div class="form-group" ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
+	    				return '<div class="form-group"  ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
 	    			};
 	    			
 	    			
@@ -155,7 +155,7 @@ directive("udtCell", function(){
 	    						if(!col.format)console.log("missing format for img !!");
 	    						return '<img ng-src="data:image/'+col.format+';base64,{{cellValue}}" style="max-width:{{col.width}}"/>';		    					    
 	    					} else{
-	    						return '<span ng-bind="cellValue"></span>';
+	    						return '<span highlight="cellValue" keywords="udtTable.searchTerms.$" ></span>';
 	    					}
 	    				}	  
 	    			};

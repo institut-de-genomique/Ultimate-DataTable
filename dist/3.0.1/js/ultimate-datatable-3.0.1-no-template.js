@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.0.1 2015-07-03 
+/*! ultimate-datatable version 3.0.1 2015-07-07 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -2011,7 +2011,52 @@ angular.module('ultimateDataTableServices', []).
     		}
     		return constructor;
     	}]); 
-;angular.module('ultimateDataTableServices').
+;angular.module('ultimateDataTableServices').directive('highlight', function() {
+	var component = function(scope, element, attrs) {
+		
+		if (!attrs.highlightClass) {
+			attrs.highlightClass = 'angular-highlight';
+		}
+		
+		var replacer = function(match, item) {
+			return '<span class="'+attrs.highlightClass+'">'+match+'</span>';
+		}
+		var tokenize = function(keywords) {
+			keywords = keywords.replace(new RegExp(',$','g'), '').split(',');
+			var i;
+			var l = keywords.length;
+			for (i=0;i<l;i++) {
+				keywords[i] = keywords[i].replace(new RegExp('^ | $','g'), '');
+			}
+			return keywords;
+		}
+		
+		scope.$watch('keywords', function(newValue, oldValue) {
+			//console.log("scope.keywords",scope.keywords);
+			if (!newValue || newValue == '') {
+				element.html(scope.highlight.toString());
+				return false;
+			}
+			
+			
+			var tokenized = tokenize(newValue);
+			var regex = new RegExp(tokenized.join('|'), 'gmi');
+			
+			// Find the words
+			var html = scope.highlight.toString().replace(regex, replacer);
+			
+			element.html(html);
+		}, true);
+	}
+	return {
+		link: 			component,
+		replace:		false,
+		scope:			{
+			highlight:	'=',
+			keywords:	'='
+		}
+	};
+});;angular.module('ultimateDataTableServices').
 //If the select or multiple choices contain 1 element, this directive select it automaticaly
 //EXAMPLE: <select ng-model="x" ng-option="x as x for x in x" udtAutoselect>...</select>
 directive('udtAutoselect',['$parse', function($parse) {
@@ -2307,7 +2352,7 @@ directive("udtCell", function(){
 	    				}else{
 	    					editElement = "Edit Not Defined for col.type !";
 	    				}		    						    				
-	    				return '<div class="form-group" ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
+	    				return '<div class="form-group"  ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
 	    			};
 	    			
 	    			
@@ -2412,7 +2457,7 @@ directive("udtCell", function(){
 	    						if(!col.format)console.log("missing format for img !!");
 	    						return '<img ng-src="data:image/'+col.format+';base64,{{cellValue}}" style="max-width:{{col.width}}"/>';		    					    
 	    					} else{
-	    						return '<span ng-bind="cellValue"></span>';
+	    						return '<span highlight="cellValue" keywords="udtTable.searchTerms.$" ></span>';
 	    					}
 	    				}	  
 	    			};
@@ -3004,6 +3049,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save":"Sauvegarder",
 							"datatable.button.add":"Ajouter",
 							"datatable.button.remove":"Supprimer",
+							"datatable.button.searchLocal":"Rechercher",
+							"datatable.button.resetSearchLocal":"Annuler",
 							"datatable.button.length" : "Taille ({0})",
 							"datatable.totalNumberRecords" : "{0} Résultat(s)",
 							"datatable.button.exportCSV" : "Export CSV",
@@ -3038,6 +3085,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save":"Save",
 							"datatable.button.add":"Add",
 							"datatable.button.remove":"Remove",
+							"datatable.button.searchLocal":"Search",
+							"datatable.button.resetSearchLocal":"Cancel",
 							"datatable.button.length" : "Size ({0})",
 							"datatable.totalNumberRecords" : "{0} Result(s)",
 							"datatable.button.exportCSV" : "CSV Export",
@@ -3056,7 +3105,7 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup" : "Group All selected lines",
 							"datatable.button.basicExportCSV" : "Export all lines",
 							"datatable.button.groupedExportCSV" : "Export only grouped lines",
-							"datatable.button.showOnlyGroups" : "See only group"	
+							"datatable.button.showOnlyGroups" : "See only group"
 						}
 					},
 					
