@@ -19,19 +19,22 @@
 						"header":"Title",
 						"property":"title",
 						"order":true,
-						"type":"text"
+						"type":"text",
+						"groupMethod":"collect"
 					},
 					{
 						"header":"Date removed",
 						"property":"date_removed",
 						"order":true,
+						"group":true,
 						"type":"date"
 					},
 					{
 						"header":"Description",
 						"property":"description",
 						"order":true,
-						"type":"text"
+						"type":"text",
+						"groupMethod":"collect"
 					},
 					{
 						"header":"URL",
@@ -39,9 +42,8 @@
 						"order":true,
 						"type":"text",
 						"edit":true,
-						"group":true,
-						"render":"<a target='blank' ng-href='{{cellValue}}'>{{cellValue}}</a>",
-						"groupMethod":"collect"
+						"groupMethod":"collect",
+						"render":"<a target='blank' ng-href='{{cellValue}}'>{{cellValue}}</a>"
 					}
 					
 				],
