@@ -1,13 +1,18 @@
-angular.module('ultimateDataTableServices').directive('highlight', function() {
+angular.module('ultimateDataTableServices').directive('udtHighlight', function() {
 	var component = function(scope, element, attrs) {
 		
 		if (!attrs.highlightClass) {
-			attrs.highlightClass = 'angular-highlight';
+			attrs.highlightClass = 'udt-highlight';
+		}
+		
+		if (!attrs.active) {
+			scope.active = true;
 		}
 		
 		var replacer = function(match, item) {
 			return '<span class="'+attrs.highlightClass+'">'+match+'</span>';
 		}
+		
 		var tokenize = function(keywords) {
 			keywords = keywords.replace(new RegExp(',$','g'), '').split(',');
 			var i;
@@ -19,9 +24,8 @@ angular.module('ultimateDataTableServices').directive('highlight', function() {
 		}
 		
 		scope.$watch('keywords', function(newValue, oldValue) {
-			//console.log("scope.keywords",scope.keywords);
-			if (!newValue || newValue == '') {
-				element.html(scope.highlight.toString());
+			if (!newValue || newValue == '' || !scope.active) {
+				element.html(scope.udtHighlight.toString());
 				return false;
 			}
 			
@@ -30,7 +34,7 @@ angular.module('ultimateDataTableServices').directive('highlight', function() {
 			var regex = new RegExp(tokenized.join('|'), 'gmi');
 			
 			// Find the words
-			var html = scope.highlight.toString().replace(regex, replacer);
+			var html = scope.udtHighlight.toString().replace(regex, replacer);
 			
 			element.html(html);
 		}, true);
@@ -39,7 +43,8 @@ angular.module('ultimateDataTableServices').directive('highlight', function() {
 		link: 			component,
 		replace:		false,
 		scope:			{
-			highlight:	'=',
+			active:		'=',
+			udtHighlight:	'=',
 			keywords:	'='
 		}
 	};

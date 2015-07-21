@@ -63,6 +63,29 @@
 	"callback":function(datatable, errorsNumber){} //used to have a callback after save all elements.
 }
 ```
+## Search
+> This option handle the search function, to search you have to call datatableObject.search(form).
+```json
+"search": {
+	active:boolean,
+	url:"theUrl",//Required if mode is remote
+}
+```
+The server have to respond with data in JSON: 
+```json
+{
+"data": [...]
+"recordsNumber":numberOfRecords
+}
+```
+## Filter
+> If active, add a input field to search locally on all data, the highlight option highlight the search term in the datatable if active
+```json
+"filter": {
+	active:boolean,//Active or not
+	highlight:boolean
+}
+```
 ## Edit
 > This option handle the edit function
 ```json

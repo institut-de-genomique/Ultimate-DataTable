@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.0.1 2015-07-07 
+/*! ultimate-datatable version 3.1.0 2015-07-21 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -50,9 +50,12 @@ angular.module('ultimateDataTableServices', []).
 							},
 							search : {
 								active:true,
-								mode:'remote', //or local but not implemented
-								url:undefined,
-								showLocalSearch:false
+								mode:'remote',
+								url:undefined
+							},
+							filter : {
+								active:false,
+								highlight:false
 							},
 							pagination:{
 								active:true,
@@ -241,23 +244,24 @@ angular.module('ultimateDataTableServices', []).
     					 * local search
     					 */
     					searchLocal : function(searchTerms){
-							//Set the properties "" or null to undefined because we don't want to filter this
-							for(var p in searchTerms) {
-								if(searchTerms[p] != undefined && (searchTerms[p] === undefined || searchTerms[p] === null || searchTerms[p] === "")){
-									searchTerms[p] = undefined;
+							if(this.config.filter.active === true){
+								//Set the properties "" or null to undefined because we don't want to filter this
+								for(var p in searchTerms) {
+									if(searchTerms[p] != undefined && (searchTerms[p] === undefined || searchTerms[p] === null || searchTerms[p] === "")){
+										searchTerms[p] = undefined;
+									}
 								}
+								
+								var _allResult = angular.copy(this.allResult);
+								_allResult = $filter('filter')(this.allResult, searchTerms, false);
+								
+								this._getAllResult = function(){return _allResult;};
+								
+								this.totalNumberRecords = _allResult.length;
+								this.sortAllResult();
+								this.computePaginationList();
+								this.computeDisplayResult();
 							}
-							
-							console.log(searchTerms);
-							var _allResult = angular.copy(this.allResult);
-							_allResult = $filter('filter')(this.allResult, searchTerms, false);
-							
-							this._getAllResult = function(){return _allResult;};
-							
-							this.totalNumberRecords = _allResult.length;
-		    				this.sortAllResult();
-		    				this.computePaginationList();
-		    				this.computeDisplayResult();
 						},
 						_getAllResult : function(){
 							return this.allResult;
@@ -2011,52 +2015,7 @@ angular.module('ultimateDataTableServices', []).
     		}
     		return constructor;
     	}]); 
-;angular.module('ultimateDataTableServices').directive('highlight', function() {
-	var component = function(scope, element, attrs) {
-		
-		if (!attrs.highlightClass) {
-			attrs.highlightClass = 'angular-highlight';
-		}
-		
-		var replacer = function(match, item) {
-			return '<span class="'+attrs.highlightClass+'">'+match+'</span>';
-		}
-		var tokenize = function(keywords) {
-			keywords = keywords.replace(new RegExp(',$','g'), '').split(',');
-			var i;
-			var l = keywords.length;
-			for (i=0;i<l;i++) {
-				keywords[i] = keywords[i].replace(new RegExp('^ | $','g'), '');
-			}
-			return keywords;
-		}
-		
-		scope.$watch('keywords', function(newValue, oldValue) {
-			//console.log("scope.keywords",scope.keywords);
-			if (!newValue || newValue == '') {
-				element.html(scope.highlight.toString());
-				return false;
-			}
-			
-			
-			var tokenized = tokenize(newValue);
-			var regex = new RegExp(tokenized.join('|'), 'gmi');
-			
-			// Find the words
-			var html = scope.highlight.toString().replace(regex, replacer);
-			
-			element.html(html);
-		}, true);
-	}
-	return {
-		link: 			component,
-		replace:		false,
-		scope:			{
-			highlight:	'=',
-			keywords:	'='
-		}
-	};
-});;angular.module('ultimateDataTableServices').
+;angular.module('ultimateDataTableServices').
 //If the select or multiple choices contain 1 element, this directive select it automaticaly
 //EXAMPLE: <select ng-model="x" ng-option="x as x for x in x" udtAutoselect>...</select>
 directive('udtAutoselect',['$parse', function($parse) {
@@ -2457,7 +2416,7 @@ directive("udtCell", function(){
 	    						if(!col.format)console.log("missing format for img !!");
 	    						return '<img ng-src="data:image/'+col.format+';base64,{{cellValue}}" style="max-width:{{col.width}}"/>';		    					    
 	    					} else{
-	    						return '<span highlight="cellValue" keywords="udtTable.searchTerms.$" ></span>';
+	    						return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
 	    					}
 	    				}	  
 	    			};
@@ -2645,7 +2604,57 @@ directive('udtForm', function(){
   		    	link: function(scope, element, attr) {
   		    	}
     		};
-    	});;angular.module('ultimateDataTableServices').
+    	});;angular.module('ultimateDataTableServices').directive('udtHighlight', function() {
+	var component = function(scope, element, attrs) {
+		
+		if (!attrs.highlightClass) {
+			attrs.highlightClass = 'udt-highlight';
+		}
+		
+		if (!attrs.active) {
+			scope.active = true;
+		}
+		
+		var replacer = function(match, item) {
+			return '<span class="'+attrs.highlightClass+'">'+match+'</span>';
+		}
+		
+		var tokenize = function(keywords) {
+			keywords = keywords.replace(new RegExp(',$','g'), '').split(',');
+			var i;
+			var l = keywords.length;
+			for (i=0;i<l;i++) {
+				keywords[i] = keywords[i].replace(new RegExp('^ | $','g'), '');
+			}
+			return keywords;
+		}
+		
+		scope.$watch('keywords', function(newValue, oldValue) {
+			if (!newValue || newValue == '' || !scope.active) {
+				element.html(scope.udtHighlight.toString());
+				return false;
+			}
+			
+			
+			var tokenized = tokenize(newValue);
+			var regex = new RegExp(tokenized.join('|'), 'gmi');
+			
+			// Find the words
+			var html = scope.udtHighlight.toString().replace(regex, replacer);
+			
+			element.html(html);
+		}, true);
+	}
+	return {
+		link: 			component,
+		replace:		false,
+		scope:			{
+			active:		'=',
+			udtHighlight:	'=',
+			keywords:	'='
+		}
+	};
+});;angular.module('ultimateDataTableServices').
 directive("udtHtmlFilter", function($filter) {
 				return {
 					  require: 'ngModel',
@@ -3301,14 +3310,14 @@ run(function($templateCache) {
   		    		+'</div>'
   		    		+'<div class="btn-group" ng-if="udtTable.isShowOtherButtons()" udt-compile="udtTable.config.otherButtons.template"></div>'
   		    		+'</div>'
-					+ '<div class="col-xs-2 .col-sm-3 col-md-3 col-lg-3" ng-if="udtTable.config.search.showLocalSearch === true">'
+					+ '<div class="col-xs-2 .col-sm-3 col-md-3 col-lg-3" ng-if="udtTable.config.filter.active === true">'
 					+  '<div class="col-xs-12 .col-sm-6 col-md-7 col-lg-8 input-group" ng-if="udtTable.isCompactMode()">'
 					+   '<input class="form-control input-compact" type="text" ng-model="udtTable.searchTerms.$" ng-keydown="$event.keyCode==13 ? udtTable.searchLocal(udtTable.searchTerms) : \'\'">'
 					+	'<span class="input-group-btn">'
-					+		'<button ng-if="udtTable.config.search.showLocalSearch === true" class="btn btn-default search-button" ng-click="udtTable.searchLocal(udtTable.searchTerms)" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.searchLocal\')}}">'
+					+		'<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchLocal(udtTable.searchTerms)" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.searchLocal\')}}">'
   		    		+			'<i class="fa fa-search"></i>'
   		    		+		'</button>'	
-					+		'<button ng-if="udtTable.config.search.showLocalSearch === true" class="btn btn-default search-button" ng-click="udtTable.searchTerms={};udtTable.searchLocal()" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.resetSearchLocal\')}}">'
+					+		'<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchTerms={};udtTable.searchLocal()" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.resetSearchLocal\')}}">'
   		    		+			'<i class="fa fa-times"></i>'
   		    		+		'</button>'
 					+ '</span>'
@@ -3316,11 +3325,11 @@ run(function($templateCache) {
 					+  '<div class="col-xs-12 .col-sm-12 col-md-12 col-lg-12 input-group" ng-if="!udtTable.isCompactMode()">'
 					+   '<input class="form-control" type="text" ng-model="udtTable.searchTerms.$">'
 					+	'<span class="input-group-btn">'
-					+		'<button ng-if="udtTable.config.search.showLocalSearch === true" class="btn btn-default search-button" ng-click="udtTable.searchLocal(udtTable.searchTerms)" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.searchLocal\')}}">'
+					+		'<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchLocal(udtTable.searchTerms)" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.searchLocal\')}}">'
   		    		+			'<i class="fa fa-search"></i>'
 					+			'<span> {{udtTableFunctions.messagesDatatable(\'datatable.button.searchLocal\')}} </span>'
   		    		+		'</button>'	
-					+		'<button ng-if="udtTable.config.search.showLocalSearch === true" class="btn btn-default search-button" ng-click="udtTable.searchTerms={};udtTable.searchLocal()" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.resetSearchLocal\')}}">'
+					+		'<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchTerms={};udtTable.searchLocal()" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.resetSearchLocal\')}}">'
   		    		+			'<i class="fa fa-times"></i>'
 					+			'<span> {{udtTableFunctions.messagesDatatable(\'datatable.button.resetSearchLocal\')}} </span>'
   		    		+		'</button>'

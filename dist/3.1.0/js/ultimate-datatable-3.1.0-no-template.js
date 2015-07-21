@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.0.0 2015-07-02 
+/*! ultimate-datatable version 3.1.0 2015-07-21 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -50,9 +50,12 @@ angular.module('ultimateDataTableServices', []).
 							},
 							search : {
 								active:true,
-								mode:'remote', //or local but not implemented
-								url:undefined,
-								showLocalSearch:false
+								mode:'remote',
+								url:undefined
+							},
+							filter : {
+								active:false,
+								highlight:false
 							},
 							pagination:{
 								active:true,
@@ -241,23 +244,24 @@ angular.module('ultimateDataTableServices', []).
     					 * local search
     					 */
     					searchLocal : function(searchTerms){
-							//Set the properties "" or null to undefined because we don't want to filter this
-							for(var p in searchTerms) {
-								if(searchTerms[p] != undefined && (searchTerms[p] === undefined || searchTerms[p] === null || searchTerms[p] === "")){
-									searchTerms[p] = undefined;
+							if(this.config.filter.active === true){
+								//Set the properties "" or null to undefined because we don't want to filter this
+								for(var p in searchTerms) {
+									if(searchTerms[p] != undefined && (searchTerms[p] === undefined || searchTerms[p] === null || searchTerms[p] === "")){
+										searchTerms[p] = undefined;
+									}
 								}
+								
+								var _allResult = angular.copy(this.allResult);
+								_allResult = $filter('filter')(this.allResult, searchTerms, false);
+								
+								this._getAllResult = function(){return _allResult;};
+								
+								this.totalNumberRecords = _allResult.length;
+								this.sortAllResult();
+								this.computePaginationList();
+								this.computeDisplayResult();
 							}
-							
-							console.log(searchTerms);
-							var _allResult = angular.copy(this.allResult);
-							_allResult = $filter('filter')(this.allResult, searchTerms, false);
-							
-							this._getAllResult = function(){return _allResult;};
-							
-							this.totalNumberRecords = _allResult.length;
-		    				this.sortAllResult();
-		    				this.computePaginationList();
-		    				this.computeDisplayResult();
 						},
 						_getAllResult : function(){
 							return this.allResult;
@@ -344,11 +348,17 @@ angular.module('ultimateDataTableServices', []).
 								for(var i=0;i<this.displayResult.length;i++){
 									this.saveLocal(this.displayResult[i].data, i);
 								}
+								
+								this.setPageNumber({number:0, clazz:''});
+
 								//Deselect all lines
 								this.selectAll(false);
 								//Create new line already selected
 								var line = {edit:false, selected:true, trClass:undefined, group:false};
 								this.displayResult.unshift({data:{}, line:line});
+								if(this.config.pagination.numberRecordsPerPage < this.displayResult.length){
+									this.displayResult.splice(this.config.pagination.numberRecordsPerPage,(this.displayResult.length+1)-this.config.pagination.numberRecordsPerPage);
+								}
 								this.allResult.unshift({});
 								this.totalNumberRecords++;
 								
@@ -357,6 +367,8 @@ angular.module('ultimateDataTableServices', []).
 									this.displayResult = this.addGroup(this.displayResult);					
 								}
 								
+								this.computePaginationList();
+
 								//setEdit
 								this.setEdit();
 							}
@@ -2299,7 +2311,7 @@ directive("udtCell", function(){
 	    				}else{
 	    					editElement = "Edit Not Defined for col.type !";
 	    				}		    						    				
-	    				return '<div class="form-group" ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
+	    				return '<div class="form-group"  ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
 	    			};
 	    			
 	    			
@@ -2404,7 +2416,7 @@ directive("udtCell", function(){
 	    						if(!col.format)console.log("missing format for img !!");
 	    						return '<img ng-src="data:image/'+col.format+';base64,{{cellValue}}" style="max-width:{{col.width}}"/>';		    					    
 	    					} else{
-	    						return '<span ng-bind="cellValue"></span>';
+	    						return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
 	    					}
 	    				}	  
 	    			};
@@ -2592,7 +2604,57 @@ directive('udtForm', function(){
   		    	link: function(scope, element, attr) {
   		    	}
     		};
-    	});;angular.module('ultimateDataTableServices').
+    	});;angular.module('ultimateDataTableServices').directive('udtHighlight', function() {
+	var component = function(scope, element, attrs) {
+		
+		if (!attrs.highlightClass) {
+			attrs.highlightClass = 'udt-highlight';
+		}
+		
+		if (!attrs.active) {
+			scope.active = true;
+		}
+		
+		var replacer = function(match, item) {
+			return '<span class="'+attrs.highlightClass+'">'+match+'</span>';
+		}
+		
+		var tokenize = function(keywords) {
+			keywords = keywords.replace(new RegExp(',$','g'), '').split(',');
+			var i;
+			var l = keywords.length;
+			for (i=0;i<l;i++) {
+				keywords[i] = keywords[i].replace(new RegExp('^ | $','g'), '');
+			}
+			return keywords;
+		}
+		
+		scope.$watch('keywords', function(newValue, oldValue) {
+			if (!newValue || newValue == '' || !scope.active) {
+				element.html(scope.udtHighlight.toString());
+				return false;
+			}
+			
+			
+			var tokenized = tokenize(newValue);
+			var regex = new RegExp(tokenized.join('|'), 'gmi');
+			
+			// Find the words
+			var html = scope.udtHighlight.toString().replace(regex, replacer);
+			
+			element.html(html);
+		}, true);
+	}
+	return {
+		link: 			component,
+		replace:		false,
+		scope:			{
+			active:		'=',
+			udtHighlight:	'=',
+			keywords:	'='
+		}
+	};
+});;angular.module('ultimateDataTableServices').
 directive("udtHtmlFilter", function($filter) {
 				return {
 					  require: 'ngModel',
@@ -2996,6 +3058,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save":"Sauvegarder",
 							"datatable.button.add":"Ajouter",
 							"datatable.button.remove":"Supprimer",
+							"datatable.button.searchLocal":"Rechercher",
+							"datatable.button.resetSearchLocal":"Annuler",
 							"datatable.button.length" : "Taille ({0})",
 							"datatable.totalNumberRecords" : "{0} Résultat(s)",
 							"datatable.button.exportCSV" : "Export CSV",
@@ -3030,6 +3094,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save":"Save",
 							"datatable.button.add":"Add",
 							"datatable.button.remove":"Remove",
+							"datatable.button.searchLocal":"Search",
+							"datatable.button.resetSearchLocal":"Cancel",
 							"datatable.button.length" : "Size ({0})",
 							"datatable.totalNumberRecords" : "{0} Result(s)",
 							"datatable.button.exportCSV" : "CSV Export",
@@ -3048,7 +3114,7 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup" : "Group All selected lines",
 							"datatable.button.basicExportCSV" : "Export all lines",
 							"datatable.button.groupedExportCSV" : "Export only grouped lines",
-							"datatable.button.showOnlyGroups" : "See only group"	
+							"datatable.button.showOnlyGroups" : "See only group"
 						}
 					},
 					

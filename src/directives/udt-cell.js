@@ -155,7 +155,7 @@ directive("udtCell", function(){
 	    						if(!col.format)console.log("missing format for img !!");
 	    						return '<img ng-src="data:image/'+col.format+';base64,{{cellValue}}" style="max-width:{{col.width}}"/>';		    					    
 	    					} else{
-	    						return '<span highlight="cellValue" keywords="udtTable.searchTerms.$" ></span>';
+	    						return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
 	    					}
 	    				}	  
 	    			};

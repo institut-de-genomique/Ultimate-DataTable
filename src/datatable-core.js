@@ -47,9 +47,12 @@ angular.module('ultimateDataTableServices', []).
 							},
 							search : {
 								active:true,
-								mode:'remote', //or local but not implemented
-								url:undefined,
-								showLocalSearch:false
+								mode:'remote',
+								url:undefined
+							},
+							filter : {
+								active:false,
+								highlight:false
 							},
 							pagination:{
 								active:true,
@@ -238,23 +241,24 @@ angular.module('ultimateDataTableServices', []).
     					 * local search
     					 */
     					searchLocal : function(searchTerms){
-							//Set the properties "" or null to undefined because we don't want to filter this
-							for(var p in searchTerms) {
-								if(searchTerms[p] != undefined && (searchTerms[p] === undefined || searchTerms[p] === null || searchTerms[p] === "")){
-									searchTerms[p] = undefined;
+							if(this.config.filter.active === true){
+								//Set the properties "" or null to undefined because we don't want to filter this
+								for(var p in searchTerms) {
+									if(searchTerms[p] != undefined && (searchTerms[p] === undefined || searchTerms[p] === null || searchTerms[p] === "")){
+										searchTerms[p] = undefined;
+									}
 								}
+								
+								var _allResult = angular.copy(this.allResult);
+								_allResult = $filter('filter')(this.allResult, searchTerms, false);
+								
+								this._getAllResult = function(){return _allResult;};
+								
+								this.totalNumberRecords = _allResult.length;
+								this.sortAllResult();
+								this.computePaginationList();
+								this.computeDisplayResult();
 							}
-							
-							console.log(searchTerms);
-							var _allResult = angular.copy(this.allResult);
-							_allResult = $filter('filter')(this.allResult, searchTerms, false);
-							
-							this._getAllResult = function(){return _allResult;};
-							
-							this.totalNumberRecords = _allResult.length;
-		    				this.sortAllResult();
-		    				this.computePaginationList();
-		    				this.computeDisplayResult();
 						},
 						_getAllResult : function(){
 							return this.allResult;
