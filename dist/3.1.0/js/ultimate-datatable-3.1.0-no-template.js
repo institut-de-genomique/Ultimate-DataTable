@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.1.0 2015-07-21 
+/*! ultimate-datatable version 3.1.0 2015-07-22 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -2631,7 +2631,8 @@ directive('udtForm', function(){
 		
 		scope.$watch('keywords', function(newValue, oldValue) {
 			if (!newValue || newValue == '' || !scope.active) {
-				element.html(scope.udtHighlight.toString());
+				if(scope.udtHighlight !== undefined)
+					element.html(scope.udtHighlight.toString());
 				return false;
 			}
 			

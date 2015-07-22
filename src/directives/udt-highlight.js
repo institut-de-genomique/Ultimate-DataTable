@@ -25,7 +25,8 @@ angular.module('ultimateDataTableServices').directive('udtHighlight', function()
 		
 		scope.$watch('keywords', function(newValue, oldValue) {
 			if (!newValue || newValue == '' || !scope.active) {
-				element.html(scope.udtHighlight.toString());
+				if(scope.udtHighlight !== undefined)
+					element.html(scope.udtHighlight.toString());
 				return false;
 			}
 			
