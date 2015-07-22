@@ -31,6 +31,11 @@ run(function($templateCache) {
   		    		+'</tr>'
   		    		+'</thead>'
   		    		+'<tbody>'
+					+	'<tr ng-if="udtTable.config.filter.columnMode">'
+  		    		+		'<td ng-repeat="col in udtTable.config.columns" ng-if="!udtTable.isHide(col.id)">'
+  		    		+			'<div udt-cell-filter/>'
+  		    		+		'</td>'
+  		    		+	'</tr>'
   		    		+	'<tr ng-if="udtTable.isEdit()">'
   		    		+		'<td ng-repeat="col in udtTable.config.columns" ng-if="!udtTable.isHide(col.id)">'
   		    		+			'<div udt-cell-header/>'
@@ -65,6 +70,9 @@ run(function($templateCache) {
 })
 .run(function($templateCache) {
   $templateCache.put('udt-cellEdit.html', '<div udt-compile="udtTableFunctions.getEditElement(col)"></div>');
+})
+.run(function($templateCache) {
+  $templateCache.put('udt-cellFilter.html', '<div udt-compile="udtTableFunctions.getEditElement(col, false, true)"></div>');
 })
 .run(function($templateCache) {
   $templateCache.put('udt-cellHeader.html', '<div ng-if="col.edit" ng-switch on="udtTable.isEdit(col.id)">'  		    			
