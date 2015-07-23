@@ -56,7 +56,8 @@ angular.module('ultimateDataTableServices', []).
 							filter : {
 								active:false,
 								highlight:false,
-								columnMode:false
+								columnMode:false,
+								showButton:false
 							},
 							pagination:{
 								active:true,

@@ -56,7 +56,8 @@ angular.module('ultimateDataTableServices', []).
 							filter : {
 								active:false,
 								highlight:false,
-								columnMode:false
+								columnMode:false,
+								showButton:false
 							},
 							pagination:{
 								active:true,
@@ -3391,22 +3392,22 @@ run(function($templateCache) {
 					+  '<div class="col-xs-12 .col-sm-6 col-md-7 col-lg-8 input-group" ng-if="udtTable.isCompactMode()">'
 					+   '<input class="form-control input-compact" udt-change="udtTable.searchLocal(udtTable.searchTerms)" type="text" ng-model="udtTable.searchTerms.$" ng-keydown="$event.keyCode==13 ? udtTable.searchLocal(udtTable.searchTerms) : \'\'">'
 					+	'<span class="input-group-btn">'
-					+		'<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchLocal(udtTable.searchTerms)" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.searchLocal\')}}">'
+					+		'<button ng-if="udtTable.config.filter.active === true && udtTable.config.filter.showButton" class="btn btn-default search-button" ng-click="udtTable.searchLocal(udtTable.searchTerms)" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.searchLocal\')}}">'
   		    		+			'<i class="fa fa-search"></i>'
   		    		+		'</button>'	
-					+		'<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchTerms={};udtTable.searchLocal()" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.resetSearchLocal\')}}">'
+					+		'<button ng-if="udtTable.config.filter.active === true 	&& udtTable.config.filter.showButton" class="btn btn-default search-button" ng-click="udtTable.searchTerms={};udtTable.searchLocal()" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.resetSearchLocal\')}}">'
   		    		+			'<i class="fa fa-times"></i>'
   		    		+		'</button>'
 					+ '</span>'
 					+ '</div>'
 					+  '<div class="col-xs-12 .col-sm-12 col-md-12 col-lg-12 input-group" ng-if="!udtTable.isCompactMode()">'
 					+   '<input class="form-control" utd-change="udtTable.searchLocal(udtTable.searchTerms)" type="text" ng-model="udtTable.searchTerms.$">'
-					+	'<span class="input-group-btn">'
-					+		'<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchLocal(udtTable.searchTerms)" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.searchLocal\')}}">'
+					+	'<span class="input-group-btn" ng-if="udtTable.config.filter.showButton">'
+					+		'<button ng-if="udtTable.config.filter.active === true  && udtTable.config.filter.showButton" class="btn btn-default search-button" ng-click="udtTable.searchLocal(udtTable.searchTerms)" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.searchLocal\')}}">'
   		    		+			'<i class="fa fa-search"></i>'
 					+			'<span> {{udtTableFunctions.messagesDatatable(\'datatable.button.searchLocal\')}} </span>'
   		    		+		'</button>'	
-					+		'<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchTerms={};udtTable.searchLocal()" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.resetSearchLocal\')}}">'
+					+		'<button ng-if="udtTable.config.filter.active === true  && udtTable.config.filter.showButton" class="btn btn-default search-button" ng-click="udtTable.searchTerms={};udtTable.searchLocal()" title="{{udtTableFunctions.messagesDatatable(\'datatable.button.resetSearchLocal\')}}">'
   		    		+			'<i class="fa fa-times"></i>'
 					+			'<span> {{udtTableFunctions.messagesDatatable(\'datatable.button.resetSearchLocal\')}} </span>'
   		    		+		'</button>'
