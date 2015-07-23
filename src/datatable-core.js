@@ -784,7 +784,8 @@ angular.module('ultimateDataTableServices', []).
 		    							var orderSense = (this.config.order.reverse)?'-':'+';
 			    						orderBy.push(orderSense+orderProperty)
 		    						}
-		    						this.allResult = $filter('orderBy')(this.allResult,orderBy);	
+		    						this.allResult = $filter('orderBy')(this._getAllResult(),orderBy);	
+									this._getAllResult = function(){return this.allResult;};	
 		    					}		    					    					
 		    				}
 		    			},	
