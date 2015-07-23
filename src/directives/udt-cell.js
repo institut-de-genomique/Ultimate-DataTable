@@ -14,7 +14,7 @@ directive("udtCell", function(){
     			    	if(header){
     			    		ngChange = '" ng-change="udtTable.updateColumn(col.property, col.id)"';
 						}else if(filter){
-							ngChange = '" ng-change="udtTable.searchLocal(udtTable.searchTerms)"';
+							ngChange = '" udt-change="udtTable.searchLocal(udtTable.searchTerms)"';
     			    	}else{
     			    		defaultValueDirective = 'udt-default-value="col.defaultValues"';
     			    	}
@@ -170,6 +170,7 @@ directive("udtCell", function(){
 	    						return '<img ng-src="data:image/'+col.format+';base64,{{cellValue}}" style="max-width:{{col.width}}"/>';		    					    
 	    					} else{
 	    						return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
+								//return '<span ng-bind="cellValue"></span>'
 	    					}
 	    				}	  
 	    			};

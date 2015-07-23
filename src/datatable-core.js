@@ -1,7 +1,7 @@
 "use strict";
 
 angular.module('ultimateDataTableServices', []).
-    	factory('datatable', ['$http', '$filter', '$parse', '$window', '$q','udtI18n', function($http, $filter, $parse, $window, $q, udtI18n){ //service to manage datatable
+    	factory('datatable', ['$http', '$filter', '$parse', '$window', '$q','udtI18n','$timeout', function($http, $filter, $parse, $window, $q, udtI18n, $timeout){ //service to manage datatable
     		var constructor = function(iConfig){
 				var datatable = {
 						configDefault:{
@@ -190,8 +190,9 @@ angular.module('ultimateDataTableServices', []).
     					allGroupResult:undefined,
     					displayResult:undefined,
     					totalNumberRecords:0,
-    					urlCache:{}, //used to cache data load from column with url attribut    					
-						lastSearchParams : undefined, //used with pagination when length or page change
+						computeDisplayResultTimeOut:undefined,
+    					urlCache:{}, //used to cache data load from column with url attribut
+    					lastSearchParams : undefined, //used with pagination when length or page change
     					inc:0, //used for unique column ids
     					configColumnDefault:{
 								edit:false, //can be edited or not
@@ -248,6 +249,7 @@ angular.module('ultimateDataTableServices', []).
     					 */
     					searchLocal : function(searchTerms){
 							if(this.config.filter.active === true){
+								var deferred = $q.defer();
 								//Set the properties "" or null to undefined because we don't want to filter this
 								this.setSpinner(true);
 								for(var p in searchTerms) {
@@ -265,7 +267,12 @@ angular.module('ultimateDataTableServices', []).
 								this.sortAllResult();
 								this.computePaginationList();
 								this.computeDisplayResult();
-								this.setSpinner(false);
+								var that = this;
+								this.computeDisplayResultTimeOut.then(function(){
+									that.setSpinner(false);
+									deferred.resolve();
+								});
+								return deferred.promise;
 							}
 						},
 						_getAllResult : function(){
@@ -355,27 +362,29 @@ angular.module('ultimateDataTableServices', []).
 								}
 								
 								this.setPageNumber({number:0, clazz:''});
+								var that = this;
+								this.computeDisplayResultTimeOut.then(function(){
+									//Deselect all lines
+									that.selectAll(false);
+									//Create new line already selected
+									var line = {edit:false, selected:true, trClass:undefined, group:false};
+									that.displayResult.unshift({data:{}, line:line});
+									if(that.config.pagination.numberRecordsPerPage < that.displayResult.length){
+										that.displayResult.splice(that.config.pagination.numberRecordsPerPage,(that.displayResult.length+1)-that.config.pagination.numberRecordsPerPage);
+									}
+									that.allResult.unshift({});
+									that.totalNumberRecords++;
+									
+									 //group function
+									if(that.isGroupActive()){
+										that.displayResult = that.addGroup(that.displayResult);					
+									}
+									
+									that.computePaginationList();
 
-								//Deselect all lines
-								this.selectAll(false);
-								//Create new line already selected
-								var line = {edit:false, selected:true, trClass:undefined, group:false};
-								this.displayResult.unshift({data:{}, line:line});
-								if(this.config.pagination.numberRecordsPerPage < this.displayResult.length){
-									this.displayResult.splice(this.config.pagination.numberRecordsPerPage,(this.displayResult.length+1)-this.config.pagination.numberRecordsPerPage);
-								}
-								this.allResult.unshift({});
-								this.totalNumberRecords++;
-								
-								 //group function
-								if(this.isGroupActive()){
-									this.displayResult = this.addGroup(this.displayResult);					
-								}
-								
-								this.computePaginationList();
-
-								//setEdit
-								this.setEdit();
+									//setEdit
+									that.setEdit();
+								});
 							}
 		    			},
 		    			/**
@@ -519,11 +528,13 @@ angular.module('ultimateDataTableServices', []).
 		    					this.computeGroup();
 		    					this.sortAllResult(); //sort all the result
 		    					this.computePaginationList(); //redefined pagination
-				    			this.computeDisplayResult(); //redefined the result must be displayed				    				
-				    			
-		    					if(angular.isFunction(this.config.group.callback)){
-			    					this.config.group.callback(this);
-			    				}
+				    			this.computeDisplayResult(); //redefined the result must be displayed
+								var that = this;
+				    			this.computeDisplayResultTimeOut.then(function(){
+									if(angular.isFunction(that.config.group.callback)){
+										that.config.group.callback(this);
+									}
+								});
 		    				} else{
 		    					//console.log("order is not active !!!");
 		    				}
@@ -680,46 +691,55 @@ angular.module('ultimateDataTableServices', []).
 		    			 * Based on pagination configuration
 		    			 */
 		    			computeDisplayResult: function(){
-		    				//to manage local pagination
-		    				var configPagination = this.config.pagination;
-		    				
-		    				var _displayResult = [];
-		    				if(this.config.group.start && this.config.group.showOnlyGroups){
-		    					_displayResult = this.allGroupResult.slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
-		    							(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage));
-		    					var displayResultTmp = [];
-			    				angular.forEach(_displayResult, function(value, key){
-			    					 var line = {edit:undefined, selected:undefined, trClass:undefined, group:true};
-		    						 this.push({data:value, line:line});
-		    					}, displayResultTmp);			    				
-			    				this.displayResult = displayResultTmp;		
-		    				} else{
-			    				if(configPagination.active && !this.isRemoteMode(configPagination.mode)){
-			    					_displayResult = angular.copy(this._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
-			    							(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage)));
-			    				}else{ //to manage all records or server pagination
-			    					_displayResult = angular.copy(this._getAllResult());		    					
-			    				}
-			    				
-			    				var displayResultTmp = [];
-			    				angular.forEach(_displayResult, function(value, key){
-			    					 var line = {edit:undefined, selected:undefined, trClass:undefined, group:false};
-		    						 this.push({data:value, line:line});
-		    					}, displayResultTmp);
-			    				
-								//group function
-			    				if(this.isGroupActive()){
-			    					this.displayResult = this.addGroup(displayResultTmp);					
-			    				}else{									
-									this.displayResult = displayResultTmp;
-									this.computeRowSpans();
-			    				}
-			    				
-			    				if(this.config.edit.byDefault){
-			    					this.config.edit.withoutSelect = true;
-			    					this.setEdit();
-			    				}	
-		    				}
+							var time = 100;
+							if(this.computeDisplayResultTimeOut !== undefined){
+								$timeout.cancel(this.computeDisplayResultTimeOut);
+							}else{
+								time = 0;
+							}
+							
+							var that = this;
+							this.computeDisplayResultTimeOut = $timeout(function(){
+								//to manage local pagination
+								var configPagination = that.config.pagination;
+								
+								var _displayResult = [];
+								if(that.config.group.start && that.config.group.showOnlyGroups){
+									_displayResult = that.allGroupResult.slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
+											(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage));
+									var displayResultTmp = [];
+									angular.forEach(_displayResult, function(value, key){
+										 var line = {edit:undefined, selected:undefined, trClass:undefined, group:true};
+										 that.push({data:value, line:line});
+									}, displayResultTmp);			    				
+									that.displayResult = displayResultTmp;		
+								} else{
+									if(configPagination.active && !that.isRemoteMode(configPagination.mode)){
+										_displayResult = angular.copy(that._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
+												(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage)));
+									}else{ //to manage all records or server pagination
+										_displayResult = angular.copy(that._getAllResult());		    					
+									}
+									
+									var displayResultTmp = [];
+									angular.forEach(_displayResult, function(value, key){
+										 var line = {edit:undefined, selected:undefined, trClass:undefined, group:false};
+										 this.push({data:value, line:line});
+									}, displayResultTmp);
+									
+									//group function
+									if(that.isGroupActive()){
+										that.displayResult = that.addGroup(displayResultTmp);					
+									}else{
+										that.displayResult = displayResultTmp;
+									}
+									
+									if(that.config.edit.byDefault){
+										that.config.edit.withoutSelect = true;
+										that.setEdit();
+									}								
+								}
+							}, time);
 		    			},
 		    			/**
 		    			 * Load all data for url column type
@@ -905,7 +925,7 @@ angular.module('ultimateDataTableServices', []).
 			    						orderBy.push(orderSense+orderProperty)
 		    						}
 		    						this.allResult = $filter('orderBy')(this._getAllResult(),orderBy);	
-									this._getAllResult = function(){return this.allResult;};	
+									this._getAllResult = function(){return this.allResult;};
 		    					}		    					    					
 		    				}
 		    			},	
@@ -948,10 +968,12 @@ angular.module('ultimateDataTableServices', []).
 			    				} else if(this.config.order.active){
 			    					this.searchWithLastParams();
 			    				}	
-		    					
-		    					if(angular.isFunction(this.config.order.callback)){
-			    					this.config.order.callback(this);
-			    				}
+		    					var that = this;
+				    			this.computeDisplayResultTimeOut.then(function(){
+									if(angular.isFunction(that.config.order.callback)){
+										that.config.order.callback(this);
+									}
+								});
 		    				} else{
 		    					//console.log("order is not active !!!");
 		    				}
@@ -1413,32 +1435,34 @@ angular.module('ultimateDataTableServices', []).
 		    					
 		    					this.computePaginationList();
 		    					this.computeDisplayResult();
-		    					
-		    					if(this.config.remove.ids.errors.length > 0){
-			    					this.displayResult.every(function(value,index){			    						
-			    						var errors = this.config.remove.ids.errors;
-			    						for(var i = 0 ; i < errors.length ; i++){
-			    							if(angular.equals(value.data,  errors[i])){
-			    								value.line.trClass = "danger";
-			    								errors.splice(i,1);
-			    								break;
-			    							}
-			    						}
-			    						if(errors.length === 0){
-			    							return false;
-			    						}else{
-			    							return true;
-			    						}
-			    					},this);
-		    					}
-		    					
-		    					
-		    					this.config.select.isSelectAll = false;
-		    					this.config.remove.error = 0;
-		    					this.config.remove.start = false;
-		    					this.config.remove.counter = 0;
-		    					this.config.remove.ids = {error:[],success:[]};
-		    					this.setSpinner(false);
+								var that = this;
+		    					this.computeDisplayResultTimeOut.then(function(){
+									if(that.config.remove.ids.errors.length > 0){
+										that.displayResult.every(function(value,index){			    						
+											var errors = that.config.remove.ids.errors;
+											for(var i = 0 ; i < errors.length ; i++){
+												if(angular.equals(value.data,  errors[i])){
+													value.line.trClass = "danger";
+													errors.splice(i,1);
+													break;
+												}
+											}
+											if(errors.length === 0){
+												return false;
+											}else{
+												return true;
+											}
+										},that);
+									}
+									
+									
+									that.config.select.isSelectAll = false;
+									that.config.remove.error = 0;
+									that.config.remove.start = false;
+									that.config.remove.counter = 0;
+									that.config.remove.ids = {error:[],success:[]};
+									that.setSpinner(false);
+								});
 		    				}
 		    			},
 		    			
@@ -1957,9 +1981,8 @@ angular.module('ultimateDataTableServices', []).
 			    							var header = column.header;
 			    							if(angular.isFunction(header)){
 			    								header = header();
-			    							}else{
-			    								header = this.messages.Messages(column.header);
 			    							}
+											
 			    							if(that.isGroupActive()){
 				    							if(column.groupMethod === "sum"){
 				    								header = header + this.messages.Messages('datatable.export.sum'); 

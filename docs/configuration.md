@@ -79,11 +79,12 @@ The server have to respond with data in JSON:
 }
 ```
 ## Filter
-> If active, add a input field to search locally on all data, the highlight option highlight the search term in the datatable if active
+> If active, add a input field to search locally on all data, the highlight option highlight the search term in the datatable if active, the columnMode option if active add filter for all columns
 ```json
 "filter": {
 	active:boolean,//Active or not
-	highlight:boolean
+	highlight:boolean,
+	columnMode:boolean
 }
 ```
 ## Edit
@@ -202,6 +203,11 @@ compact:boolean/boolean
 	showButton:boolean,//Show the export button in the toolbar
 	delimiter:";"/Set the delimiter
 }
+```
+## Show total number records
+> If true show the number of total records on the left corner
+```json
+"showTotalNumberRecords":boolean
 ```
 #Advanced features
 ## Show
