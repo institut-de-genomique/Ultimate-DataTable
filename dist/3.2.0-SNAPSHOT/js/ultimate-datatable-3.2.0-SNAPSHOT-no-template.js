@@ -1,8 +1,4 @@
-<<<<<<< HEAD:dist/3.1.0/js/ultimate-datatable-3.1.0-no-template.js
-/*! ultimate-datatable version 3.1.0 2015-07-23 
-=======
 /*! ultimate-datatable version 3.2.0-SNAPSHOT 2015-07-24 
->>>>>>> merge:dist/3.2.0-SNAPSHOT/js/ultimate-datatable-3.2.0-SNAPSHOT-no-template.js
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
