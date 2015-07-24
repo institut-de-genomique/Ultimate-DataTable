@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.1.0 2015-07-22 
+/*! ultimate-datatable version 3.2.0-SNAPSHOT 2015-07-24 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -42,6 +42,7 @@ angular.module('ultimateDataTableServices', []).
 													"groupMethod": sum, average, countDistinct, collect
 													"defaultValues":"" //If the value of the column is undefined or "" when the user edit, this value show up
 													"url"://to lazy data
+													"mergeCells":false //to enable merge cell on this column
 													"
 												  }*/
 							columnsUrl:undefined, //Load columns config
@@ -174,6 +175,10 @@ angular.module('ultimateDataTableServices', []).
 								enableLineSelection:false, //used to authorized selection on group line
 								columns:{}
 							},
+							mergeCells : {
+								active:false,
+								rowspans : undefined
+							},
 							showTotalNumberRecords:true,
 							spinner:{
 								start:false
@@ -187,8 +192,8 @@ angular.module('ultimateDataTableServices', []).
     					allGroupResult:undefined,
     					displayResult:undefined,
     					totalNumberRecords:0,
-    					urlCache:{}, //used to cache data load from column with url attribut
-    					lastSearchParams : undefined, //used with pagination when length or page change
+    					urlCache:{}, //used to cache data load from column with url attribut    					
+						lastSearchParams : undefined, //used with pagination when length or page change
     					inc:0, //used for unique column ids
     					configColumnDefault:{
 								edit:false, //can be edited or not
@@ -559,6 +564,117 @@ angular.module('ultimateDataTableServices', []).
 	    					},displayResult);
 	    					return displayResult;
 		    			},
+						
+						getColumnValue : function(result, column){
+							var colValue; 
+							if (!result.line.group && (column.url === undefined || column.url === null)) {
+								var property = column.property;
+								var isFunction = false;
+								if(angular.isFunction(property)){
+									property = property();
+									isFunction = true;
+								}
+								property += this.getFilter(column);
+								property += this.getFormatter(column);
+								colValue = $parse(property)(result.data);
+								if(colValue === undefined && isFunction === true){//Because the property here is not $parsable
+									//The function have to return a $scope value
+									colValue = property;
+								}
+								if(colValue !==  undefined && column.type === "number"){
+									colValue = colValue.replace(/\u00a0/g,"");
+								}
+								if(colValue === undefined && column.type === "boolean"){
+									colValue = this.messages.Messages('datatable.export.no');
+								}else if(colValue !== undefined && column.type === "boolean"){
+									if(colValue){
+										colValue = this.messages.Messages('datatable.export.yes');
+									}else{
+										colValue = this.messages.Messages('datatable.export.no')
+									}
+								}
+								
+							} else if(result.line.group) {
+								
+								var v = $parse("group."+column.id)(result.data);
+								//if error in group function
+								if (angular.isDefined(v) && angular.isString(v) && v.charAt(0) === "#") {
+									colValue = v;
+								} else if(angular.isDefined(v)) {
+									//not filtered properties because used during the compute
+									colValue = $parse("group."+column.id+this.getFormatter(column))(result.data);
+								} else {
+									colValue =  undefined;
+								}
+								
+								if(colValue !==  undefined && column.type === "number"){
+									colValue = colValue.replace(/\u00a0/g,"");
+								}				    			    				
+								
+							}else if(!result.line.group && column.url !== undefined && column.url !== null) {
+								var url = $parse(column.url)(result.data);
+								colValue = $parse(column.property+this.getFilter(column)+this.getFormatter(column))(this.urlCache[url]);
+								
+								if(colValue !==  undefined && column.type === "number"){
+									colValue = colValue.replace(/\u00a0/g,"");
+								}
+								
+							}
+							return colValue;
+						},
+						
+						
+						/**
+						 * compute for each <td> the row span if user whant to merge cell	
+						 */
+						computeRowSpans : function(){
+							if(this.config.mergeCells.active === true){
+								this.config.mergeCells.rowspans = undefined;
+								//init rowspans values
+								var rowspans = undefined;
+								rowspans = new Array(this.displayResult.length);
+								for(var i = 0; i < this.displayResult.length ; i++){
+									rowspans[i] = new Array(this.config.columns.length);
+								}
+								
+								var currentDisplayResult = this.displayResult;
+								var currentColumns = this.config.columns;
+								
+								var previousResult = undefined;
+								var nbRowEquals = new Array(this.config.columns.length);
+								for(var j = 0; j < nbRowEquals.length; j++){
+									nbRowEquals[j] = 0;
+								}
+								currentDisplayResult.forEach(function(result, i) {
+										currentColumns.forEach(function(column, j) {											
+											if(i > 0 && column.mergeCells){
+												var currentColValue = this.getColumnValue(result,column);			    			
+												var previousColValue = this.getColumnValue(previousResult,column);			    			
+												if(currentColValue === previousColValue){
+													rowspans[i][j] = 0;
+													nbRowEquals[j]++;
+													//last element
+													if(i === (currentDisplayResult.length -1)){
+														rowspans[i-(nbRowEquals[j])][j] = nbRowEquals[j]+1;
+													}
+													
+												}else{
+													rowspans[i][j] = 1;
+													rowspans[i-(nbRowEquals[j]+1)][j] = nbRowEquals[j]+1;
+													nbRowEquals[j] = 0;														
+												}
+											} else if(i === 0){
+												rowspans[i][j] = 1;
+											}
+				    			    		
+			    						}, this);
+										previousResult = result;
+									}, this);
+								
+								this.config.mergeCells.rowspans = rowspans;
+							}
+						},
+						
 		    			/**
 		    			 * Selected only the records will be displayed.
 		    			 * Based on pagination configuration
@@ -591,11 +707,12 @@ angular.module('ultimateDataTableServices', []).
 		    						 this.push({data:value, line:line});
 		    					}, displayResultTmp);
 			    				
-			    				//group function
+								//group function
 			    				if(this.isGroupActive()){
 			    					this.displayResult = this.addGroup(displayResultTmp);					
-			    				}else{
-			    					this.displayResult = displayResultTmp;
+			    				}else{									
+									this.displayResult = displayResultTmp;
+									this.computeRowSpans();
 			    				}
 			    				
 			    				if(this.config.edit.byDefault){
@@ -1577,6 +1694,9 @@ angular.module('ultimateDataTableServices', []).
 			    					if(columns[i].edit && !this.config.edit.active){
 			    						columns[i].edit = false;
 			    					}
+									if(columns[i].mergeCells && !this.config.mergeCells.active){
+			    						columns[i].mergeCells = false;
+			    					}
 			    					//TODO: else{Error here ?}
 			    					
 			    					if(columns[i].choiceInList && !angular.isDefined(columns[i].listStyle)){
@@ -1852,7 +1972,7 @@ angular.module('ultimateDataTableServices', []).
 			    							}
 			    							lineValue = lineValue + header + delimiter;
 			    							}
-			    						}); 
+			    						},this); 
 			    					lineValue = lineValue.substr(0, lineValue.length-1) + "\n";
 			    					//data
 			    					displayResultTmp.forEach(function(result) {
@@ -1914,11 +2034,11 @@ angular.module('ultimateDataTableServices', []).
 				    			    				lineValue = lineValue + ((colValue!==null)&&(colValue)?colValue:"") + delimiter;
 				    			    			}				    			    			
 			    							}
-			    						});
+			    						},this);
 			    						if ((exportType==='all') || ((exportType==='groupsOnly') && result.line.group)) {
 			    							lineValue = lineValue.substr(0, lineValue.length-1) + "\n";
 			    						}
-			    					});
+			    					},this);
 			    					displayResultTmp = undefined;
 			    					
 			    					//fix for the accents in Excel : add BOM (byte-order-mark)
@@ -1944,9 +2064,9 @@ angular.module('ultimateDataTableServices', []).
 		    				var format = "";
 		    				if (col && col.type)
 			    				if(col.type === "date"){
-			    					format += " | date:'"+(col.format?col.format:this.messagesDatatable("date.format"))+"'";
+			    					format += " | date:'"+(col.format?col.format:this.messages.Messages("date.format"))+"'";
 			    				}else if(col.type === "datetime"){
-			    					format += " | date:'"+(col.format?col.format:this.messagesDatatable("datetime.format"))+"'";
+			    					format += " | date:'"+(col.format?col.format:this.messages.Messages("datetime.format"))+"'";
 			    				}else if(col.type === "number"){
 									format += " | number"+(col.format?':'+col.format:'');
 								}    				
@@ -2747,6 +2867,24 @@ directive('udtTable', function(){
 		    				}
 						}
 	    			};
+					
+					scope.udtTableFunctions.getRowSpanValue = function(i,j){
+						var udtTable = scope.udtTable;
+						if(udtTable.config.mergeCells.active){
+							return udtTable.config.mergeCells.rowspans[i][j];
+						}else{
+							return 1;
+						}
+					};
+					
+					scope.udtTableFunctions.isShowCell = function(col, i, j){
+						var udtTable = scope.udtTable;
+						var value = !udtTable.isHide(col.id);
+						if(udtTable.config.mergeCells.active && value){
+							value = (udtTable.config.mergeCells.rowspans[i][j] !== 0)
+						}						
+						return value;
+					};
   		    	}
     		};
     	});;angular.module('ultimateDataTableServices').
@@ -2782,8 +2920,8 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
   		    		
   		    		if(!scope.udtTableFunctions){scope.udtTableFunctions = {};}
   		    		
-  		    		
-  		    		scope.udtTableFunctions.messagesDatatable = function(message,arg){	
+  		    		scope.udtTableFunctions.messages = {};
+  		    		scope.udtTableFunctions.messages.Messages = function(message,arg){	
 						if(angular.isFunction(message)){
 			    				message = message();
 			    		}

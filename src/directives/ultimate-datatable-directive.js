@@ -21,8 +21,8 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
   		    		
   		    		if(!scope.udtTableFunctions){scope.udtTableFunctions = {};}
   		    		
-  		    		
-  		    		scope.udtTableFunctions.messagesDatatable = function(message,arg){	
+  		    		scope.udtTableFunctions.messages = {};
+  		    		scope.udtTableFunctions.messages.Messages = function(message,arg){	
 						if(angular.isFunction(message)){
 			    				message = message();
 			    		}

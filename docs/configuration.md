@@ -171,6 +171,13 @@ compact:boolean/boolean
 	"showButton":boolean//Show the hide button in the toolbar
 }
 ```
+## Merge Cells
+> If the user want to merge same cells in some column(s)
+```json
+"mergeCells":{
+	"active":boolean//Active or not
+}
+```
 ## Select
 > The way the user will select the lines
 ```json
