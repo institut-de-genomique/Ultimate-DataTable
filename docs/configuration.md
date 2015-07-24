@@ -84,7 +84,8 @@ The server have to respond with data in JSON:
 "filter": {
 	active:boolean,//Active or not
 	highlight:boolean,
-	columnMode:boolean
+	columnMode:boolean,
+	showButton:boolean //Show the filter and reset buttons if true
 }
 ```
 ## Edit
