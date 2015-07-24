@@ -31,7 +31,7 @@ run(function($templateCache) {
   		    		+'</tr>'
   		    		+'</thead>'
   		    		+'<tbody>'
-					+	'<tr ng-if="udtTable.config.filter.columnMode">'
+					+	'<tr ng-if="udtTable.config.filter.columnMode && !udtTable.isEdit()" class="filter">'
   		    		+		'<td ng-repeat="col in udtTable.config.columns" ng-if="!udtTable.isHide(col.id)">'
   		    		+			'<div udt-cell-filter/>'
   		    		+		'</td>'

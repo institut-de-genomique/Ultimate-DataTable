@@ -7,6 +7,10 @@
 	height:30px;
 }
 
+.datatable .filter {
+	background-color: #f1f1f1;
+}
+
 .row_selected {
 	background-color: #f1f1f1;
 }

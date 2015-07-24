@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.0-SNAPSHOT 2015-07-23 
+/*! ultimate-datatable version 3.2.0-SNAPSHOT 2015-07-24 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 .datatable .btn-toolbar .btn,.datatable div[name="udt-toolbar-results"],
@@ -8,6 +8,10 @@
 	font-size:12px;
 	line-height: 1.33333333;
 	height:30px;
+}
+
+.datatable .filter {
+	background-color: #f1f1f1;
 }
 
 .row_selected {

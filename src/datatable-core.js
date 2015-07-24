@@ -733,6 +733,7 @@ angular.module('ultimateDataTableServices', []).
 										that.displayResult = that.addGroup(displayResultTmp);					
 									}else{
 										that.displayResult = displayResultTmp;
+										that.computeRowSpans();
 									}
 									
 									if(that.config.edit.byDefault){
