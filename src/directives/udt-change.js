@@ -3,7 +3,7 @@ directive('udtChange', ['$interval', function($interval) {
 	return {
 		require: 'ngModel',
 		link: function(scope, element, attrs, ngModel) {
-			
+			scope.oldValue = undefined;
 			scope.needRefresh = false;
 			scope.runFunction = function(){
 				var unbindWatcher  = scope.$watch(attrs.udtChange, function(newValue){
@@ -12,7 +12,10 @@ directive('udtChange', ['$interval', function($interval) {
 			};
 			
 			scope.$watch(attrs.ngModel, function(value){
-				scope.needRefresh = true;
+				if(scope.oldValue !== value){
+					scope.needRefresh = true;
+					scope.oldValue = value;
+				}
 			});
 			
 			$interval(function(){ 

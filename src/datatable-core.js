@@ -289,9 +289,12 @@ angular.module('ultimateDataTableServices', []).
 			    				var url = this.getUrlFunction(this.config.search.url);
 			    				if(url){
 			    					this.setSpinner(true);
+									var that = this;
 			    					$http.get(url(),{params:this.getParams(params), datatable:this}).success(function(data, status, headers, config) {
 			    						config.datatable.setData(data.data, data.recordsNumber);
-			    						config.datatable.setSpinner(false);
+										that.computeDisplayResultTimeOut.then(function(){
+											that.setSpinner(false);
+										});
 			    					});
 			    				}else{
 			    					throw 'no url define for search ! ';

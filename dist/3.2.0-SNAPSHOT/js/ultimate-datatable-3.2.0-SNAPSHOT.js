@@ -292,9 +292,12 @@ angular.module('ultimateDataTableServices', []).
 			    				var url = this.getUrlFunction(this.config.search.url);
 			    				if(url){
 			    					this.setSpinner(true);
+									var that = this;
 			    					$http.get(url(),{params:this.getParams(params), datatable:this}).success(function(data, status, headers, config) {
 			    						config.datatable.setData(data.data, data.recordsNumber);
-			    						config.datatable.setSpinner(false);
+										that.computeDisplayResultTimeOut.then(function(){
+											that.setSpinner(false);
+										});
 			    					});
 			    				}else{
 			    					throw 'no url define for search ! ';
@@ -695,6 +698,7 @@ angular.module('ultimateDataTableServices', []).
 		    			 * Based on pagination configuration
 		    			 */
 		    			computeDisplayResult: function(){
+							console.log("computeDisplayResult");
 							var time = 100;
 							if(this.computeDisplayResultTimeOut !== undefined){
 								$timeout.cancel(this.computeDisplayResultTimeOut);
@@ -1200,6 +1204,7 @@ angular.module('ultimateDataTableServices', []).
 		    				}else{
 		    					//console.log("save is not active !");		    				
 		    				}
+							console.log("finishSave");
 		    			},
 		    			
 		    			saveBatchRemote : function(values){
@@ -2633,7 +2638,7 @@ directive('udtChange', ['$interval', function($interval) {
 	return {
 		require: 'ngModel',
 		link: function(scope, element, attrs, ngModel) {
-			
+			scope.oldValue = undefined;
 			scope.needRefresh = false;
 			scope.runFunction = function(){
 				var unbindWatcher  = scope.$watch(attrs.udtChange, function(newValue){
@@ -2642,7 +2647,10 @@ directive('udtChange', ['$interval', function($interval) {
 			};
 			
 			scope.$watch(attrs.ngModel, function(value){
-				scope.needRefresh = true;
+				if(scope.oldValue !== value){
+					scope.needRefresh = true;
+					scope.oldValue = value;
+				}
 			});
 			
 			$interval(function(){ 
