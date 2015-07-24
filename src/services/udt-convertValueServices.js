@@ -1,7 +1,7 @@
 angular.module('ultimateDataTableServices').
-factory('convertValueServices', [function() {
+factory('udtConvertValueServices', [function() {
     		var constructor = function($scope){
-				var convertValueServices = {
+				var udtConvertValueServices = {
 				    //Convert the value in inputUnit to outputUnit if the units are different
 					convertValue : function(value, inputUnit, outputUnit, precision){
 							if(inputUnit !== outputUnit && !isNaN(value)){
@@ -42,7 +42,7 @@ factory('convertValueServices', [function() {
 						return value;
 					}
 				};
-				return convertValueServices;
+				return udtConvertValueServices;
 			};
     		return constructor;
 }]);
