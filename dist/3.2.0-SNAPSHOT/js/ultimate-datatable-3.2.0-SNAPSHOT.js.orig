@@ -695,6 +695,7 @@ angular.module('ultimateDataTableServices', []).
 		    			 * Based on pagination configuration
 		    			 */
 		    			computeDisplayResult: function(){
+<<<<<<< HEAD
 							var time = 100;
 							if(this.computeDisplayResultTimeOut !== undefined){
 								$timeout.cancel(this.computeDisplayResultTimeOut);
@@ -732,7 +733,6 @@ angular.module('ultimateDataTableServices', []).
 									}, displayResultTmp);
 									
 									//group function
-									that.config.mergeCells.rowspans = undefined;
 									if(that.isGroupActive()){
 										that.displayResult = that.addGroup(displayResultTmp);					
 									}else{
@@ -746,6 +746,49 @@ angular.module('ultimateDataTableServices', []).
 									}								
 								}
 							}, time);
+=======
+		    				//to manage local pagination
+		    				var configPagination = this.config.pagination;
+		    				
+		    				var _displayResult = [];
+		    				if(this.config.group.start && this.config.group.showOnlyGroups){
+		    					_displayResult = this.allGroupResult.slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
+		    							(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage));
+		    					var displayResultTmp = [];
+			    				angular.forEach(_displayResult, function(value, key){
+			    					 var line = {edit:undefined, selected:undefined, trClass:undefined, group:true};
+		    						 this.push({data:value, line:line});
+		    					}, displayResultTmp);			    				
+			    				this.displayResult = displayResultTmp;		
+		    				} else{
+			    				if(configPagination.active && !this.isRemoteMode(configPagination.mode)){
+			    					_displayResult = angular.copy(this._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
+			    							(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage)));
+			    				}else{ //to manage all records or server pagination
+			    					_displayResult = angular.copy(this._getAllResult());		    					
+			    				}
+			    				
+			    				var displayResultTmp = [];
+			    				angular.forEach(_displayResult, function(value, key){
+			    					 var line = {edit:undefined, selected:undefined, trClass:undefined, group:false};
+		    						 this.push({data:value, line:line});
+		    					}, displayResultTmp);
+			    				
+								//group function
+								this.config.mergeCells.rowspans = undefined;
+			    				if(this.isGroupActive()){
+			    					this.displayResult = this.addGroup(displayResultTmp);																	
+			    				}else{									
+									this.displayResult = displayResultTmp;
+									this.computeRowSpans();
+			    				}
+			    				
+			    				if(this.config.edit.byDefault){
+			    					this.config.edit.withoutSelect = true;
+			    					this.setEdit();
+			    				}	
+		    				}
+>>>>>>> bug fixe mergeCells with group
 		    			},
 		    			/**
 		    			 * Load all data for url column type

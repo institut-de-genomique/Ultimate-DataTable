@@ -729,6 +729,7 @@ angular.module('ultimateDataTableServices', []).
 									}, displayResultTmp);
 									
 									//group function
+									that.config.mergeCells.rowspans = undefined;
 									if(that.isGroupActive()){
 										that.displayResult = that.addGroup(displayResultTmp);					
 									}else{

@@ -732,6 +732,7 @@ angular.module('ultimateDataTableServices', []).
 									}, displayResultTmp);
 									
 									//group function
+									that.config.mergeCells.rowspans = undefined;
 									if(that.isGroupActive()){
 										that.displayResult = that.addGroup(displayResultTmp);					
 									}else{
@@ -2939,7 +2940,7 @@ directive('udtTable', function(){
 					
 					scope.udtTableFunctions.getRowSpanValue = function(i,j){
 						var udtTable = scope.udtTable;
-						if(udtTable.config.mergeCells.active){
+						if(udtTable.config.mergeCells.active && udtTable.config.mergeCells.rowspans !== undefined){
 							return udtTable.config.mergeCells.rowspans[i][j];
 						}else{
 							return 1;
@@ -2949,7 +2950,7 @@ directive('udtTable', function(){
 					scope.udtTableFunctions.isShowCell = function(col, i, j){
 						var udtTable = scope.udtTable;
 						var value = !udtTable.isHide(col.id);
-						if(udtTable.config.mergeCells.active && value){
+						if(udtTable.config.mergeCells.active && value && udtTable.config.mergeCells.rowspans !== undefined){
 							value = (udtTable.config.mergeCells.rowspans[i][j] !== 0)
 						}						
 						return value;
