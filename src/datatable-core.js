@@ -1071,37 +1071,40 @@ angular.module('ultimateDataTableServices', []).
 		    			 */
 		    			setEdit : function(column){	
 		    				if(this.config.edit.active){
-								this._getAllResult = function(){return this.allResult;};
-		    					this.config.edit.columns = {};
-			    				var find = false;
-			    				for(var i = 0; i < this.displayResult.length; i++){
-			    					
-			    					if(this.displayResult[i].line.selected || this.config.edit.withoutSelect){
-			    						if(angular.isUndefined(this.config.edit.lineMode) || (angular.isFunction(this.config.edit.lineMode) && this.config.edit.lineMode(this.displayResult[i].data))){
-			    							this.displayResult[i].line.edit=true;			    						
-			    							find = true;			    					
-			    						}else
-			    							this.displayResult[i].line.edit=false;
-			    						
-			    					}else{
-			    						this.displayResult[i].line.edit=false;
-			    					}			    					   					
-			    				}
-			    				this.selectAll(false);
-			    				if(find){
-			    					this.config.edit.start = true;
-			    					if(column){
-			    						var columnId = column.id
-			    						if(angular.isUndefined(this.config.edit.columns[columnId])){
-			    							this.config.edit.columns[columnId] = {};
-			    						}
-			    						this.config.edit.columns[columnId].edit=true;			    						
-			    					}
-			    					else this.config.edit.all = true;
-			    				}
-		    				}else{
-		    					//console.log("edit is not active !");
-		    				}
+								var that = this;
+								this.computeDisplayResultTimeOut.then(function(){
+									that._getAllResult = function(){return that.allResult;};
+									that.config.edit.columns = {};
+									var find = false;
+									for(var i = 0; i < that.displayResult.length; i++){
+										
+										if(that.displayResult[i].line.selected || that.config.edit.withoutSelect){
+											if(angular.isUndefined(that.config.edit.lineMode) || (angular.isFunction(that.config.edit.lineMode) && that.config.edit.lineMode(that.displayResult[i].data))){
+												that.displayResult[i].line.edit=true;			    						
+												find = true;			    					
+											}else
+												that.displayResult[i].line.edit=false;
+											
+										}else{
+											that.displayResult[i].line.edit=false;
+										}			    					   					
+									}
+									that.selectAll(false);
+									if(find){
+										that.config.edit.start = true;
+										if(column){
+											var columnId = column.id
+											if(angular.isUndefined(that.config.edit.columns[columnId])){
+												that.config.edit.columns[columnId] = {};
+											}
+											that.config.edit.columns[columnId].edit=true;			    						
+										}
+										else that.config.edit.all = true;
+									}
+								});
+							}else{
+								//console.log("edit is not active !");
+							}
 		    			},		    			
 		    			/**
 		    			 * Test if a column must be in edition mode
