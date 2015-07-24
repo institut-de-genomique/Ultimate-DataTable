@@ -62,6 +62,11 @@
 ```json
 "order" : boolean
 ```
+##Merge Cells
+> merge cell with the same values in the column
+```json
+"mergeCells" : boolean
+```
 ##Type
 > The column input type
 ```json

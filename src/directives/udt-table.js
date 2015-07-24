@@ -62,6 +62,24 @@ directive('udtTable', function(){
 		    				}
 						}
 	    			};
+					
+					scope.udtTableFunctions.getRowSpanValue = function(i,j){
+						var udtTable = scope.udtTable;
+						if(udtTable.config.mergeCells.active){
+							return udtTable.config.mergeCells.rowspans[i][j];
+						}else{
+							return 1;
+						}
+					};
+					
+					scope.udtTableFunctions.isShowCell = function(col, i, j){
+						var udtTable = scope.udtTable;
+						var value = !udtTable.isHide(col.id);
+						if(udtTable.config.mergeCells.active && value){
+							value = (udtTable.config.mergeCells.rowspans[i][j] !== 0)
+						}						
+						return value;
+					};
   		    	}
     		};
     	});
