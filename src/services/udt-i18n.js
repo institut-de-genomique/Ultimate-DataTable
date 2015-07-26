@@ -80,6 +80,10 @@ factory('udtI18n', [function() {
 					
 					//Translate the key with the correct language
 					Messages : function(key){
+						  if(this.translateTable[this.preferedLanguage] === undefined){
+							this.preferedLanguage = "en";
+						  }
+						  
 						  var translatedString = this.translateTable[this.preferedLanguage][key];
 						  if(translatedString === undefined){
 							return key;

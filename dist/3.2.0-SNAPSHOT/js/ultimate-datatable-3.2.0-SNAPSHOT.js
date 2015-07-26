@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.0-SNAPSHOT 2015-07-24 
+/*! ultimate-datatable version 3.2.0-SNAPSHOT 2015-07-26 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -698,7 +698,6 @@ angular.module('ultimateDataTableServices', []).
 		    			 * Based on pagination configuration
 		    			 */
 		    			computeDisplayResult: function(){
-							console.log("computeDisplayResult");
 							var time = 100;
 							if(this.computeDisplayResultTimeOut !== undefined){
 								$timeout.cancel(this.computeDisplayResultTimeOut);
@@ -1204,7 +1203,6 @@ angular.module('ultimateDataTableServices', []).
 		    				}else{
 		    					//console.log("save is not active !");		    				
 		    				}
-							console.log("finishSave");
 		    			},
 		    			
 		    			saveBatchRemote : function(values){
@@ -3357,6 +3355,10 @@ factory('udtI18n', [function() {
 					
 					//Translate the key with the correct language
 					Messages : function(key){
+						  if(this.translateTable[this.preferedLanguage] === undefined){
+							this.preferedLanguage = "en";
+						  }
+						  
 						  var translatedString = this.translateTable[this.preferedLanguage][key];
 						  if(translatedString === undefined){
 							return key;
