@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.0-SNAPSHOT 2015-07-26 
+/*! ultimate-datatable version 3.2.0-SNAPSHOT 2015-07-27 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -2435,9 +2435,13 @@ directive("udtCell", function(){
     			    	}else{
     			    		defaultValueDirective = 'udt-default-value="col.defaultValues"';
     			    	}
-						var userDirectives = col.editDirectives;
-						if(angular.isFunction(userDirectives)){
-							userDirectives = userDirectives();
+						
+						var userDirectives = "";
+						if(col.editDirectives !== undefined){
+							userDirectives = col.editDirectives;
+							if(angular.isFunction(userDirectives)){
+								userDirectives = userDirectives();
+							}
 						}
 	    						    				
 	    				if(col.type === "boolean"){
@@ -2696,7 +2700,7 @@ directive('udtConvertvalue',['udtConvertValueServices', function(udtConvertValue
 			var convertValues = udtConvertValueServices();
 			var property = undefined;
 			
-			scope.$watch(attr.convertValue, function(value){
+			scope.$watch(attr.udtConvertvalue, function(value){
 				if(value.saveMeasureValue != undefined && value.displayMeasureValue != undefined){
 					property = value;
 				}
@@ -2779,7 +2783,7 @@ directive('udtDefaultValue',['$parse', function($parse) {
 	    			require: 'ngModel',
 	    			link: function(scope, element, attrs, ngModel) {
 	    				var defaultValue = null;
-	    				scope.$watch(attrs.dtDefaultValue, function(defaultValues){
+	    				scope.$watch(attrs.udtDefaultValue, function(defaultValues){
 	    					if(defaultValues != undefined){
 	    						defaultValue = defaultValues;
 	    					}
@@ -2861,11 +2865,11 @@ directive("udtHtmlFilter", function($filter) {
 					  link: function(scope, element, attrs, ngModelController) {
 					    ngModelController.$formatters.push(function(data) {
 					    	var convertedData = data;
-					    	  if(attrs.dtHtmlFilter == "datetime"){
+					    	  if(attrs.udtHtmlFilter == "datetime"){
 					    			convertedData = $filter('date')(convertedData, Messages("datetime.format"));
-					    	   }else if(attrs.dtHtmlFilter == "date"){
+					    	   }else if(attrs.udtHtmlFilter == "date"){
 					    		   	convertedData = $filter('date')(convertedData, Messages("date.format"));
-					    	   }else if(attrs.dtHtmlFilter == "number"){
+					    	   }else if(attrs.udtHtmlFilter == "number"){
 					    		   	convertedData = $filter('number')(convertedData);
 					    	   }
 					    	
