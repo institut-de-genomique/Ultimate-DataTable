@@ -9,7 +9,7 @@ directive('udtConvertvalue',['udtConvertValueServices', function(udtConvertValue
 			var convertValues = udtConvertValueServices();
 			var property = undefined;
 			
-			scope.$watch(attr.convertValue, function(value){
+			scope.$watch(attr.udtConvertvalue, function(value){
 				if(value.saveMeasureValue != undefined && value.displayMeasureValue != undefined){
 					property = value;
 				}

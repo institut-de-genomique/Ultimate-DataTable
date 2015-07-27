@@ -2696,7 +2696,7 @@ directive('udtConvertvalue',['udtConvertValueServices', function(udtConvertValue
 			var convertValues = udtConvertValueServices();
 			var property = undefined;
 			
-			scope.$watch(attr.convertValue, function(value){
+			scope.$watch(attr.udtConvertvalue, function(value){
 				if(value.saveMeasureValue != undefined && value.displayMeasureValue != undefined){
 					property = value;
 				}
@@ -2861,11 +2861,11 @@ directive("udtHtmlFilter", function($filter) {
 					  link: function(scope, element, attrs, ngModelController) {
 					    ngModelController.$formatters.push(function(data) {
 					    	var convertedData = data;
-					    	  if(attrs.dtHtmlFilter == "datetime"){
+					    	  if(attrs.udtHtmlFilter == "datetime"){
 					    			convertedData = $filter('date')(convertedData, Messages("datetime.format"));
-					    	   }else if(attrs.dtHtmlFilter == "date"){
+					    	   }else if(attrs.udtHtmlFilter == "date"){
 					    		   	convertedData = $filter('date')(convertedData, Messages("date.format"));
-					    	   }else if(attrs.dtHtmlFilter == "number"){
+					    	   }else if(attrs.udtHtmlFilter == "number"){
 					    		   	convertedData = $filter('number')(convertedData);
 					    	   }
 					    	
