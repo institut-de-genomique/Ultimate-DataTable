@@ -18,9 +18,13 @@ directive("udtCell", function(){
     			    	}else{
     			    		defaultValueDirective = 'udt-default-value="col.defaultValues"';
     			    	}
-						var userDirectives = col.editDirectives;
-						if(angular.isFunction(userDirectives)){
-							userDirectives = userDirectives();
+						
+						var userDirectives = "";
+						if(col.editDirectives !== undefined){
+							userDirectives = col.editDirectives;
+							if(angular.isFunction(userDirectives)){
+								userDirectives = userDirectives();
+							}
 						}
 	    						    				
 	    				if(col.type === "boolean"){
