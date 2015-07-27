@@ -6,7 +6,7 @@ directive('udtDefaultValue',['$parse', function($parse) {
 	    			require: 'ngModel',
 	    			link: function(scope, element, attrs, ngModel) {
 	    				var defaultValue = null;
-	    				scope.$watch(attrs.dtDefaultValue, function(defaultValues){
+	    				scope.$watch(attrs.udtDefaultValue, function(defaultValues){
 	    					if(defaultValues != undefined){
 	    						defaultValue = defaultValues;
 	    					}

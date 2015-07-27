@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.0-SNAPSHOT 2015-07-26 
+/*! ultimate-datatable version 3.2.0-SNAPSHOT 2015-07-27 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -2779,7 +2779,7 @@ directive('udtDefaultValue',['$parse', function($parse) {
 	    			require: 'ngModel',
 	    			link: function(scope, element, attrs, ngModel) {
 	    				var defaultValue = null;
-	    				scope.$watch(attrs.dtDefaultValue, function(defaultValues){
+	    				scope.$watch(attrs.udtDefaultValue, function(defaultValues){
 	    					if(defaultValues != undefined){
 	    						defaultValue = defaultValues;
 	    					}
