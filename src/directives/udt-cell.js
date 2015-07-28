@@ -74,7 +74,7 @@ directive("udtCell", function(){
 			    	
 			    	scope.udtTableFunctions.getConvertDirective = function(col, header){
 			    		if(col.convertValue != undefined && col.convertValue.active == true && col.convertValue.saveMeasureValue != col.convertValue.displayMeasureValue){
-			    			return 'udtConvertvalue="col.convertValue"';
+			    			return 'udt-convertvalue="col.convertValue"';
 			    		}
 			    		return "";
 			    	}

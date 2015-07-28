@@ -37,7 +37,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 			    	scope.udtTableFunctions.cancel = function(){
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.cancel()}).then(function(){
-		    				scope.udtTable.setSpinner(false);  		    				
+		    				scope.udtTable.computeDisplayResultTimeOut.then(function(){
+								scope.udtTable.setSpinner(false); 
+							});	   		    				
 		    			});
 		    			
 		    					    			
@@ -47,7 +49,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.setNumberRecordsPerPage(elt)}).then(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.pagination.mode)){
-		    					scope.udtTable.setSpinner(false);  		    				
+		    					scope.udtTable.computeDisplayResultTimeOut.then(function(){
+									scope.udtTable.setSpinner(false); 
+								});	    				
 		    				}
 		    			});
 		    			
@@ -58,7 +62,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.setPageNumber(page)}).then(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.pagination.mode)){
-		    					scope.udtTable.setSpinner(false);  		    				
+								scope.udtTable.computeDisplayResultTimeOut.then(function(){
+									scope.udtTable.setSpinner(false); 
+								});									
 		    				}	    				
 		    			});		    			
 		    		};
@@ -74,7 +80,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.setOrderColumn(column)}).then(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.order.mode)){
-		    					scope.udtTable.setSpinner(false);  		    				
+								scope.udtTable.computeDisplayResultTimeOut.then(function(){
+									scope.udtTable.setSpinner(false);  		    			
+								});								
 		    				} 		    				
 		    			});	
 		    			
@@ -90,7 +98,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		scope.udtTableFunctions.setGroupColumn = function(column){
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.setGroupColumn(column)}).then(function(){
-		    				scope.udtTable.setSpinner(false);  		    				
+							scope.udtTable.computeDisplayResultTimeOut.then(function(){
+								scope.udtTable.setSpinner(false);
+							});  		    				
 		    			});
 		    		};			
 		    		
@@ -105,7 +115,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		scope.udtTableFunctions.updateShowOnlyGroups = function(){
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.updateShowOnlyGroups()}).then(function(){
-		    				scope.udtTable.setSpinner(false);  		    				
+							scope.udtTable.computeDisplayResultTimeOut.then(function(){
+								scope.udtTable.setSpinner(false); 
+							});									
 		    			});
 		    		};
 		    		

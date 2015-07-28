@@ -2491,7 +2491,7 @@ directive("udtCell", function(){
 			    	
 			    	scope.udtTableFunctions.getConvertDirective = function(col, header){
 			    		if(col.convertValue != undefined && col.convertValue.active == true && col.convertValue.saveMeasureValue != col.convertValue.displayMeasureValue){
-			    			return 'udtConvertvalue="col.convertValue"';
+			    			return 'udt-convertvalue="col.convertValue"';
 			    		}
 			    		return "";
 			    	}
@@ -2692,40 +2692,61 @@ directive('udtCompile', function($compile) {
 		});;angular.module('ultimateDataTableServices').
 //This directive convert the ngModel value to a view value and then the view value to the ngModel unit value
 //The value passed to the directive must be an object with displayMeasureValue and saveMeasureValue
-directive('udtConvertvalue',['udtConvertValueServices', function(udtConvertValueServices) {
+directive('udtConvertvalue',['udtConvertValueServices','$filter', function(udtConvertValueServices, $filter) {
 	return {
-		require: 'ngModel',
-		link: function(scope, ele, attr, ngModel) {
-			//init service
-			var convertValues = udtConvertValueServices();
-			var property = undefined;
-			
-			scope.$watch(attr.udtConvertvalue, function(value){
-				if(value.saveMeasureValue != undefined && value.displayMeasureValue != undefined){
-					property = value;
-				}
-			});
-			
-			//model to view
-			scope.$watch(
-				function(){
-					return ngModel.$modelValue;
-				}, function(newValue, oldValue){
-					if(property != undefined){
-						ngModel.$setViewValue(convertValues.convertValue(newValue, property.saveMeasureValue, property.displayMeasureValue));
+                require: 'ngModel',
+                link: function(scope, element, attr, ngModel) {
+                	//init service
+                	var convertValues = udtConvertValueServices();
+                	var property = undefined;
+                	
+					var watchModelValue = function(){
+						return scope.$watch(
+									function(){
+										return ngModel.$modelValue;
+									}, function(newValue, oldValue){
+										if(property != undefined){
+											var convertedValue = convertValues.convertValue(newValue, property.saveMeasureValue, property.displayMeasureValue);
+											ngModel.$setViewValue($filter('number')(convertedValue));
+											ngModel.$render();
+										}
+								});
+					};
+					
+                	scope.$watch(attr.udtConvertvalue, function(value){
+    					if(value.saveMeasureValue != undefined && value.displayMeasureValue != undefined){
+    						property = value;
+    					}
+    				});
+                	
+                	//model to view when the user go out of the input
+                	element.bind('blur', function () {
+                		var convertedValue = convertValues.convertValue(ngModel.$modelValue, property.saveMeasureValue, property.displayMeasureValue, ngModel.$viewValue.length);
+                		ngModel.$setViewValue($filter('number')(convertedValue));
 						ngModel.$render();
-					}
-			});
-			
-			//view to model
-			ngModel.$parsers.push(function(value) {
-				if(property != undefined){
-					value = convertValues.convertValue(value, property.displayMeasureValue, property.saveMeasureValue);
-				}
-				return value;
-			});
-		}
-	};
+						//We restart the watcher when the user is out of the inputs
+						scope.currentWatcher = watchModelValue();
+                	});
+                	
+					//when the user go into the input
+					element.bind('focus', function () {
+						//We need to disable the watcher when the user is typing
+						scope.currentWatcher();
+                	});
+					
+                	//model to view whatcher
+                	scope.currentWatcher = watchModelValue();
+                	
+                    //view to model
+                    ngModel.$parsers.push(function(value) {
+                    	value = convertValues.parse(value);
+                    	if(property != undefined){
+	                    	value = convertValues.convertValue(value, property.displayMeasureValue, property.saveMeasureValue);
+                    	}
+                    	return value;
+                    });
+                }
+            };
 }]);;angular.module('ultimateDataTableServices').
  //Convert the date in format(view) to a timestamp date(model)
 directive('udtDateTimestamp', function() {
@@ -2834,7 +2855,7 @@ directive('udtForm', function(){
 		
 		scope.$watch('keywords', function(newValue, oldValue) {
 			if (!newValue || newValue == '' || !scope.active) {
-				if(scope.udtHighlight !== undefined)
+				if(scope.udtHighlight !== undefined && scope.udtHighlight !== null)
 					element.html(scope.udtHighlight.toString());
 				return false;
 			}
@@ -3019,7 +3040,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 			    	scope.udtTableFunctions.cancel = function(){
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.cancel()}).then(function(){
-		    				scope.udtTable.setSpinner(false);  		    				
+		    				scope.udtTable.computeDisplayResultTimeOut.then(function(){
+								scope.udtTable.setSpinner(false); 
+							});	   		    				
 		    			});
 		    			
 		    					    			
@@ -3029,7 +3052,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.setNumberRecordsPerPage(elt)}).then(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.pagination.mode)){
-		    					scope.udtTable.setSpinner(false);  		    				
+		    					scope.udtTable.computeDisplayResultTimeOut.then(function(){
+									scope.udtTable.setSpinner(false); 
+								});	    				
 		    				}
 		    			});
 		    			
@@ -3040,7 +3065,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.setPageNumber(page)}).then(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.pagination.mode)){
-		    					scope.udtTable.setSpinner(false);  		    				
+								scope.udtTable.computeDisplayResultTimeOut.then(function(){
+									scope.udtTable.setSpinner(false); 
+								});									
 		    				}	    				
 		    			});		    			
 		    		};
@@ -3056,7 +3083,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.setOrderColumn(column)}).then(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.order.mode)){
-		    					scope.udtTable.setSpinner(false);  		    				
+								scope.udtTable.computeDisplayResultTimeOut.then(function(){
+									scope.udtTable.setSpinner(false);  		    			
+								});								
 		    				} 		    				
 		    			});	
 		    			
@@ -3072,7 +3101,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		scope.udtTableFunctions.setGroupColumn = function(column){
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.setGroupColumn(column)}).then(function(){
-		    				scope.udtTable.setSpinner(false);  		    				
+							scope.udtTable.computeDisplayResultTimeOut.then(function(){
+								scope.udtTable.setSpinner(false);
+							});  		    				
 		    			});
 		    		};			
 		    		
@@ -3087,7 +3118,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		scope.udtTableFunctions.updateShowOnlyGroups = function(){
 		    			scope.udtTable.setSpinner(true);
 		    			$timeout(function(){scope.udtTable.updateShowOnlyGroups()}).then(function(){
-		    				scope.udtTable.setSpinner(false);  		    				
+							scope.udtTable.computeDisplayResultTimeOut.then(function(){
+								scope.udtTable.setSpinner(false); 
+							});									
 		    			});
 		    		};
 		    		
