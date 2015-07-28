@@ -34,7 +34,7 @@
  <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/bootstrap/js/bootstrap-3.3.4.min.js" type="text/javascript" charset="utf-8"></script>
  <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/angular-js/angular-1.3.16.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/momentjs.js" type="text/javascript" charset="utf-8"></script>
- <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/ultimate-datatable-3.1.0.js" type="text/javascript" charset="utf-8"></script>
+ <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/ultimate-datatable-3.2.0.js" type="text/javascript" charset="utf-8"></script>
 ```
 
 ### HTML
