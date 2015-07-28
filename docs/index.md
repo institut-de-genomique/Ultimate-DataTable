@@ -6,8 +6,8 @@ You can [fork this project in GitHub](https://github.com/institut-de-genomique/U
 > **Keep in mind that this documentation is a work in progress**
 
 ##Versions
-> **Current stable version** : 3.1.0<br>
-**Latest version** : 3.2.X-SNAPSHOT
+> **Current stable version** : 3.2.0<br>
+**Latest version** : 3.2.0
 
 
 ## Quick start
@@ -21,6 +21,7 @@ You can [fork this project in GitHub](https://github.com/institut-de-genomique/U
 	<li><a href="https://jquery.com/">Jquery</a></li>
 	<li><a href="http://getbootstrap.com/">Bootstrap CSS and Javascript (3.x)</a></li>
 	<li><a href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</a></li>
+	<li><a href="http://momentjs.com/">MomentJS</a> If you use dates</li>
 </ul>
 ```html
  <link rel="stylesheet" href="http://institut-de-genomique.github.io/Ultimate-DataTable/js/bootstrap/css/bootstrap-3.3.4.min.css">
@@ -29,6 +30,7 @@ You can [fork this project in GitHub](https://github.com/institut-de-genomique/U
  <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/jquery/jquery_1.11.1.min.js" type="text/javascript" charset="utf-8"></script>
  <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/bootstrap/js/bootstrap-3.3.4.min.js" type="text/javascript" charset="utf-8"></script>
  <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/angular-js/angular-1.3.16.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/momentjs.js" type="text/javascript" charset="utf-8"></script>
  <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/ultimate-datatable-3.1.0.js" type="text/javascript" charset="utf-8"></script>
 ```
 

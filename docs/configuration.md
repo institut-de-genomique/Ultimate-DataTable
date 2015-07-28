@@ -197,7 +197,7 @@ compact:boolean/boolean
 }
 ```
 ## CSV export
-> If you want to make an export of all the data
+> If you want to make an export of all the data, you need to import the dependencies/fileSaver/fileSaver.min.js file to use this feature
 ```json
 "exportCSV":{
 	active:boolean,//Active or not

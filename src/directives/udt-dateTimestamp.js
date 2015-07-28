@@ -8,7 +8,7 @@ directive('udtDateTimestamp', function() {
 						
 	                	var convertToDate = function(date){
 	                		if(date !== null && date !== undefined && date !== ""){
-		                		var format = Messages("date.format").toUpperCase();
+		                		var format = scope.udtTableFunctions.messages.Messages("date.format").toUpperCase();
 		                		date = moment(date).format(format);
 		                		return date;
 	                		}
@@ -17,7 +17,7 @@ directive('udtDateTimestamp', function() {
 	                	
 	                	var convertToTimestamp = function(date){
 	                		if(date !== null && date !== undefined && date !== ""){
-		                		var format = Messages("date.format").toUpperCase();
+		                		var format = scope.udtTableFunctions.messages.Messages("date.format").toUpperCase();
 		    					return moment(date, format).valueOf();
 	                		}
 	                		return "";
