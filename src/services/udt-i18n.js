@@ -6,7 +6,7 @@ factory('udtI18n', [function() {
 					translateTable : {
 						"fr":{
 							"result":"Résultats",
-							"date.format":"dd/mm/yyyy",
+							"date.format":"dd/MM/yyyy",
 							"datetime.format":"dd/MM/yyyy HH:mm:ss",
 							"datatable.button.selectall":"Tout Sélectionner",
 							"datatable.button.unselectall" :"Tout Délectionner",

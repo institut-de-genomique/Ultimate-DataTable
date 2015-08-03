@@ -714,7 +714,7 @@ angular.module('ultimateDataTableServices', []).
 									var displayResultTmp = [];
 									angular.forEach(_displayResult, function(value, key){
 										 var line = {edit:undefined, selected:undefined, trClass:undefined, group:true};
-										 that.push({data:value, line:line});
+										 this.push({data:value, line:line});
 									}, displayResultTmp);			    				
 									that.displayResult = displayResultTmp;		
 								} else{
@@ -1186,7 +1186,7 @@ angular.module('ultimateDataTableServices', []).
 			    							//add the data in table to send in once all the result
 			    							data.push({index:i, data:valueFunction(this.displayResult[i].data)});			    							
 			    						} else{	
-			    							this.saveLocal(this.displayResult[i].data,i);
+			    							this.saveLocal(valueFunction(this.displayResult[i].data),i);
 			    						}
 			    					}						
 			    				}
