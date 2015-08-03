@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.0 2015-07-28 
+/*! ultimate-datatable version 3.2.1 2015-08-03 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -717,7 +717,7 @@ angular.module('ultimateDataTableServices', []).
 									var displayResultTmp = [];
 									angular.forEach(_displayResult, function(value, key){
 										 var line = {edit:undefined, selected:undefined, trClass:undefined, group:true};
-										 that.push({data:value, line:line});
+										 this.push({data:value, line:line});
 									}, displayResultTmp);			    				
 									that.displayResult = displayResultTmp;		
 								} else{
@@ -1189,7 +1189,7 @@ angular.module('ultimateDataTableServices', []).
 			    							//add the data in table to send in once all the result
 			    							data.push({index:i, data:valueFunction(this.displayResult[i].data)});			    							
 			    						} else{	
-			    							this.saveLocal(this.displayResult[i].data,i);
+			    							this.saveLocal(valueFunction(this.displayResult[i].data),i);
 			    						}
 			    					}						
 			    				}
@@ -3318,7 +3318,7 @@ factory('udtI18n', [function() {
 					translateTable : {
 						"fr":{
 							"result":"Résultats",
-							"date.format":"dd/mm/yyyy",
+							"date.format":"dd/MM/yyyy",
 							"datetime.format":"dd/MM/yyyy HH:mm:ss",
 							"datatable.button.selectall":"Tout Sélectionner",
 							"datatable.button.unselectall" :"Tout Délectionner",
@@ -3442,7 +3442,7 @@ run(function($templateCache) {
   		    		+'</tr>'
   		    		+'</thead>'
   		    		+'<tbody>'
-					+	'<tr ng-if="udtTable.config.filter.columnMode && !udtTable.isEdit()" class="filter">'
+					+	'<tr ng-if="udtTable.config.filter.columnMode && !udtTable.config.edit.start" class="filter">'
   		    		+		'<td ng-repeat="col in udtTable.config.columns" ng-if="!udtTable.isHide(col.id)">'
   		    		+			'<div udt-cell-filter/>'
   		    		+		'</td>'
