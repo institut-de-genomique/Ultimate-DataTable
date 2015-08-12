@@ -4,7 +4,7 @@ factory('udtConvertValueServices', [function() {
 				var udtConvertValueServices = {
 				    //Convert the value in inputUnit to outputUnit if the units are different
 					convertValue : function(value, inputUnit, outputUnit, precision){
-							if(inputUnit !== outputUnit && !isNaN(value)){
+							if(inputUnit !== outputUnit && !isNaN(value) && null !== value){
 								var convert = this.getConversion(inputUnit,outputUnit);
 								if(convert != undefined && !angular.isFunction(convert)){
 									value = value * convert;
