@@ -11,6 +11,10 @@
 	background-color: #f1f1f1;
 }
 
+.datatable .xheader {
+	text-align: center;
+}
+
 .row_selected {
 	background-color: #f1f1f1;
 }

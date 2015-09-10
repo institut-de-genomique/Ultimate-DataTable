@@ -16,7 +16,7 @@ run(function($templateCache) {
   		    		+'<table class="table table-condensed table-hover table-bordered">'
   		    		+'<thead>'
   		    		+'<tr ng-repeat="(key,headers) in udtTable.getExtraHeaderConfig()">'
-  		    		+	'<th colspan="{{header.colspan}}" ng-repeat="header in headers"><span ng-bind="udtTableFunctions.messages.Messages(header.label)"/></th>'
+  		    		+	'<th colspan="{{header.colspan}}" ng-repeat="header in headers" class="xheader"><span ng-bind="udtTableFunctions.messages.Messages(header.label)"/></th>'
   		    		+'</tr>'
   		    		+'<tr>'
   		    		+	'<th id="{{column.id}}" ng-repeat="column in udtTable.getColumnsConfig()" ng-model="column" draggable ng-if="!udtTable.isHide(column.id)">'

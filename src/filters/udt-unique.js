@@ -12,7 +12,10 @@ filter('udtUnique', function($parse) {
     		    extend = angular.extend,
     		    copy = angular.copy,
     		    equals = angular.equals;
-
+				
+				if(!isArray(collection) && !isObject(collection)){
+					return collection;
+				}
 	
 	    		/**
 	    		* get an object and return array of values
