@@ -1058,7 +1058,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q','udtI18n','$
       if(this.config.edit.active){
         var that = this;
         this.computeDisplayResultTimeOut.then(function(){
-          that._getAllResult = function(){return that.allResult;};
           that.config.edit.columns = {};
           var find = false;
           for(var i = 0; i < that.displayResult.length; i++){
@@ -1316,6 +1315,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q','udtI18n','$
         }
         this.config.save.newData = [];
         this.setSpinner(false);
+        this.searchLocal(this.searchTerms);
       }
 
     },
@@ -1566,7 +1566,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q','udtI18n','$
         this.config.remove = angular.copy(this.configMaster.remove);
         this.config.select = angular.copy(this.configMaster.select);
         this.config.messages = angular.copy(this.configMaster.messages);
-        this.totalNumberRecords = this.allResult.length;
+        this.totalNumberRecords = this._getAllResult().length;
         this.computePaginationList();
         this.computeDisplayResult();
 
