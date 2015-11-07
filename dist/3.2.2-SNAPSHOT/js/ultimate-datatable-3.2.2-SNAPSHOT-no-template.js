@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2015-09-10 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2015-11-07 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -14,7 +14,7 @@ angular.module('ultimateDataTableServices', []).
 								list:{},//if dynamic=false
 								dynamic:true //if dynamic=true, the headers will be auto generated
 							},//ex: extraHeaders:{number:2,dynamic:false,list:{0:[{"label":"test","colspan":"1"},{"label":"a","colspan":"1"}],1:[{"label":"test2","colspan":"5"}]}}
-							columns : [], /*ex : 
+							columns : [], /*ex :
 												{
 													"header":"Code Container", //the title //used by default Messages
 													"property":"code", //the property to bind or function used to extract the value
@@ -100,14 +100,14 @@ angular.module('ultimateDataTableServices', []).
 							},
 							edit : {
 								active:false,
-								withoutSelect:false, //edit all line without selected it								
+								withoutSelect:false, //edit all line without selected it
 								showButton : true,
 								columnMode : false,
-								byDefault : false, //put in edit mode when the datatable is build 
+								byDefault : false, //put in edit mode when the datatable is build
 								start : false,
 								all : false,
 								columns : {}, //columnIndex : {edit : true/false, value:undefined}
-								lineMode:undefined //function used to define if line is editable. 
+								lineMode:undefined //function used to define if line is editable.
 							},
 							save :{
 								active:false,
@@ -191,7 +191,7 @@ angular.module('ultimateDataTableServices', []).
 								start:false
 							},
 							compact:true //mode compact pour le nom des bouttons
-							
+
 						},
 						config:undefined,
     					configMaster:undefined,
@@ -251,13 +251,13 @@ angular.module('ultimateDataTableServices', []).
 		    				this.config.select = angular.copy(this.configMaster.select);
 		    				this.config.messages = angular.copy(this.configMaster.messages);
 		    				this.config.pagination.pageNumber = 0;
-							this._search(angular.copy(params));							
+							this._search(angular.copy(params));
     					},
 						/**
     					 * local search
     					 */
     					searchLocal : function(searchTerms){
-							if(this.config.filter.active === true){								
+							if(this.config.filter.active === true){
 								//Set the properties "" or null to undefined because we don't want to filter this
 								this.setSpinner(true);
 								for(var p in searchTerms) {
@@ -265,20 +265,20 @@ angular.module('ultimateDataTableServices', []).
 										searchTerms[p] = undefined;
 									}
 								}
-								
+
 								var _allResult = angular.copy(this.allResult);
 								_allResult = $filter('filter')(this.allResult, searchTerms, false);
-								
+
 								this._getAllResult = function(){return _allResult;};
-								
+
 								this.totalNumberRecords = _allResult.length;
 								//this.sortAllResult();
 								this.computePaginationList();
 								this.computeDisplayResult();
 								var that = this;
 								this.computeDisplayResultTimeOut.then(function(){
-									that.setSpinner(false);									
-								});								
+									that.setSpinner(false);
+								});
 							}
 						},
 						_getAllResult : function(){
@@ -314,7 +314,7 @@ angular.module('ultimateDataTableServices', []).
 		    			searchWithLastParams : function(){
 		    				this._search(this.lastSearchParams);
 		    			},
-		    			
+
 		    			/**
 		    			 * Set all data used by search method or directly when local data
 		    			 */
@@ -331,7 +331,7 @@ angular.module('ultimateDataTableServices', []).
 		    				this.sortAllResult();
 		    				this.computePaginationList();
 		    				this.computeDisplayResult();
-							this._getAllResult = function(){return this.allResult;};		    				
+							this._getAllResult = function(){return this.allResult;};
 		    			},
 		    			/**
 		    			 * Return all the data
@@ -349,7 +349,7 @@ angular.module('ultimateDataTableServices', []).
 			    					this.config.pagination.pageNumber=0;
 			    				}
 			    				for(var i = 0 ; i < data.length; i++){
-			    					this.allResult.push(data[i]);				    				
+			    					this.allResult.push(data[i]);
 			    				}
 			    				this.totalNumberRecords = this.allResult.length;
 			    				this.loadUrlColumnProperty();
@@ -357,7 +357,7 @@ angular.module('ultimateDataTableServices', []).
 			    				this.sortAllResult();
 			    				this.computePaginationList();
 			    				this.computeDisplayResult();
-								this._getAllResult = function(){return this.allResult;};		
+								this._getAllResult = function(){return this.allResult;};
 			    			}
 		    			},
 						/**
@@ -368,13 +368,13 @@ angular.module('ultimateDataTableServices', []).
 								//call inti method for the new data
 								var newData = this.config.add.init(this);
 								var line = {edit:true, selected:true, trClass:undefined, group:false, new:true};
-								 
+
 								if(this.config.add.after){
 									this.displayResult.push({data:newData, line:line})
 								}else{
 									this.displayResult.unshift({data:newData, line:line})
 								}
-								this.config.edit.all = true								
+								this.config.edit.all = true
 							}
 		    			},
 		    			/**
@@ -408,14 +408,14 @@ angular.module('ultimateDataTableServices', []).
 				    						propertyGetter += that.getFilter(column);
 				    						var columnGetter = $parse(propertyGetter);
 				    						var columnSetter = $parse("group."+column.id);
-				    						
+
 				    						if('sum' === column.groupMethod || 'average' ===  column.groupMethod){
 					    						var result = groupData.reduce(function(value, element){
 					    							return value += columnGetter(element);
-					    						}, 0);	
-					    						
+					    						}, 0);
+
 					    						if('average' ===  column.groupMethod)result = result / groupData.length;
-					    						
+
 					    						if(isNaN(result)){
 					    							result = "#ERROR";
 					    						}
@@ -434,30 +434,30 @@ angular.module('ultimateDataTableServices', []).
 				    							}else{
 				    								result = undefined;
 				    							}
-				    							columnSetter.assign(group, result);	
+				    							columnSetter.assign(group, result);
 				    						}else if('countDistinct' === column.groupMethod){
-				    							var result = $filter('udtCountdistinct')(groupData, propertyGetter); 
+				    							var result = $filter('udtCountdistinct')(groupData, propertyGetter);
 				    							columnSetter.assign(group, result);
 				    						}else if('collect' === column.groupMethod){
-				    							var result = $filter('udtCollect')(groupData, propertyGetter); 
+				    							var result = $filter('udtCollect')(groupData, propertyGetter);
 				    							columnSetter.assign(group, result);
 				    						}else{
 				    							console.error("groupMethod is not managed "+column.groupMethod)
 				    						}
 				    					});
-				    					
-				    					groups[key] = group;				    					
-				    					this.allGroupResult.push(group);				    									    									    				
+
+				    					groups[key] = group;
+				    					this.allGroupResult.push(group);
 				    				}
-				    				this.config.group.data = groups;				    				
+				    				this.config.group.data = groups;
 		    				}else{
 		    					this.config.group.data = undefined;
 		    					this.allGroupResult = undefined;
 		    				}
-		    				
+
 		    			},
-		    			
-		    			getGroupColumnValue:function(groupValue, columnProperty){		    				
+
+		    			getGroupColumnValue:function(groupValue, columnProperty){
 	    					for(var i = 0 ; i < this.config.columns.length ; i++){
 	    						if(this.config.columns[i].property === columnProperty){
 	    							var column = this.config.columns[i];
@@ -465,14 +465,14 @@ angular.module('ultimateDataTableServices', []).
 	    							return columnGetter(groupValue);
 	    						}
 	    					}
-	    					console.log("column not found for property :"+columnProperty);		    					
+	    					console.log("column not found for property :"+columnProperty);
 		    				return undefined;
 		    			},
-		    			
+
 		    			isGroupActive : function(){
 		    				return (this.config.group.active && this.config.group.start);
 		    			},
-		    			
+
 		    			/**
 		    			 * set the order column name
 		    			 * @param orderColumnName : column name
@@ -492,13 +492,13 @@ angular.module('ultimateDataTableServices', []).
 		    							this.config.group.columns[columnId] = true;
 		    							if(this.config.group.columns["all"]) this.config.group.columns["all"] = false;
 		    						}
-		    						
+
 		    						for(var i = 0; i < this.config.columns.length; i++){
 			    						if(this.config.columns[i].id === columnId){
 			    							this.config.group.columns[this.config.columns[i].id] = true;
 			    						}else{
 			    							this.config.group.columns[this.config.columns[i].id] = false;
-			    						}		    							    						
+			    						}
 			    					}
 		    					}else{ //degroupe
 		    						this.config.group.columns[columnId] = !this.config.group.columns[columnId];
@@ -508,13 +508,13 @@ angular.module('ultimateDataTableServices', []).
 		    						}
 		    						this.config.group.start=false;
 		    					}
-		    					
+
 		    					if(this.config.edit.active && this.config.edit.start){
     								//TODO add a warning popup
     								console.log("edit is active, you lost all modification !!");
     								this.config.edit = angular.copy(this.configMaster.edit); //reinit edit
     							}
-		    					
+
 		    					this.computeGroup();
 		    					this.sortAllResult(); //sort all the result
 		    					this.computePaginationList(); //redefined pagination
@@ -532,12 +532,12 @@ angular.module('ultimateDataTableServices', []).
 		    			updateShowOnlyGroups : function(){
 		    				this.sortAllResult(); //sort all the result
 		    				this.computePaginationList(); //redefined pagination
-			    			this.computeDisplayResult(); //redefined the result must be displayed				    							    			
+			    			this.computeDisplayResult(); //redefined the result must be displayed
 		    			},
 		    			getGroupColumnClass : function(columnId){
 		    				if(this.config.group.active){
 		    					if(!this.config.group.columns[columnId]) {return 'fa fa-bars';}
-	    						else  {return 'fa fa-outdent';}		    							    							    							    						    					    					
+	    						else  {return 'fa fa-outdent';}
 		    				} else{
 		    					//console.log("order is not active !!!");
 		    				}
@@ -548,26 +548,26 @@ angular.module('ultimateDataTableServices', []).
 	    					var groupConfig = this.config.group;
 	    					displayResultTmp.forEach(function(element, index, array){
 	    						/* previous mode */
-	    						if(!groupConfig.after && (index === 0 
+	    						if(!groupConfig.after && (index === 0
 	    								|| groupGetter(element.data) !== groupGetter(array[index-1].data))){
 	    							var line = {edit:undefined, selected:undefined, trClass:undefined, group:true, new:false};
 	    							this.push({data:groupConfig.data[groupGetter(element.data)], line:line});
-	    						}		    						
+	    						}
 	    						this.push(element);
-	    						
+
 	    						/* after mode */
-	    						if(groupConfig.after && (index === (array.length - 1) 
+	    						if(groupConfig.after && (index === (array.length - 1)
 	    								|| groupGetter(element.data) !== groupGetter(array[index+1].data))){
 	    							var line = {edit:undefined, selected:undefined, trClass:undefined, group:true, new:false};
 	    							this.push({data:groupConfig.data[groupGetter(element.data)], line:line});
-	    						}		    						
-	    						
+	    						}
+
 	    					},displayResult);
 	    					return displayResult;
 		    			},
-						
+
 						getColumnValue : function(result, column){
-							var colValue; 
+							var colValue;
 							if (!result.line.group && (column.url === undefined || column.url === null)) {
 								var property = column.property;
 								var isFunction = false;
@@ -594,9 +594,9 @@ angular.module('ultimateDataTableServices', []).
 										colValue = this.messages.Messages('datatable.export.no')
 									}
 								}
-								
+
 							} else if(result.line.group) {
-								
+
 								var v = $parse("group."+column.id)(result.data);
 								//if error in group function
 								if (angular.isDefined(v) && angular.isString(v) && v.charAt(0) === "#") {
@@ -607,26 +607,26 @@ angular.module('ultimateDataTableServices', []).
 								} else {
 									colValue =  undefined;
 								}
-								
-								if(colValue !==  undefined && column.type === "number"){
-									colValue = colValue.replace(/\u00a0/g,"");
-								}				    			    				
-								
-							}else if(!result.line.group && column.url !== undefined && column.url !== null) {
-								var url = $parse(column.url)(result.data);
-								colValue = $parse(column.property+this.getFilter(column)+this.getFormatter(column))(this.urlCache[url]);
-								
+
 								if(colValue !==  undefined && column.type === "number"){
 									colValue = colValue.replace(/\u00a0/g,"");
 								}
-								
+
+							}else if(!result.line.group && column.url !== undefined && column.url !== null) {
+								var url = $parse(column.url)(result.data);
+								colValue = $parse(column.property+this.getFilter(column)+this.getFormatter(column))(this.urlCache[url]);
+
+								if(colValue !==  undefined && column.type === "number"){
+									colValue = colValue.replace(/\u00a0/g,"");
+								}
+
 							}
 							return colValue;
 						},
-						
-						
+
+
 						/**
-						 * compute for each <td> the row span if user whant to merge cell	
+						 * compute for each <td> the row span if user whant to merge cell
 						 */
 						computeRowSpans : function(){
 							if(this.config.mergeCells.active === true){
@@ -637,20 +637,20 @@ angular.module('ultimateDataTableServices', []).
 								for(var i = 0; i < this.displayResult.length ; i++){
 									rowspans[i] = new Array(this.config.columns.length);
 								}
-								
+
 								var currentDisplayResult = this.displayResult;
 								var currentColumns = this.config.columns;
-								
+
 								var previousResult = undefined;
 								var nbRowEquals = new Array(this.config.columns.length);
 								for(var j = 0; j < nbRowEquals.length; j++){
 									nbRowEquals[j] = 0;
 								}
 								currentDisplayResult.forEach(function(result, i) {
-										currentColumns.forEach(function(column, j) {											
+										currentColumns.forEach(function(column, j) {
 											if(i > 0 && column.mergeCells){
-												var currentColValue = this.getColumnValue(result,column);			    			
-												var previousColValue = this.getColumnValue(previousResult,column);			    			
+												var currentColValue = this.getColumnValue(result,column);
+												var previousColValue = this.getColumnValue(previousResult,column);
 												if(currentColValue === previousColValue){
 													rowspans[i][j] = 0;
 													nbRowEquals[j]++;
@@ -658,24 +658,24 @@ angular.module('ultimateDataTableServices', []).
 													if(i === (currentDisplayResult.length -1)){
 														rowspans[i-(nbRowEquals[j])][j] = nbRowEquals[j]+1;
 													}
-													
+
 												}else{
 													rowspans[i][j] = 1;
 													rowspans[i-(nbRowEquals[j]+1)][j] = nbRowEquals[j]+1;
-													nbRowEquals[j] = 0;														
+													nbRowEquals[j] = 0;
 												}
 											} else if(i === 0){
 												rowspans[i][j] = 1;
 											}
-				    			    		
+
 			    						}, this);
 										previousResult = result;
 									}, this);
-								
+
 								this.config.mergeCells.rowspans = rowspans;
 							}
 						},
-						
+
 		    			/**
 		    			 * Selected only the records will be displayed.
 		    			 * Based on pagination configuration
@@ -687,49 +687,49 @@ angular.module('ultimateDataTableServices', []).
 							}else{
 								time = 0;
 							}
-							
+
 							var that = this;
 							this.computeDisplayResultTimeOut = $timeout(function(){
 								//to manage local pagination
 								var configPagination = that.config.pagination;
-								
+
 								var _displayResult = [];
 								if(that.config.group.start && that.config.group.showOnlyGroups){
-									_displayResult = that.allGroupResult.slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
+									_displayResult = that.allGroupResult.slice((configPagination.pageNumber*configPagination.numberRecordsPerPage),
 											(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage));
 									var displayResultTmp = [];
 									angular.forEach(_displayResult, function(value, key){
 										 var line = {edit:undefined, selected:undefined, trClass:undefined, group:true, new:false};
 										 this.push({data:value, line:line});
-									}, displayResultTmp);			    				
-									that.displayResult = displayResultTmp;		
+									}, displayResultTmp);
+									that.displayResult = displayResultTmp;
 								} else{
 									if(configPagination.active && !that.isRemoteMode(configPagination.mode)){
-										_displayResult = angular.copy(that._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
+										_displayResult = angular.copy(that._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage),
 												(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage)));
 									}else{ //to manage all records or server pagination
-										_displayResult = angular.copy(that._getAllResult());		    					
+										_displayResult = angular.copy(that._getAllResult());
 									}
-									
+
 									var displayResultTmp = [];
 									angular.forEach(_displayResult, function(value, key){
 										 var line = {edit:undefined, selected:undefined, trClass:undefined, group:false, new:false};
 										 this.push({data:value, line:line});
 									}, displayResultTmp);
-									
+
 									//group function
 									that.config.mergeCells.rowspans = undefined;
 									if(that.isGroupActive()){
-										that.displayResult = that.addGroup(displayResultTmp);					
+										that.displayResult = that.addGroup(displayResultTmp);
 									}else{
 										that.displayResult = displayResultTmp;
 										that.computeRowSpans();
 									}
-									
+
 									if(that.config.edit.byDefault){
 										that.config.edit.withoutSelect = true;
 										that.setEdit();
-									}								
+									}
 								}
 							}, time);
 		    			},
@@ -737,57 +737,57 @@ angular.module('ultimateDataTableServices', []).
 		    			 * Load all data for url column type
 		    			 */
 		    			loadUrlColumnProperty :function(){
-		    				
+
 		    				var urlColumns = this.getColumnsConfig().filter(function(column){
 		    					return (column.url !== undefined && column.url !== null);
 		    				});
-		    				
+
 		    				var displayResult = this.allResult;
 		    				var urlQueries = [];
 		    				var urlCache = this.urlCache = {};
-		    				
+
 		    				urlColumns.forEach(function(column){
 		    					displayResult.forEach(function(value){
 	    							var url = $parse(column.url)(value);
 		    						if(!angular.isDefined(urlCache[url])){
 		    							urlCache[url] = "in waiting data ...";
 		    							urlQueries.push($http.get(url, {url:url}));
-		    						}		    								    					
+		    						}
 		    					});
 		    				});
-		    				
+
 		    				$q.all(urlQueries).then(function(results){
 								angular.forEach(results, function(result, key){
 									if(result.status !== 200){
 										console.log("Error for load column property : "+result.config.url);
 									}else{
-										urlCache[result.config.url] = result.data;										
-									}																									
+										urlCache[result.config.url] = result.data;
+									}
 								});
-							});	
-							
+							});
+
 		    			},
-		    			
+
 		    			//pagination functions
 		    			/**
 		    			 * compute the pagination item list
 		    			 */
 		    			computePaginationList: function(){
-		    				var configPagination = this.config.pagination;		    						    						    				
+		    				var configPagination = this.config.pagination;
 		    				if(configPagination.active){
 		    					configPagination.pageList = [];
 			    				var currentPageNumber = configPagination.pageNumber;
-			    				
+
 	    						var nbPages = Math.ceil(this.totalNumberRecords / configPagination.numberRecordsPerPage);
 	    						if(this.config.group.active && this.config.group.start && this.config.group.showOnlyGroups){
 		    						nbPages = Math.ceil(this.allGroupResult.length / configPagination.numberRecordsPerPage);
 		    					}
-	    						
+
 	    						if(currentPageNumber > nbPages-1){
 	    							configPagination.pageNumber=0;
 	    							currentPageNumber = 0;
 	    						}
-	    						
+
 	    						if(nbPages > 1 && nbPages <= configPagination.numberPageListMax){
 			    					for(var i = 0; i < nbPages; i++){
 			    						configPagination.pageList.push({number:i, label:i+1,  clazz:(i!=currentPageNumber)?'':'active'});
@@ -800,30 +800,30 @@ angular.module('ultimateDataTableServices', []).
 		    						}else if(min > nbPages - configPagination.numberPageListMax){
 		    							min = nbPages - configPagination.numberPageListMax;
 		    						}
-		    							
+
 		    						if(max < configPagination.numberPageListMax){
 		    							max=configPagination.numberPageListMax
 		    						}else if(max > nbPages){
 		    							max=nbPages;
 		    						}
-		    						
+
 		    						configPagination.pageList.push({number:0, label:'<<',  clazz:(currentPageNumber!=min)?'':'disabled'});
 		    						configPagination.pageList.push({number:currentPageNumber-1, label:'<',  clazz:(currentPageNumber!=min)?'':'disabled'});
-		    						
+
 		    						for(; min < max; min++){
 		    							configPagination.pageList.push({number:min, label:min+1,  clazz:(min!=currentPageNumber)?'':'active'});
 			    					}
-		    						
+
 		    						configPagination.pageList.push({number:currentPageNumber+1, label:'>',  clazz:(currentPageNumber!=max-1)?'':'disabled'});
 		    						configPagination.pageList.push({number:nbPages-1, label:'>>',  clazz:(currentPageNumber!=max-1)?'':'disabled'});
-		    					}		    					
+		    					}
 		    				}else{
 		    					//console.log("pagination is not active !!!");
-		    				}		    				
+		    				}
 		    			},
-		    			
+
 		    			setSpinner:function(value){
-		    				this.config.spinner.start = value;		    				
+		    				this.config.spinner.start = value;
 		    			},
     					/**
     					 * Set the number of records by page
@@ -843,18 +843,18 @@ angular.module('ultimateDataTableServices', []).
 	    								console.log("edit is active, you lost all modification !!");
 	    								this.config.edit = angular.copy(this.configMaster.edit); //reinit edit
 	    							}
-	    							//reinit to first page	    							
+	    							//reinit to first page
 	    							this.config.pagination.pageNumber=0;
 	    							if(this.isRemoteMode(this.config.pagination.mode)){
 	    								this.searchWithLastParams();
 	    							}else{
 	    								this.computePaginationList();
-	    								this.computeDisplayResult();	    								
-	    							}	    							
+	    								this.computeDisplayResult();
+	    							}
 	    						}
     						}else{
 		    					//console.log("pagination is not active !!!");
-		    				}	
+		    				}
     					},
     					/**
     					 * Change the page result
@@ -867,7 +867,7 @@ angular.module('ultimateDataTableServices', []).
 	    								console.log("edit is active, you lost all modification !!");
 	    								this.config.edit = angular.copy(this.configMaster.edit); //reinit edit
 	    							}
-	    							
+
 		    						this.config.pagination.pageNumber=page.number;
 		    						if(this.isRemoteMode(this.config.pagination.mode)){
 										this.searchWithLastParams();
@@ -878,9 +878,9 @@ angular.module('ultimateDataTableServices', []).
 	    						}
     						}else{
 		    					//console.log("pagination is not active !!!");
-		    				}    						
+		    				}
     					},
-    						
+
     					//order functions
     					/**
 		    			 * Sort all result
@@ -888,7 +888,7 @@ angular.module('ultimateDataTableServices', []).
 		    			sortAllResult : function(){
 		    				if(this.config.order.active && !this.isRemoteMode(this.config.order.mode)){
 		    					var orderBy = [];
-		    					
+
 		    					if(this.config.group.active && this.config.group.start && this.config.group.by !== "all"){
 		    						if(!this.config.group.showOnlyGroups){
 			    						var orderGroupSense = (this.config.order.groupReverse)?'-':'+';
@@ -899,7 +899,7 @@ angular.module('ultimateDataTableServices', []).
 			    							var orderSense = (this.config.order.reverse)?'-':'+';
 				    						orderBy.push(orderSense+orderProperty)
 			    						}
-			    						this.allResult = $filter('orderBy')(this.allResult, orderBy);	
+			    						this.allResult = $filter('orderBy')(this.allResult, orderBy);
 		    						}else{
 		    							if(angular.isDefined(this.config.order.by)){
 			    							var orderProperty = "group."+this.config.order.by.id;
@@ -909,17 +909,17 @@ angular.module('ultimateDataTableServices', []).
 		    							this.allGroupResult = $filter('orderBy')(this.allGroupResult, orderBy);
 		    						}
 		    					}else if(angular.isDefined(this.config.order.by)){
-		    						
+
 		    						if(angular.isDefined(this.config.order.by)){
 		    							var orderProperty = this.config.order.by.property;
 				    					orderProperty += (this.config.order.by.filter)?'|'+this.config.order.by.filter:'';
 		    							var orderSense = (this.config.order.reverse)?'-':'+';
 			    						orderBy.push(orderSense+orderProperty)
 		    						}
-		    						this.allResult = $filter('orderBy')(this.allResult,orderBy);									
-		    					}		    					    					
+		    						this.allResult = $filter('orderBy')(this.allResult,orderBy);
+		    					}
 		    				}
-		    			},	
+		    			},
 		    			/**
 		    			 * set the order column name
 		    			 * @param orderColumnName : column name
@@ -928,23 +928,23 @@ angular.module('ultimateDataTableServices', []).
 		    				if(this.config.order.active){
 		    					var columnPropertyName = column.property;
 		    					var columnId  = column.id;
-		    					
+
 		    					if(angular.isDefined(this.config.group.by) &&  this.config.group.by.property === columnPropertyName && !this.config.group.showOnlyGroups){
-		    						this.config.order.groupReverse = !this.config.order.groupReverse; 		    						
+		    						this.config.order.groupReverse = !this.config.order.groupReverse;
 		    					}else{
 		    						if(!angular.isDefined(this.config.order.by) || this.config.order.by.property !== columnPropertyName){
 			    						this.config.order.by = column;
 			    						this.config.order.reverse = false;
 			    					}else{
-			    						this.config.order.reverse = !this.config.order.reverse;		    						
+			    						this.config.order.reverse = !this.config.order.reverse;
 			    					}
-			    					
+
 			    					for(var i = 0; i < this.config.columns.length; i++){
 			    						if(this.config.columns[i].id === columnId){
 			    							this.config.order.columns[this.config.columns[i].id] = true;
 			    						}else{
 			    							this.config.order.columns[this.config.columns[i].id] = false;
-			    						}		    							    						
+			    						}
 			    					}
 			    					if(this.config.edit.active && this.config.edit.start){
 	    								//TODO add a warning popup
@@ -952,13 +952,13 @@ angular.module('ultimateDataTableServices', []).
 	    								this.config.edit = angular.copy(this.configMaster.edit); //reinit edit
 	    							}
 		    					}
-		    					
+
 		    					if(!this.isRemoteMode(this.config.order.mode)){
 		    						this.sortAllResult(); //sort all the result
-				    				this.computeDisplayResult(); //redefined the result must be displayed				    				
+				    				this.computeDisplayResult(); //redefined the result must be displayed
 			    				} else if(this.config.order.active){
 			    					this.searchWithLastParams();
-			    				}	
+			    				}
 		    					var that = this;
 				    			this.computeDisplayResultTimeOut.then(function(){
 									if(angular.isFunction(that.config.order.callback)){
@@ -973,13 +973,13 @@ angular.module('ultimateDataTableServices', []).
 		    				if(this.config.order.active){
 		    					if(angular.isDefined(this.config.group.by) && this.config.group.by.id === columnId && !this.config.group.showOnlyGroups){
 		    						if(!this.config.order.groupReverse) {return 'fa fa-sort-up';}
-		    						else {return 'fa fa-sort-down';}	
+		    						else {return 'fa fa-sort-down';}
 		    					}else{
 		    						if(!this.config.order.columns[columnId]) {return 'fa fa-sort';}
-		    						else if(this.config.order.columns[columnId] && !this.config.order.reverse) {return 'fa fa-sort-up';}		    						
-		    						else if(this.config.order.columns[columnId] && this.config.order.reverse) {return 'fa fa-sort-down';}	
+		    						else if(this.config.order.columns[columnId] && !this.config.order.reverse) {return 'fa fa-sort-up';}
+		    						else if(this.config.order.columns[columnId] && this.config.order.reverse) {return 'fa fa-sort-down';}
 		    					}
-		    						    							    						    					    					
+
 		    				} else{
 		    					//console.log("order is not active !!!");
 		    				}
@@ -1002,7 +1002,7 @@ angular.module('ultimateDataTableServices', []).
 		    							this.config.show.add(value.data);
 		    						}
 		    					}, this);
-		    							    			
+
 		    				}else{
 		    					//console.log("show is not active !");
 		    				}
@@ -1012,7 +1012,7 @@ angular.module('ultimateDataTableServices', []).
 		    			 * set the hide column
 		    			 * @param hideColumnName : column name
 		    			 */
-		    			setHideColumn : function(column){	
+		    			setHideColumn : function(column){
 		    				if(this.config.hide.active){
 		    					var columnId = column.id;
 			    				if(!this.config.hide.columns[columnId]){
@@ -1024,9 +1024,9 @@ angular.module('ultimateDataTableServices', []).
 		    				}else{
 		    					//console.log("hide is not active !");
 		    				}
-		    				
+
 		    			},
-		    			
+
 		    			/**
 		    			 * Test if a column must be grouped
 		    			 * @param columnId : column id
@@ -1038,26 +1038,26 @@ angular.module('ultimateDataTableServices', []).
 		    					return false;
 		    				}
 		    			},
-		    			
+
 		    			/**
 		    			 * Test if a column must be hide
-		    			 * @param columnId : column id 
+		    			 * @param columnId : column id
 		    			 */
 		    			isHide : function(columnId){
 		    				if(this.config.hide.active && this.config.hide.columns[columnId]){
-				    			return this.config.hide.columns[columnId];				    							    		
+				    			return this.config.hide.columns[columnId];
 		    				}else{
 		    					//console.log("hide is not active !");
 		    					return false;
 		    				}
-		    			},		    			
+		    			},
 		    			//edit
-		    			
+
 		    			/**
 		    			 * set Edit all column or just one
 		    			 * @param editColumnName : column name
 		    			 */
-		    			setEdit : function(column){	
+		    			setEdit : function(column){
 		    				if(this.config.edit.active){
 								var that = this;
 								this.computeDisplayResultTimeOut.then(function(){
@@ -1065,17 +1065,17 @@ angular.module('ultimateDataTableServices', []).
 									that.config.edit.columns = {};
 									var find = false;
 									for(var i = 0; i < that.displayResult.length; i++){
-										
+
 										if(that.displayResult[i].line.selected || that.config.edit.withoutSelect){
 											if(angular.isUndefined(that.config.edit.lineMode) || (angular.isFunction(that.config.edit.lineMode) && that.config.edit.lineMode(that.displayResult[i].data))){
-												that.displayResult[i].line.edit=true;			    						
-												find = true;			    					
+												that.displayResult[i].line.edit=true;
+												find = true;
 											}else
 												that.displayResult[i].line.edit=false;
-											
+
 										}else{
 											that.displayResult[i].line.edit=false;
-										}			    					   					
+										}
 									}
 									that.selectAll(false);
 									if(find){
@@ -1085,7 +1085,7 @@ angular.module('ultimateDataTableServices', []).
 											if(angular.isUndefined(that.config.edit.columns[columnId])){
 												that.config.edit.columns[columnId] = {};
 											}
-											that.config.edit.columns[columnId].edit=true;			    						
+											that.config.edit.columns[columnId].edit=true;
 										}
 										else that.config.edit.all = true;
 									}
@@ -1093,7 +1093,7 @@ angular.module('ultimateDataTableServices', []).
 							}else{
 								//console.log("edit is not active !");
 							}
-		    			},		    			
+		    			},
 		    			/**
 		    			 * Test if a column must be in edition mode
 		    			 * @param editColumnName : column name
@@ -1105,14 +1105,14 @@ angular.module('ultimateDataTableServices', []).
 		    					if(columnId && line){
 		    						if(angular.isUndefined(this.config.edit.columns[columnId])){
 		    							this.config.edit.columns[columnId] = {};
-		    						}			    								    							    					
+		    						}
 			    					var columnEdit = this.config.edit.columns[columnId].edit;
 			    					isEdit = (line.edit && columnEdit) || (line.edit && this.config.edit.all);
 			    				}else if(columnId){
 			    					if(angular.isUndefined(this.config.edit.columns[columnId])){
 		    							this.config.edit.columns[columnId] = {};
-		    						}			    								    								    					
-			    					var columnEdit = this.config.edit.columns[columnId].edit;			    					
+		    						}
+			    					var columnEdit = this.config.edit.columns[columnId].edit;
 			    					isEdit = (columnEdit || this.config.edit.all);
 			    				}else{
 			    					isEdit = (this.config.edit.columnMode && this.config.edit.start);
@@ -1139,7 +1139,7 @@ angular.module('ultimateDataTableServices', []).
 			    					}
 			    				}
 		    				}else{
-		    					//console.log("edit is not active !");		    				
+		    					//console.log("edit is not active !");
 		    				}
 		    			},
 		    			//save
@@ -1155,7 +1155,7 @@ angular.module('ultimateDataTableServices', []).
 		    					this.config.messages.text = undefined;
 		    					this.config.messages.clazz = undefined;
 		    					var data = [];
-		    					
+
 								var valueFunction = this.getValueFunction(this.config.save.value);
 		    					for(var i = 0; i < this.displayResult.length; i++){
 			    					if(this.displayResult[i].line.edit || this.config.save.withoutEdit){
@@ -1166,32 +1166,32 @@ angular.module('ultimateDataTableServices', []).
 				    					this.resetErrors(i);
 			    						if(this.isRemoteMode(this.config.save.mode) && !this.config.save.batch){
 			    							//add the url in table to used $q
-			    							data.push(this.getSaveRemoteRequest(this.displayResult[i].data, i));			    							
+			    							data.push(this.getSaveRemoteRequest(this.displayResult[i].data, i));
 			    						} else if(this.isRemoteMode(this.config.save.mode) && this.config.save.batch){
 			    							//add the data in table to send in once all the result
-			    							data.push({index:i, data:valueFunction(this.displayResult[i].data)});			    							
-			    						} else{	
+			    							data.push({index:i, data:valueFunction(this.displayResult[i].data)});
+			    						} else{
 			    							this.saveLocal(valueFunction(this.displayResult[i].data),i);
 			    						}
-			    					}						
+			    					}
 			    				}
 		    					if(!this.isRemoteMode(this.config.save.mode) || data.length === 0){
 	    							this.saveFinish();
 	    						}else if(this.isRemoteMode(this.config.save.mode) && !this.config.save.batch){
 	    							this.saveRemote(data);
 	    						} else if(this.isRemoteMode(this.config.save.mode) && this.config.save.batch){
-	    							this.saveBatchRemote(data);	    							
-	    						}		    					
+	    							this.saveBatchRemote(data);
+	    						}
 		    				}else{
-		    					//console.log("save is not active !");		    				
+		    					//console.log("save is not active !");
 		    				}
 		    			},
-		    			
+
 		    			saveBatchRemote : function(values){
 		    				var nbElementByBatch = Math.ceil(values.length / 6); //6 because 6 request max in parrallel with firefox and chrome
 		    				var queries = [];
 							for(var i = 0; i  < 6 && values.length > 0 ; i++){
-								queries.push(this.getSaveRemoteRequest(values.splice(0, nbElementByBatch)));	    								
+								queries.push(this.getSaveRemoteRequest(values.splice(0, nbElementByBatch)));
 							}
 							$q.all(queries).then(function(results){
 								angular.forEach(results, function(result, key){
@@ -1199,22 +1199,22 @@ angular.module('ultimateDataTableServices', []).
 										console.log("Error for batch save");
 									}else{
 										angular.forEach(result.data, function(value, key){
-											this.datatable.saveRemoteOneElement(value.status, value.data, value.index);	    									
+											this.datatable.saveRemoteOneElement(value.status, value.data, value.index);
 	    								}, result.config);
 									}
-																									
+
 								});
-							});		    							
+							});
 		    			},
-		    			
+
 		    			saveRemote : function(queries){
 		    				$q.all(queries).then(function(results){
 								angular.forEach(results, function(value, key){
-									value.config.datatable.saveRemoteOneElement(value.status, value.data, value.config.index);																
-								});				
-							});				
+									value.config.datatable.saveRemoteOneElement(value.status, value.data, value.config.index);
+								});
+							});
 		    			},
-		    			
+
 		    			saveRemoteOneElement : function(status, value, index){
 		    				if(status !== 200){
 								if(this.config.save.changeClass){
@@ -1229,9 +1229,9 @@ angular.module('ultimateDataTableServices', []).
 								this.resetErrors(index);
 								this.saveLocal(value, index);
 								this.saveFinish();
-							}  				
+							}
 		    			},
-		    			
+
 		    			getSaveRemoteRequest : function(value, i){
 		    				var urlFunction = this.getUrlFunction(this.config.save.url);
 		    				var method = this.config.save.method;
@@ -1249,14 +1249,14 @@ angular.module('ultimateDataTableServices', []).
 			    					}).
 			    					error(function(data, status, headers, config) {
 			    						  config.datatable.saveRemoteOneElement(status, data, config.index);
-			    					});				    				
-			    				
+			    					});
+
 			    				}
 		    				}else{
 		    					throw 'no url define for save !';
 		    				}
 		    			},
-		    			
+
 		    			/**
 		    			 * Call after save to update the records property
 		    			 */
@@ -1265,7 +1265,7 @@ angular.module('ultimateDataTableServices', []).
 		    					if(data){
 		    						this.displayResult[i].data = data;
 		    					}
-		    					
+
 		    					//update in the all result table
 								if(!this.displayResult[i].line.new){
 									var j = i;
@@ -1273,23 +1273,23 @@ angular.module('ultimateDataTableServices', []).
 										j = i + (this.config.pagination.pageNumber*this.config.pagination.numberRecordsPerPage);
 									}
 									this.allResult[j] = angular.copy(this.displayResult[i].data);
-			    					
+
 								}else{
 									this.config.save.newData.push(data);
 								}
-		    					
+
 		    					if(!this.config.save.keepEdit){
 		    						this.displayResult[i].line.edit = undefined;
 		    					}else{
-		    						this.displayResult[i].line.edit = true;		    						
+		    						this.displayResult[i].line.edit = true;
 		    					}
-			    				
+
 								if(this.config.save.changeClass){
 									this.displayResult[i].line.trClass = "success";
 								}
 								this.config.save.number--;
 		    				}else{
-		    					//console.log("save is not active !");		    				
+		    					//console.log("save is not active !");
 		    				}
 		    			},
 		    			/**
@@ -1304,7 +1304,7 @@ angular.module('ultimateDataTableServices', []).
 		    						this.config.messages.clazz = this.config.messages.successClass;
 		    						this.config.messages.text = this.config.messages.transformKey(this.config.messages.successKey.save);
 		    					}
-		    					
+
 		    					if(angular.isFunction(this.config.save.callback)){
 			    					this.config.save.callback(this, this.config.save.error);
 			    				}
@@ -1315,12 +1315,12 @@ angular.module('ultimateDataTableServices', []).
 		    					this.config.save.start = false;
 		    					//insert new data create by addBlank in result
 		    					if(this.config.save.newData.length > 0){
-		    						this.addData(this.config.save.newData);			    					
+		    						this.addData(this.config.save.newData);
 		    					}
 		    					this.config.save.newData = [];
-		    					this.setSpinner(false);	
+		    					this.setSpinner(false);
 		    				}
-	    					
+
 		    			},
 		    			/**
 		    			 * Test if save mode can be enable
@@ -1341,36 +1341,36 @@ angular.module('ultimateDataTableServices', []).
 		    			remove : function(){
 		    				if(this.config.remove.active && !this.config.remove.start){
 		    					var r= $window.confirm(this.messages.Messages("datatable.remove.confirm"));
-		    					if(r){		  
+		    					if(r){
 		    						this.setSpinner(true);
 			    					this.config.messages.text = undefined;
 			    					this.config.messages.clazz = undefined;
-			    					
+
 			    					this.config.remove.counter = 0;
 			    					this.config.remove.start = true;
 			    					this.config.remove.number = 0;
 			    					this.config.remove.error = 0;
 			    					this.config.remove.ids = {errors:[],success:[]};
-			    					
+
 			    					for(var i = 0; i < this.displayResult.length; i++){
 			    						if(this.displayResult[i].line.selected && (!this.displayResult[i].line.edit || this.config.remove.withEdit)){
 				    						if(this.isRemoteMode(this.config.remove.mode)){
 				    							this.config.remove.number++;
-				    							this.removeRemote(this.displayResult[i].data, i);				    							
+				    							this.removeRemote(this.displayResult[i].data, i);
 				    						}else{
-				    							this.config.remove.ids.success.push(i);				    							
+				    							this.config.remove.ids.success.push(i);
 				    						}
-				    					}						
+				    					}
 				    				}
 			    					if(!this.isRemoteMode(this.config.remove.mode)){
 			    						this.removeFinish();
-			    					}			    					
+			    					}
 		    					}
 		    				}else{
-		    					//console.log("remove is not active !");		    				
+		    					//console.log("remove is not active !");
 		    				}
 		    			},
-		    			
+
 		    			/**
 		    			 * Call after save to update the records property
 		    			 */
@@ -1385,46 +1385,46 @@ angular.module('ultimateDataTableServices', []).
 								}
 								this.allResult.splice(j,1);
 								this.config.remove.counter++;
-								this.totalNumberRecords--;																						
+								this.totalNumberRecords--;
 		    				} else{
-		    					//console.log("remove is not active !");		    				
+		    					//console.log("remove is not active !");
 		    				}
 		    			},
-		    			
+
 		    			removeRemote : function(value, i){
 		    				var url = this.getUrlFunction(this.config.remove.url);
 			    			if(url){
 			    				return $http['delete'](url(value), {datatable:this, index:i, value:value})
 			    				.success(function(data, status, headers, config) {
 			    					config.datatable.config.remove.ids.success.push(config.index);
-			    					config.datatable.config.remove.number--;						    				
+			    					config.datatable.config.remove.number--;
 			    					config.datatable.removeFinish();
 			    				})
 			    				.error(function(data, status, headers, config) {
 			    					config.datatable.config.remove.ids.errors.push(config.value);
 			    					config.datatable.config.remove.error++;
-			    					config.datatable.config.remove.number--;						    				
+			    					config.datatable.config.remove.number--;
 			    					config.datatable.removeFinish();
-			    				});			    				
+			    				});
 		    				}else{
 		    					throw 'no url define for save !';
 		    				}
 		    			},
-		    			
-		    				    					    			
+
+
 		    			/**
 		    			 * Call when a remove is done
 		    			 */
 		    			removeFinish : function(){
 		    				if(this.config.remove.number === 0){
-		    					
+
 		    					this.config.remove.ids.success.sort(function(a, b) {
 		    						return a - b;
 		    					}).forEach(function(i){
 		    						this.removeLocal(i);
 		    					}, this);
-		    					
-		    					
+
+
 		    					if(this.config.remove.error > 0){
 		    						this.config.messages.clazz = this.config.messages.errorClass;
 		    						this.config.messages.text = this.config.messages.transformKey(this.config.messages.errorKey.remove, this.config.remove.error);
@@ -1432,17 +1432,17 @@ angular.module('ultimateDataTableServices', []).
 		    						this.config.messages.clazz = this.config.messages.successClass;
 		    						this.config.messages.text = this.config.messages.transformKey(this.config.messages.successKey.remove);
 		    					}
-		    					
+
 		    					if(angular.isFunction(this.config.remove.callback)){
 			    					this.config.remove.callback(this,this.config.remove.error);
-			    				}	
-		    					
+			    				}
+
 		    					this.computePaginationList();
 		    					this.computeDisplayResult();
 								var that = this;
 		    					this.computeDisplayResultTimeOut.then(function(){
 									if(that.config.remove.ids.errors.length > 0){
-										that.displayResult.every(function(value,index){			    						
+										that.displayResult.every(function(value,index){
 											var errors = that.config.remove.ids.errors;
 											for(var i = 0 ; i < errors.length ; i++){
 												if(angular.equals(value.data,  errors[i])){
@@ -1458,8 +1458,8 @@ angular.module('ultimateDataTableServices', []).
 											}
 										},that);
 									}
-									
-									
+
+
 									that.config.select.isSelectAll = false;
 									that.config.remove.error = 0;
 									that.config.remove.start = false;
@@ -1469,14 +1469,14 @@ angular.module('ultimateDataTableServices', []).
 								});
 		    				}
 		    			},
-		    			
+
 		    			/**
 		    			 * indicate if at least one line is selected and not in edit mode
 		    			 */
 		    			canRemove: function(){
 		    				if(this.config.remove.active && !this.config.remove.start){
 			    				for(var i = 0; this.displayResult && i < this.displayResult.length; i++){
-		    						if(this.displayResult[i].line.selected && (!this.displayResult[i].line.edit || this.config.remove.withEdit))return true;	    						
+		    						if(this.displayResult[i].line.selected && (!this.displayResult[i].line.edit || this.config.remove.withEdit))return true;
 		    					}
 		    				}else{
 		    					//console.log("remove is not active !");
@@ -1500,8 +1500,8 @@ angular.module('ultimateDataTableServices', []).
 			    							this.displayResult[i].line.groupSelected=true;
 			    							this.displayResult[i].line.trClass="info";
 			    						}
-			    						
-			    						
+
+
 			    					}else {
 			    						if(!this.displayResult[i].line.group){
 			    							this.displayResult[i].line.selected=false;
@@ -1510,14 +1510,14 @@ angular.module('ultimateDataTableServices', []).
 			    							this.displayResult[i].line.groupSelected=false;
 			    							this.displayResult[i].line.trClass=undefined;
 			    						}
-			    						
+
 			    					}
 		    					}
 		    				}else{
 								//console.log("select is not active");
 							}
-		    			},	    			
-		    			
+		    			},
+
 		    			/**
 		    			 * Return all selected element and unselect the data
 		    			 */
@@ -1548,13 +1548,13 @@ angular.module('ultimateDataTableServices', []).
 		    			 */
 		    			isSelect: function(){
 		    				for(var i = 0; this.displayResult && i < this.displayResult.length; i++){
-	    						if(this.displayResult[i].line.selected)return true;	    						
+	    						if(this.displayResult[i].line.selected)return true;
 	    					}
 		    				return false;
 		    			},
 		    			isSelectGroup: function(){
 		    				for(var i = 0; this.displayResult && i < this.displayResult.length; i++){
-	    						if(this.displayResult[i].line.groupSelected)return true;	    						
+	    						if(this.displayResult[i].line.groupSelected)return true;
 	    					}
 		    				return false;
 		    			},
@@ -1572,23 +1572,23 @@ angular.module('ultimateDataTableServices', []).
 								this.totalNumberRecords = this.allResult.length;
 			    				this.computePaginationList();
 			    				this.computeDisplayResult();
-			    				
+
 		    				}
 		    			},
-		    			
-		    			//template helper functions		    			
+
+		    			//template helper functions
 		    			isShowToolbar: function(){
 		    				return (this.isShowToolbarButtons() || this.isShowToolbarPagination() || this.isShowToolbarResults());
 		    			},
-		    			
+
 		    			isShowToolbarButtons: function(){
 		    				return ( this.isShowCRUDButtons()
-		    						|| this.isShowHideButtons()  || (this.config.show.active && this.config.show.showButton)  
+		    						|| this.isShowHideButtons()  || (this.config.show.active && this.config.show.showButton)
 		    						|| this.isShowExportCSVButton()
 		    						|| this.isShowOtherButtons());
 		    			},
 		    			isShowCRUDButtons: function(){
-		    				return (  (this.config.edit.active && this.config.edit.showButton) 
+		    				return (  (this.config.edit.active && this.config.edit.showButton)
 		    						||  (this.config.save.active && this.config.save.showButton) || (this.config.remove.active && this.config.remove.showButton));
 		    			},
 		    			isShowHideButtons: function(){
@@ -1606,22 +1606,22 @@ angular.module('ultimateDataTableServices', []).
 		    			isShowToolbarResults: function(){
 		    				return this.config.showTotalNumberRecords;
 		    			},
-		    			
+
 		    			isCompactMode: function(){
 		    				return this.config.compact;
 		    			},
-		    			
+
 		    			isEmpty: function(){
 		    				return (this.allResult === undefined || this.allResult === null || this.allResult.length === 0);
 		    			},
-		    			
+
 		    			/**
 		    			 * Function to show (or not) the "CSV Export" button
-		    			 */ 
+		    			 */
 		    			isShowExportCSVButton: function(){
 		    				return (this.config.exportCSV.active && this.config.exportCSV.showButton);
 		    			},
-		    			
+
 		    			isShowButton: function(configParam, column){
 		    				if(column){
 		    					return (this.config[configParam].active && ((this.config[configParam].showButtonColumn !== undefined && this.config[configParam].showButtonColumn) || this.config[configParam].showButton) && column[configParam]);
@@ -1629,13 +1629,13 @@ angular.module('ultimateDataTableServices', []).
 		    					return (this.config[configParam].active && this.config[configParam].showButton);
 		    				}
 		    			},
-		    			
+
 						setShowButton: function(configParam, value){
 		    				if(this.config[configParam].active){
 		    					this.config[configParam].showButton = value;
 		    				}
 		    			},
-		    			
+
 		    			/**
 		    			 * Add pagination parameters if needed
 		    			 */
@@ -1651,7 +1651,7 @@ angular.module('ultimateDataTableServices', []).
 			    					params.numberRecordsPerPage = this.config.pagination.numberRecordsPerPage;
 		    					}
 		    				}
-		    				
+
 		    				if(this.config.order.active && this.isRemoteMode(this.config.order.mode) && angular.isDefined(this.config.order.by)){
 		    					params.orderBy = this.config.order.by.property;
 		    					params.orderSense = (this.config.order.reverse)?"-1":"1";
@@ -1699,19 +1699,19 @@ angular.module('ultimateDataTableServices', []).
 		    				if(angular.isDefined(columns)){
 		    					var initPosition = 1000000;
 		    					for(var i = 0 ; i < columns.length; i++){
-		    						
+
 		    						if(!columns[i].type || columns[i].type.toLowerCase() === "string"){
 		    							columns[i].type = "text";
 		    						}else{
 		    							columns[i].type = columns[i].type.toLowerCase();
 		    						}
-		    						
+
 		    						if(columns[i].type === "img" || columns[i].type === "image"){
 		    							if(!columns[i].format)console.log("missing format for "+columns[i].property);
 		    							if(!columns[i].width)columns[i].width='100%';
 		    						}
-		    						
-			    					
+
+
 			    					columns[i].id = this.generateColumnId();
 			    					/*
 			    					if(columns[i].hide && !this.config.hide.active){
@@ -1728,15 +1728,15 @@ angular.module('ultimateDataTableServices', []).
 			    					}
 									*/
 			    					//TODO: else{Error here ?}
-			    					
+
 			    					if(columns[i].choiceInList && !angular.isDefined(columns[i].listStyle)){
 			    						columns[i].listStyle = "select";
 			    					}
-			    					
+
 			    					if(columns[i].choiceInList && !angular.isDefined(columns[i].possibleValues)){
 			    						columns[i].possibleValues = [];
 			    					}
-			    					
+
 			    					if(this.config.group.active && angular.isDefined(this.config.group.by) && (columns[i].property === this.config.group.by || columns[i].property === this.config.group.by.property)){
 			    						this.config.group.by = columns[i];
 			    						this.config.group.columns[columns[i].id] = true;
@@ -1751,36 +1751,36 @@ angular.module('ultimateDataTableServices', []).
 			    					}else{
 			    						this.config.order.columns[columns[i].id] = false;
 			    					}
-			    					
+
 			    					//ack to keep the default order in chrome
 			    					if(null === columns[i].position || undefined === columns[i].position){
 			    						columns[i].position = initPosition++;
 			    					}
-			    					
+
 			    					if(columns[i].convertValue !== undefined && columns[i].convertValue.active === true && (columns[i].convertValue.displayMeasureValue === undefined || columns[i].convertValue.saveMeasureValue === undefined)){
 			    						 throw "Columns config error: "+columns[i].property+" convertValue=active but convertValue.displayMeasureValue or convertValue.saveMeasureValue is missing";
 			    					}
 			    				}
-		    					
+
 		    					var settings = $.extend(true, [], this.configColumnDefault, columns);
 		    					settings = $filter('orderBy')(settings, 'position');
-		    					
+
 		    					this.config.columns = angular.copy(settings);
 			    	    		this.configMaster.columns = angular.copy(settings);
 			    	    		this.newExtraHeaderConfig();
 		    			    }
 		    			},
 		    			setColumnsConfigWithUrl : function(){
-		    				$http.get(this.config.columnsUrl,{datatable:this}).success(function(data, status, headers, config) {		    						
+		    				$http.get(this.config.columnsUrl,{datatable:this}).success(function(data, status, headers, config) {
 	    						config.datatable.setColumnsConfig(data);
 	    					});
 		    			},
 		    			getColumnsConfig: function(){
-		    				return this.config.columns;		    				
+		    				return this.config.columns;
 		    			},
-		    			
+
 		    			getConfig: function(){
-		    				return this.config;		    				
+		    				return this.config;
 		    			},
 		    			setConfig: function(config){
 		    				var settings = $.extend(true, {}, this.configDefault, config);
@@ -1791,13 +1791,13 @@ angular.module('ultimateDataTableServices', []).
 		    				}else{
 		    					this.setColumnsConfig(this.config.columns);
 		    				}
-		    	    		
+
 		    	    		if(this.displayResult && this.displayResult.length > 0){
 		    	    			this.computePaginationList();
-		    	    			this.computeDisplayResult();		    	    			
+		    	    			this.computeDisplayResult();
 		    	    		}
 		    			},
-		    			
+
 		    			/**
 		    			 * Return column with hide
 		    			 */
@@ -1810,7 +1810,7 @@ angular.module('ultimateDataTableServices', []).
 		    				}
 		    				return c;
 		    			},
-		    			
+
 		    			/**
 		    			 * Return column with group
 		    			 */
@@ -1823,7 +1823,7 @@ angular.module('ultimateDataTableServices', []).
 		    				}
 		    				return c;
 		    			},
-		    			
+
 		    			/**
 		    			 * Return column with edit
 		    			 */
@@ -1851,11 +1851,11 @@ angular.module('ultimateDataTableServices', []).
 		    				if(possibleValues!=undefined){
 		    					column.possibleValues = possibleValues;
 		    				}
-		    				
+
 		    				if(extraHeaders!=undefined){
 		    					column.extraHeaders = extraHeaders;
 		    				}
-		    				
+
 		    				return column;
 		    			},
 		    			/**
@@ -1866,7 +1866,7 @@ angular.module('ultimateDataTableServices', []).
 		    				if(position>=0){
 			    				column.position = position;
 		    				}
-		    				
+
 	    					this.config.columns.push(column);
 		    				this.setColumnsConfig(this.config.columns);
 		    				this.newExtraHeaderConfig();
@@ -1908,11 +1908,11 @@ angular.module('ultimateDataTableServices', []).
 				    								count = 0;//Reset the count to 0
 				    							}
 				    							//The first time the header will be undefined
-				    							if(header == undefined){	
+				    							if(header == undefined){
 				    								//create the new header with colspan 0 (the current column will be counted)
 							    					header =  {"label":this.config.columns[j].extraHeaders[i],"colspan":0};
 							    				}
-				    							
+
 				    							//if two near columns have the same header
 				    							if(this.config.columns[j].extraHeaders[i] == header.label){
 				    								header.colspan += 1;
@@ -1924,7 +1924,7 @@ angular.module('ultimateDataTableServices', []).
 				    								//colspan = 1 because we're already on the first column who have this header
 				    								header =  {"label":this.config.columns[j].extraHeaders[i],"colspan":1};
 				    							}
-				    						
+
 				    						}else if(header != undefined){
 				    							lineUsed = true;
 				    							//If we find a undefined column, we add the old header
@@ -1932,7 +1932,7 @@ angular.module('ultimateDataTableServices', []).
 				    							//and increment the count var
 				    							count++;
 				    							//The old header is added
-			    								header =  undefined;	
+			    								header =  undefined;
 				    						}else{
 				    							//No header to add, the previous one was a undefined column
 				    							//increment the count var
@@ -1940,7 +1940,7 @@ angular.module('ultimateDataTableServices', []).
 				    						}
 				    					}
 				    				}
-				    				
+
 				    				//At the end of the level loop
 				    				//If we have undefined column left
 				    				//And the line have at least one item
@@ -1948,15 +1948,15 @@ angular.module('ultimateDataTableServices', []).
 				    					this.addToExtraHeaderConfig(i,{"label":"","colspan":count});
 				    					count = 0;
 				    				}
-				    				
+
 				    				//If we have defined column left
 				    				if(header != undefined){
-		    							this.addToExtraHeaderConfig(i, header);	
+		    							this.addToExtraHeaderConfig(i, header);
 				    				}
 			    				}
 		    				}
 		    			},
-		    			
+
 
 		    			/**
 		    			 * Function to export data in a CSV file
@@ -1964,48 +1964,48 @@ angular.module('ultimateDataTableServices', []).
 		    			exportCSV : function(exportType) {
 		    				if(this.config.exportCSV.active){
 			    				this.config.exportCSV.start = true;
-			    				var cas, delimiter = this.config.exportCSV.delimiter, lineValue = "", colValue, that = this; 		    				
-			    				
+			    				var cas, delimiter = this.config.exportCSV.delimiter, lineValue = "", colValue, that = this;
+
 			    				//calcule results ( code extracted from method computeDisplayResult() )
 			    				var displayResultTmp = [];
 			    				angular.forEach(this.allResult, function(value, key){
 			    					 var line = {edit:undefined, selected:undefined, trClass:undefined, group:false, new:false};
 		    						 this.push({data:value, line:line});
-		    					}, displayResultTmp);			    				
+		    					}, displayResultTmp);
 			    				if(this.isGroupActive()){
-			    					displayResultTmp = this.addGroup(displayResultTmp);					
+			    					displayResultTmp = this.addGroup(displayResultTmp);
 			    				}
 			    				//manage results
 			    				if (displayResultTmp) {
-			    						    					
+
 			    					var columnsToPrint = this.config.columns;
 			    					//header
 			    					columnsToPrint.forEach(function(column) {
 			    						if(!that.config.hide.columns[column.id]){
-			    							
+
 			    							var header = column.header;
 			    							if(angular.isFunction(header)){
 			    								header = header();
 			    							}
-											
+
 			    							if(that.isGroupActive()){
 				    							if(column.groupMethod === "sum"){
-				    								header = header + this.messages.Messages('datatable.export.sum'); 
+				    								header = header + this.messages.Messages('datatable.export.sum');
 				    							}else if(column.groupMethod === "average"){
 				    								header = header + this.messages.Messages('datatable.export.average');
 				    							}else if(column.groupMethod === "unique"){
 				    								header = header + this.messages.Messages('datatable.export.unique');
 				    							}else if(column.groupMethod === "countDistinct"){
 				    								header = header + this.messages.Messages('datatable.export.countDistinct');
-				    							} 
+				    							}
 			    							}
 			    							lineValue = lineValue + header + delimiter;
 			    							}
-			    						},this); 
+			    						},this);
 			    					lineValue = lineValue.substr(0, lineValue.length-1) + "\n";
 			    					//data
 			    					displayResultTmp.forEach(function(result) {
-			    						
+
 			    						columnsToPrint.forEach(function(column) {
 			    							if(!that.config.hide.columns[column.id]){
 			    							//algo to set colValue (value of the column)
@@ -2037,7 +2037,7 @@ angular.module('ultimateDataTableServices', []).
 				    			    				}
 					    							lineValue = lineValue + ((colValue!==null)&&(colValue)?colValue:"") + delimiter;
 				    			    			} else if(result.line.group) {
-				    			    				
+
 				    			    				var v = $parse("group."+column.id)(result.data);
 				    			    				//if error in group function
 				    			    				if (angular.isDefined(v) && angular.isString(v) && v.charAt(0) === "#") {
@@ -2048,20 +2048,20 @@ angular.module('ultimateDataTableServices', []).
 				    			    				} else {
 				    			    					colValue =  undefined;
 				    			    				}
-				    			    				
-				    			    				if(colValue !==  undefined && column.type === "number"){
-				    			    					colValue = colValue.replace(/\u00a0/g,"");
-				    			    				}				    			    				
-				    			    				lineValue = lineValue + ((colValue!==null)&&(colValue)?colValue:"") + delimiter;
-				    			    			}else if(!result.line.group && column.url !== undefined && column.url !== null  && exportType !== 'groupsOnly') {
-				    			    				var url = $parse(column.url)(result.data);
-				    			    				colValue = $parse(column.property+that.getFilter(column)+that.getFormatter(column))(that.urlCache[url]);
-				    			    				
+
 				    			    				if(colValue !==  undefined && column.type === "number"){
 				    			    					colValue = colValue.replace(/\u00a0/g,"");
 				    			    				}
 				    			    				lineValue = lineValue + ((colValue!==null)&&(colValue)?colValue:"") + delimiter;
-				    			    			}				    			    			
+				    			    			}else if(!result.line.group && column.url !== undefined && column.url !== null  && exportType !== 'groupsOnly') {
+				    			    				var url = $parse(column.url)(result.data);
+				    			    				colValue = $parse(column.property+that.getFilter(column)+that.getFormatter(column))(that.urlCache[url]);
+
+				    			    				if(colValue !==  undefined && column.type === "number"){
+				    			    					colValue = colValue.replace(/\u00a0/g,"");
+				    			    				}
+				    			    				lineValue = lineValue + ((colValue!==null)&&(colValue)?colValue:"") + delimiter;
+				    			    			}
 			    							}
 			    						},this);
 			    						if ((exportType==='all') || ((exportType==='groupsOnly') && result.line.group)) {
@@ -2069,14 +2069,14 @@ angular.module('ultimateDataTableServices', []).
 			    						}
 			    					},this);
 			    					displayResultTmp = undefined;
-			    					
+
 			    					//fix for the accents in Excel : add BOM (byte-order-mark)
-			    					var fixedstring = "\ufeff" + lineValue;		    							    					
-			    					
+			    					var fixedstring = "\ufeff" + lineValue;
+
 			    					//save
-			    					var blob = new Blob([fixedstring], {type: "text/plain;charset=utf-8"}); 
+			    					var blob = new Blob([fixedstring], {type: "text/plain;charset=utf-8"});
 			    					var currdatetime = $filter('date')(new Date(), 'yyyyMMdd_HHmmss');
-			    					var text_filename = (this.config.name || this.configDefault.name) + "_" + currdatetime;		    					
+			    					var text_filename = (this.config.name || this.configDefault.name) + "_" + currdatetime;
 			    					saveAs(blob, text_filename + ".csv");
 			    				}
 			    				else {
@@ -2085,9 +2085,9 @@ angular.module('ultimateDataTableServices', []).
 			    				this.config.exportCSV.start = false;
 		    				}
 		    			},
-		    			
+
 		    			/**
-		    			 * Sub-function use by (not only) exportCSV() 
+		    			 * Sub-function use by (not only) exportCSV()
 		    			 */
 	  		    		getFormatter : function(col){
 		    				var format = "";
@@ -2098,24 +2098,24 @@ angular.module('ultimateDataTableServices', []).
 			    					format += " | date:'"+(col.format?col.format:this.messages.Messages("datetime.format"))+"'";
 			    				}else if(col.type === "number"){
 									format += " | number"+(col.format?':'+col.format:'');
-								}    				
+								}
 		    				return format;
 		    			},
-		    			
+
 		    			getFilter : function(col){
 		    				var filter = '';
 	    					if(col.convertValue != undefined && col.convertValue.active == true && col.convertValue.saveMeasureValue != col.convertValue.displayMeasureValue){
 	    						filter += '|udtConvert:'+JSON.stringify(col.convertValue);
-	    						
+
 	    					}
 		    				if(col.filter){
 		    					return filter+'|'+col.filter;
 		    				}
 		    				return filter;
 		    			},
-		    			
+
 		    			/**
-		    			 * Function to enable/disable the "CSV Export" button 
+		    			 * Function to enable/disable the "CSV Export" button
 		    			 */
 		    			canExportCSV: function(){
 		    				if(this.config.exportCSV.active && !this.config.exportCSV.start && !this.isEmpty()){
@@ -2132,38 +2132,38 @@ angular.module('ultimateDataTableServices', []).
 		    				var posDrop = droppedCol.position;
 		    				var posDrag = draggedCol.position;
 		    				for(var i=0;i<datatable.config.columns.length;i++){
-		    					if(posDrag < posDrop &&  datatable.config.columns[i].position > posDrag 
+		    					if(posDrag < posDrop &&  datatable.config.columns[i].position > posDrag
 		    							&& datatable.config.columns[i].position < posDrop
 		    							&& datatable.config.columns[i].id !== draggedCol.id){
 		    						datatable.config.columns[i].position--;
 		    					}
-		    					
-		    					if(posDrag > posDrop &&  datatable.config.columns[i].position > posDrop 
+
+		    					if(posDrag > posDrop &&  datatable.config.columns[i].position > posDrop
 		    							&& datatable.config.columns[i].position < posDrag
 		    							&& datatable.config.columns[i].id !== draggedCol.id){
 		    						datatable.config.columns[i].position++;
 		    					}
-		    					
+
 		    					if(datatable.config.columns[i].id === draggedCol.id){
 		    						datatable.config.columns[i].position = posDrop-1;
 		    					}
 		    				}
 		    				datatable.setColumnsConfig(datatable.config.columns);
 		    			}
-		    					    			
+
     			};
-				
+
 				if(arguments.length == 2){
 					iConfig = arguments[1];
 					console.log("used bad constructor for datatable, only one argument is required the config");
 				}
-				
+
 				datatable.setConfig(iConfig);
-    			
+
 				return datatable;
     		}
     		return constructor;
-    	}]); 
+    	}]);
 ;angular.module('ultimateDataTableServices').
 //If the select or multiple choices contain 1 element, this directive select it automaticaly
 //EXAMPLE: <select ng-model="x" ng-option="x as x for x in x" udtAutoselect>...</select>
@@ -2416,8 +2416,11 @@ directive("udtCell", function(){
   		    	templateUrl:'udt-cell.html',
 	    		link: function(scope, element, attr) {
 	    			if(!scope.udtTableFunctions){scope.udtTableFunctions = {};}
-	    			
+
 	    			scope.udtTableFunctions.getEditElement = function(col, header, filter){
+						if (filter && col.showFilter !== undefined && !col.showFilter) {
+							return '';
+						}
 	    				var editElement = '';
 	    				var ngChange = '"';
 	    				var defaultValueDirective = "";
@@ -2428,7 +2431,7 @@ directive("udtCell", function(){
     			    	}else{
     			    		defaultValueDirective = 'udt-default-value="col.defaultValues"';
     			    	}
-						
+
 						var userDirectives = "";
 						if(col.editDirectives !== undefined){
 							userDirectives = col.editDirectives;
@@ -2436,70 +2439,70 @@ directive("udtCell", function(){
 								userDirectives = userDirectives();
 							}
 						}
-	    						    				
+
 	    				if(col.type === "boolean"){
 	    					editElement = '<input class="form-control"' +defaultValueDirective+' udt-html-filter="{{col.type}}" '+userDirectives+' type="checkbox" class="input-small" ng-model="'+this.getEditProperty(col, header, filter)+ngChange+'/>';
 	    				}else if(!col.choiceInList){
 							//TODO: type='text' because html5 autoformat return a string before that we can format the number ourself
 	    					editElement = '<input class="form-control" '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" '+userDirectives+' type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+this.getDateTimestamp(col.type)+'/>';
 	    				}else if(col.choiceInList){
-	    					switch (col.listStyle) { 
+	    					switch (col.listStyle) {
 	    						case "radio":
 	    							editElement = '<label ng-repeat="opt in col.possibleValues" '+defaultValueDirective+'  for="radio{{col.id}}"><input id="radio{{col.id}}" udt-html-filter="{{col.type}}" '+userDirectives+' type="radio" ng-model="'+this.getEditProperty(col,hearder,filter)+ngChange+' value="{{opt.name}}">{{opt.name}}<br></label>';
-	    							break;		    						
+	    							break;
 	    						case "multiselect":
 	    							editElement = '<select class="form-control" multiple="true" '+defaultValueDirective+' ng-options="opt.code as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></select>';
 		    						break;
 	    						case "bt-select":
-	    							editElement = '<div class="form-control" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';			        		  	    	
+	    							editElement = '<div class="form-control" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
 	    							break;
 								case "bt-select-filter":
-	    							editElement = '<div class="form-control" filter="true" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';			        		  	    	
+	    							editElement = '<div class="form-control" filter="true" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
 	    							break;
 	    						case "bt-select-multiple":
-	    							editElement = '<div class="form-control" '+defaultValueDirective+' udt-btselect multiple="true" bt-dropdown-class="dropdown-menu-right" placeholder="" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';			        		  	    	
+	    							editElement = '<div class="form-control" '+defaultValueDirective+' udt-btselect multiple="true" bt-dropdown-class="dropdown-menu-right" placeholder="" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
 	    							break;
 	    						default:
 	    							editElement = '<select class="form-control" '+defaultValueDirective+' ng-options="opt.code as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></select>';
 		    						break;
-		  	    			}		    					
+		  	    			}
 	    				}else{
 	    					editElement = "Edit Not Defined for col.type !";
-	    				}		    						    				
+	    				}
 	    				return '<div class="form-group"  ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
 	    			};
-	    			
-	    			
+
+
 	    			scope.udtTableFunctions.getEditProperty = function(col, header, filter){
 	    				if(header){
     			    		return  "udtTable.config.edit.columns."+col.id+".value";
     			    	} else if(filter){
 							return "udtTable.searchTerms."+col.property;
 						} else if(angular.isString(col.property)){
-    			    		return "value.data."+col.property;        			    		
+    			    		return "value.data."+col.property;
     			    	} else {
     			    		throw "Error property is not editable !";
-    			    	}		    				
+    			    	}
 			    	};
-			    	
+
 			    	scope.udtTableFunctions.getConvertDirective = function(col, header){
 			    		if(col.convertValue != undefined && col.convertValue.active == true && col.convertValue.saveMeasureValue != col.convertValue.displayMeasureValue){
 			    			return 'udt-convertvalue="col.convertValue"';
 			    		}
 			    		return "";
 			    	}
-			    	
+
 			    	scope.udtTableFunctions.getInputType = function(col){
 	    				if(col.type === "date" || col.type === "datetime" || col.type === "datetime-local"){
     			    		return "text";
 	    				}
 	    				return col.type
 			    	};
-	    			
+
 			    	scope.udtTableFunctions.getFormatter = scope.udtTable.getFormatter;
-	    			
+
 	    			scope.udtTableFunctions.getFilter = scope.udtTable.getFilter;
-	    			
+
 	    			scope.udtTableFunctions.getOptions = function(col){
 	    				if(angular.isString(col.possibleValues)){
 	    					return col.possibleValues;
@@ -2507,21 +2510,21 @@ directive("udtCell", function(){
 	    					return 'col.possibleValues';
 	    				}
 	    			};
-	    			
+
 	    			scope.udtTableFunctions.getGroupBy = function(col){
 	    				if(angular.isString(col.groupBy)){
 	    					return 'group by opt.'+col.groupBy;
 	    				}else{
 	    					return '';
 	    				}
-	    					
+
 	    			};
-	    			
+
 	    			scope.udtTableFunctions.getDateTimestamp = function(colType){
 	    				if(colType==="date"){
 	    					return 'udt-date-timestamp';
 	    				}
-	    				
+
 	    				return '';
 	    			};
   		    	}
@@ -2531,7 +2534,7 @@ directive("udtCell", function(){
     			restrict: 'A',
   		    	replace:true,
   		    	templateUrl:'udt-editableCell.html',
-	    		link: function(scope, element, attr) {  		    		
+	    		link: function(scope, element, attr) {
   		    	}
     		};
     	}).directive("udtCellHeader", function(){
@@ -2556,10 +2559,10 @@ directive("udtCell", function(){
     		return {
     			restrict: 'A',
   		    	replace:true,
-  		    	templateUrl:'udt-cellEdit.html', 
-  		    	link: function(scope, element, attr) {		    		
+  		    	templateUrl:'udt-cellEdit.html',
+  		    	link: function(scope, element, attr) {
   		    	}
-  		    	
+
     		};
     	}).directive("udtCellRead", function($http){
     		return {
@@ -2568,7 +2571,7 @@ directive("udtCell", function(){
   		    	templateUrl:'udt-cellRead.html' ,
   		    	link: function(scope, element, attr) {
   		    		if(!scope.udtTableFunctions){scope.udtTableFunctions = {};}
-  		    		
+
   		    		scope.udtTableFunctions.getDisplayElement = function(col){
 	    				if(angular.isDefined(col.render) && col.render !== null){
     						if(angular.isFunction(col.render)){
@@ -2578,25 +2581,25 @@ directive("udtCell", function(){
     						}
 	    				}else{
 	    					if(col.type === "boolean"){
-	    						return '<div ng-switch on="cellValue"><i ng-switch-when="true" class="fa fa-check-square-o"></i><i ng-switch-default class="fa fa-square-o"></i></div>';	    						
+	    						return '<div ng-switch on="cellValue"><i ng-switch-when="true" class="fa fa-check-square-o"></i><i ng-switch-default class="fa fa-square-o"></i></div>';
 	    					}else if(col.type === "img" || col.type === "image"){
 	    						if(!col.format)console.log("missing format for img !!");
-	    						return '<img ng-src="data:image/'+col.format+';base64,{{cellValue}}" style="max-width:{{col.width}}"/>';		    					    
+	    						return '<img ng-src="data:image/'+col.format+';base64,{{cellValue}}" style="max-width:{{col.width}}"/>';
 	    					} else{
 	    						return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
 								//return '<span ng-bind="cellValue"></span>'
 	    					}
-	    				}	  
+	    				}
 	    			};
-	    			
+
 	    			var getDisplayFunction = function(col, onlyProperty){
 	    				if(angular.isFunction(col.property)){
     			    		return col.property(scope.value.data);
     			    	}else{
-    			    		return getDisplayValue(col, scope.value, onlyProperty, scope);        			    		
-    			    	}		    				
+    			    		return getDisplayValue(col, scope.value, onlyProperty, scope);
+    			    	}
 			    	};
-	    			
+
 			    	var getDisplayValue = function(column, value, onlyProperty, currentScope){
 			    		if(onlyProperty){
 			    			return currentScope.$eval(column.property, value.data);
@@ -2613,19 +2616,19 @@ directive("udtCell", function(){
 			    					return currentScope.$eval("group."+column.id+currentScope.udtTableFunctions.getFormatter(column), value.data);
 			    				}else{
 			    					return undefined;
-			    				}			    							    				
+			    				}
 			    			}else if(!value.line.group && column.url !== undefined && column.url !== null){
 			    				var url = currentScope.$eval(column.url, value.data);
-			    				return currentScope.$eval(column.property+currentScope.udtTableFunctions.getFilter(column)+currentScope.udtTableFunctions.getFormatter(column), scope.udtTable.urlCache[url]);			    				
+			    				return currentScope.$eval(column.property+currentScope.udtTableFunctions.getFilter(column)+currentScope.udtTableFunctions.getFormatter(column), scope.udtTable.urlCache[url]);
 			    			}
-			    		}	    				
+			    		}
 	    			};
-	    			
+
 	    			if(scope.col.type === "img" || scope.col.type === "image"){
 	    				scope.cellValue = getDisplayFunction(scope.col, true);
 	    			}else{
 	    				scope.cellValue = getDisplayFunction(scope.col, false);
-	    			}	    					    		
+	    			}
   		    	}
     		};
     	});;angular.module('ultimateDataTableServices').
@@ -3352,8 +3355,8 @@ factory('udtI18n', [function() {
 							"result":"Results",
 							"date.format":"MM/dd/yyyy",
 							"datetime.format":"MM/dd/yyyy HH:mm:ss",
-							"datatable.button.selectall":"Tout Sélectionner",
-							"datatable.button.unselectall" :"Tout Délectionner",
+							"datatable.button.selectall":"Select all",
+							"datatable.button.unselectall" :"Deselect all",
 							"datatable.button.cancel":"Cancel",
 							"datatable.button.hide":"Hide",
 							"datatable.button.show":"Show Details",
@@ -3383,6 +3386,42 @@ factory('udtI18n', [function() {
 							"datatable.button.basicExportCSV" : "Export all lines",
 							"datatable.button.groupedExportCSV" : "Export only grouped lines",
 							"datatable.button.showOnlyGroups" : "See only group"
+						},
+						"nl":{
+							"result": "Resultaten",
+							"date.format": "dd/MM/yyyy",
+							"datetime.format": "dd/MM/yyyy HH:mm:ss",
+							"datatable.button.selectall": "Selecteer alles",
+							"datatable.button.unselectall": "Deselecteer alles",
+							"datatable.button.cancel": "Annuleren",
+							"datatable.button.hide": "Verberg",
+							"datatable.button.show": "Toon details",
+							"datatable.button.edit": "Bewerk",
+							"datatable.button.sort": "Sorteer",
+							"datatable.button.save": "Opslaan",
+							"datatable.button.add": "Toevoegen",
+							"datatable.button.remove": "Verwijderen",
+							"datatable.button.searchLocal": "Zoek",
+							"datatable.button.resetSearchLocal": "Annuleer",
+							"datatable.button.length": "Grote ({0})",
+							"datatable.totalNumberRecords": "{0} Resultaten",
+							"datatable.button.exportCSV": "CSV Export",
+							"datatable.msg.success.save": "Opslag is succesvol",
+							"datatable.msg.error.save": "Er zijn {0} backup(s) met een fout.",
+							"datatable.msg.success.remove": "Alles is succesvol verwijderd.",
+							"datatable.msg.error.remove": " Er zijn {0} verwijderingen met een fout.",
+							"datatable.remove.confirm": "Bevestigd u de verwijdering?",
+							"datatable.export.sum": "(Som)",
+							"datatable.export.average": "(Gemiddeld)",
+							"datatable.export.unique":"(Enkele waarde)",
+							"datatable.export.countDistinct": "(Aantal unieke waarden)",
+							"datatable.export.yes": "Ja",
+							"datatable.export.no": "Nee",
+							"datatable.button.group": "Groeperen / Degroeperen",
+							"datatable.button.generalGroup": "Groepeer alle geselecteerde regels",
+							"datatable.button.basicExportCSV": "Exporteer alle regels",
+							"datatable.button.groupedExportCSV": "Exporteer alleen de gegroepeerde regels",
+							"datatable.button.showOnlyGroups": "Toon alleen de groep"
 						}
 					},
 					
