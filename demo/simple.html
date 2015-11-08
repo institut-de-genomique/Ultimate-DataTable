@@ -16,6 +16,7 @@
 		
 			var datatableConfig = {
 				"name":"simple_datatable",
+				"extraHeaders":{number:1},
 				"columns":[
 					{
 						"header":"Name",
@@ -23,7 +24,9 @@
 						"order":true,
 						"type":"text",
 						"showFilter":true,
-						"groupMethod":"collect"
+						"groupMethod":"collect",
+						"hide":true,
+						"extraHeaders":{"0":"H1"}
 					},
 					{
 						"header":"Registered",
@@ -31,14 +34,19 @@
 						"order":true,
 						"group":true,
 						"type":"date",
-						"edit":true
+						"edit":true,
+						"hide":true,
+						"extraHeaders":{"0":"H1"}
 					},
 					{
 						"header":"About",
 						"property":"about",
 						"order":true,
 						"type":"text",
-						"groupMethod":"collect"
+						"groupMethod":"collect",
+						"hide":true,
+						"extraHeaders":{"0":"H2"}
+						
 					},
 					{
 						"header":"Picture",
@@ -47,7 +55,9 @@
 						"type":"text",
 						"edit":true,
 						"groupMethod":"collect",
-						"render":"<a target='blank' ng-href='{{cellValue}}'>{{cellValue}}</a>"
+						"render":"<a target='blank' ng-href='{{cellValue}}'>{{cellValue}}</a>",
+						"hide":true,
+						"extraHeaders":{"0":"H2"}
 					}
 					
 				],
@@ -86,6 +96,9 @@
 					active:true,//Active or not
 					showButton:true,//Show the export button in the toolbar
 					delimiter:";"//Set the delimiter
+				},
+				"hide":{
+					"active":true,
 				}
 			};
 			
