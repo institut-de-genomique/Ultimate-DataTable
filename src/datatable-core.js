@@ -1078,6 +1078,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q','udtI18n','$
           if(find){
             that.config.edit.start = true;
             if(column){
+              that.config.edit.all = false;
               var columnId = column.id
               if(angular.isUndefined(that.config.edit.columns[columnId])){
                 that.config.edit.columns[columnId] = {};
