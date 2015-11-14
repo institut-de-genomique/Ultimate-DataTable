@@ -14,7 +14,7 @@ directive("udtCell", function(){
     			    	if(header){
     			    		ngChange = '" ng-change="udtTable.updateColumn(col.property, col.id)"';
 						}else if(filter){
-							ngChange = '" udt-change="udtTable.searchLocal(udtTable.searchTerms)"';
+							ngChange = '" udt-change="udtTable.computeDisplayResult()"';
     			    	}else{
     			    		defaultValueDirective = 'udt-default-value="col.defaultValues"';
     			    	}
