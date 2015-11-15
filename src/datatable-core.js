@@ -272,39 +272,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 this.config.pagination.pageNumber = 0;
                 this._search(angular.copy(params));
             },
-            /**
-             * local search
-             */
-            searchLocal: function(searchTerms) {
-                if (this.config.filter.active === true) {
-                    //Set the properties "" or null to undefined because we don't want to filter this
-                    this.setSpinner(true);
-                    for (var p in searchTerms) {
-                        if (searchTerms[p] != undefined && (searchTerms[p] === undefined || searchTerms[p] === null || searchTerms[p] === "")) {
-                            searchTerms[p] = undefined;
-                        }
-                    }
-
-                    var _allResult = angular.copy(this.allResult);
-                    _allResult = $filter('filter')(this.allResult, searchTerms, false);
-
-                    this._getAllResult = function() {
-                        return _allResult;
-                    };
-
-                    this.totalNumberRecords = _allResult.length;
-                    //this.sortAllResult();
-                    this.computePaginationList();
-                    this.computeDisplayResult();
-                    var that = this;
-                    this.computeDisplayResultTimeOut.then(function() {
-                        that.setSpinner(false);
-                    });
-                }
-            },
-            _getAllResult: function() {
-                return this.allResult;
-            },
             //search functions
             /**
              * Internal Search function to populate the datatable
@@ -353,11 +320,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 this.loadUrlColumnProperty();
                 this.computeGroup();
                 this.sortAllResult();
-                this.computePaginationList();
                 this.computeDisplayResult();
-                this._getAllResult = function() {
-                    return this.allResult;
-                };
             },
             /**
              * Return all the data
@@ -381,11 +344,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     this.loadUrlColumnProperty();
                     this.computeGroup();
                     this.sortAllResult();
-                    this.computePaginationList();
                     this.computeDisplayResult();
-                    this._getAllResult = function() {
-                        return this.allResult;
-                    };
                 }
             },
             /**
@@ -557,7 +516,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 
                     this.computeGroup();
                     this.sortAllResult(); //sort all the result
-                    this.computePaginationList(); //redefined pagination
                     this.computeDisplayResult(); //redefined the result must be displayed
                     var that = this;
                     this.computeDisplayResultTimeOut.then(function() {
@@ -571,7 +529,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             },
             updateShowOnlyGroups: function() {
                 this.sortAllResult(); //sort all the result
-                this.computePaginationList(); //redefined pagination
                 this.computeDisplayResult(); //redefined the result must be displayed
             },
             getGroupColumnClass: function(columnId) {
@@ -770,41 +727,56 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             });
                         }, displayResultTmp);
                         that.displayResult = displayResultTmp;
+                        that.computePaginationList();
                     } else {
-                        if (configPagination.active && !that.isRemoteMode(configPagination.mode)) {
-                            _displayResult = angular.copy(that._getAllResult().slice((configPagination.pageNumber * configPagination.numberRecordsPerPage), (configPagination.pageNumber * configPagination.numberRecordsPerPage + configPagination.numberRecordsPerPage)));
-                        } else { //to manage all records or server pagination
-                            _displayResult = angular.copy(that._getAllResult());
+                      var searchTerms = {data:{}};
+                      for (var p in that.searchTerms) {
+                        if (that.searchTerms[p] !== undefined && that.searchTerms[p] !== null && that.searchTerms[p] !== "") {
+                          searchTerms.data[p] = that.searchTerms[p];
                         }
+                      }
+                      var _allResult = angular.copy(that.allResult);
+                      _displayResult = _allResult.map(function(data, index){
+                        var line = {
+                            edit: undefined,
+                            selected: undefined,
+                            trClass: undefined,
+                            group: false,
+                            new: false,
+                            allResultIndex: index
+                        };
+                        return {
+                            data: data,
+                            line: line
+                        };
+                      });
 
-                        var displayResultTmp = [];
-                        angular.forEach(_displayResult, function(value, key) {
-                            var line = {
-                                edit: undefined,
-                                selected: undefined,
-                                trClass: undefined,
-                                group: false,
-                                new: false
-                            };
-                            this.push({
-                                data: value,
-                                line: line
-                            });
-                        }, displayResultTmp);
+                      if(that.config.filter.active === true){
+                        _displayResult = $filter('filter')(_displayResult, searchTerms, false);
+                      }
 
-                        //group function
-                        that.config.mergeCells.rowspans = undefined;
-                        if (that.isGroupActive()) {
-                            that.displayResult = that.addGroup(displayResultTmp);
-                        } else {
-                            that.displayResult = displayResultTmp;
-                            that.computeRowSpans();
-                        }
+                      if(configPagination.pageList === undefined || configPagination.pageList.length === 0 || that.totalNumberRecords !== _displayResult.length){
+                        that.totalNumberRecords = _displayResult.length;
+                        that.computePaginationList();
+                      }
 
-                        if (that.config.edit.byDefault) {
-                            that.config.edit.withoutSelect = true;
-                            that.setEdit();
-                        }
+                      if (configPagination.active && !that.isRemoteMode(configPagination.mode)) {
+                        _displayResult = _displayResult.slice((configPagination.pageNumber * configPagination.numberRecordsPerPage), (configPagination.pageNumber * configPagination.numberRecordsPerPage + configPagination.numberRecordsPerPage));
+                      }
+
+                      //group function
+                      that.config.mergeCells.rowspans = undefined;
+                      if (that.isGroupActive()) {
+                          that.displayResult = that.addGroup(_displayResult);
+                      } else {
+                          that.displayResult = _displayResult;
+                          that.computeRowSpans();
+                      }
+
+                      if (that.config.edit.byDefault) {
+                          that.config.edit.withoutSelect = true;
+                          that.setEdit();
+                      }
                     }
                 }, time);
             },
@@ -949,7 +921,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         if (this.isRemoteMode(this.config.pagination.mode)) {
                             this.searchWithLastParams();
                         } else {
-                            this.computePaginationList();
                             this.computeDisplayResult();
                         }
                     }
@@ -1169,9 +1140,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (this.config.edit.active) {
                     var that = this;
                     this.computeDisplayResultTimeOut.then(function() {
-                        that._getAllResult = function() {
-                            return that.allResult;
-                        };
                         that.config.edit.columns = {};
                         var find = false;
                         for (var i = 0; i < that.displayResult.length; i++) {
@@ -1386,11 +1354,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 
                     //update in the all result table
                     if (!this.displayResult[i].line.new) {
-                        var j = i;
-                        if (this.config.pagination.active && !this.isRemoteMode(this.config.pagination.mode)) {
-                            j = i + (this.config.pagination.pageNumber * this.config.pagination.numberRecordsPerPage);
-                        }
-                        this.allResult[j] = angular.copy(this.displayResult[i].data);
+                        this.allResult[this.displayResult[i].line.allResultIndex] = angular.copy(this.displayResult[i].data);
 
                     } else {
                         this.config.save.newData.push(data);
@@ -1477,9 +1441,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             if (this.displayResult[i].line.selected && (!this.displayResult[i].line.edit || this.config.remove.withEdit)) {
                                 if (this.isRemoteMode(this.config.remove.mode)) {
                                     this.config.remove.number++;
-                                    this.removeRemote(this.displayResult[i].data, i);
+                                    this.removeRemote(this.displayResult[i].data, this.displayResult[i].line.allResultIndex);
                                 } else {
-                                    this.config.remove.ids.success.push(i);
+                                    this.config.remove.ids.success.push(this.displayResult[i].line.allResultIndex);
                                 }
                             }
                         }
@@ -1498,13 +1462,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             removeLocal: function(i) {
                 if (this.config.remove.active && this.config.remove.start) {
                     //update in the all result table
-                    var j;
-                    if (this.config.pagination.active && !this.isRemoteMode(this.config.pagination.mode)) {
-                        j = (i + (this.config.pagination.pageNumber * this.config.pagination.numberRecordsPerPage)) - this.config.remove.counter;
-                    } else {
-                        j = i - this.config.remove.counter;
-                    }
-                    this.allResult.splice(j, 1);
+                    this.allResult.splice(i, 1);
                     this.config.remove.counter++;
                     this.totalNumberRecords--;
                 } else {
@@ -1562,7 +1520,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         this.config.remove.callback(this, this.config.remove.error);
                     }
 
-                    this.computePaginationList();
                     this.computeDisplayResult();
                     var that = this;
                     this.computeDisplayResultTimeOut.then(function() {
@@ -1699,8 +1656,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     this.config.remove = angular.copy(this.configMaster.remove);
                     this.config.select = angular.copy(this.configMaster.select);
                     this.config.messages = angular.copy(this.configMaster.messages);
-                    this.totalNumberRecords = this.allResult.length;
-                    this.computePaginationList();
                     this.computeDisplayResult();
 
                 }
@@ -1892,7 +1847,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         if (columns[i].convertValue !== undefined && columns[i].convertValue.active === true && (columns[i].convertValue.displayMeasureValue === undefined || columns[i].convertValue.saveMeasureValue === undefined)) {
                             throw "Columns config error: " + columns[i].property + " convertValue=active but convertValue.displayMeasureValue or convertValue.saveMeasureValue is missing";
                         }
-                        
+
                         if(null === columns[i].showFilter || undefined === columns[i].showFilter){
                             columns[i].showFilter = false;
                         }
@@ -1931,7 +1886,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 }
 
                 if (this.displayResult && this.displayResult.length > 0) {
-                    this.computePaginationList();
                     this.computeDisplayResult();
                 }
             },
