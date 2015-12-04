@@ -28,9 +28,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 			    		}
 						
 						if(arg==null || arg==undefined){
-			    			return scope.udtTable.messages.Messages(message);
+			    			return scope.udtTable.config.messages.transformKey(message);
 						}else{
-							return scope.udtTable.messages.Messages(message, arg);
+							return scope.udtTable.config.messages.transformKey(message, arg);
 						}
 			    	};
 			    	
@@ -125,7 +125,7 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    			if(scope.udtTable.config.group.active && scope.udtTable.config.group.start && !scope.udtTable.config.group.showOnlyGroups){
 		    				return scope.udtTable.totalNumberRecords + " - "+scope.udtTable.allGroupResult.length;
 		    			}else if(scope.udtTable.config.group.active && scope.udtTable.config.group.start && scope.udtTable.config.group.showOnlyGroups){
-		    				return scope.udtTable.allGroupResult.length
+		    				return (scope.udtTable.allGroupResult)?scope.udtTable.allGroupResult.length:0;
 		    			}else{
 		    				return scope.udtTable.totalNumberRecords;
 		    			}

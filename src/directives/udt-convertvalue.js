@@ -30,7 +30,7 @@ directive('udtConvertvalue',['udtConvertValueServices','$filter', function(udtCo
                 	
                 	//model to view when the user go out of the input
                 	element.bind('blur', function () {
-                		var convertedValue = convertValues.convertValue(ngModel.$modelValue, property.saveMeasureValue, property.displayMeasureValue, ngModel.$viewValue.length);
+                		var convertedValue = convertValues.convertValue(ngModel.$modelValue, property.saveMeasureValue, property.displayMeasureValue);
                 		ngModel.$setViewValue($filter('number')(convertedValue));
 						ngModel.$render();
 						//We restart the watcher when the user is out of the inputs

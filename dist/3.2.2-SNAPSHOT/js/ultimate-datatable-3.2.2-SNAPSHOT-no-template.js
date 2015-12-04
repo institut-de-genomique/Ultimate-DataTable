@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2015-11-10 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2015-12-04 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -524,8 +524,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (this.config.group.active) {
                     var columnId;
                     column === 'all' ? columnId = 'all' : columnId = column.id;
-                    if (this.config.group.by === undefined || this.config.group.by !== column) {
-                        this.config.group.start = true;
+ 		    		if(this.config.group.by === undefined || this.config.group.by.property !== column.property){
+						this.config.group.start = true;
                         if (columnId === "all") {
                             this.config.group.by = columnId;
                             this.config.group.columns['all'] = true;
@@ -640,6 +640,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     property += this.getFilter(column);
                     property += this.getFormatter(column);
                     colValue = $parse(property)(result.data);
+					if(colValue === null)colValue = undefined;
                     if (colValue === undefined && isFunction === true) { //Because the property here is not $parsable
                         //The function have to return a $scope value
                         colValue = property;
@@ -669,7 +670,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     } else {
                         colValue = undefined;
                     }
-
+					if(colValue === null)colValue = undefined;
                     if (colValue !== undefined && column.type === "number") {
                         colValue = colValue.replace(/\u00a0/g, "");
                     }
@@ -677,7 +678,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 } else if (!result.line.group && column.url !== undefined && column.url !== null) {
                     var url = $parse(column.url)(result.data);
                     colValue = $parse(column.property + this.getFilter(column) + this.getFormatter(column))(this.urlCache[url]);
-
+					if(colValue === null)colValue = undefined;
                     if (colValue !== undefined && column.type === "number") {
                         colValue = colValue.replace(/\u00a0/g, "");
                     }
@@ -774,12 +775,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }, displayResultTmp);
                         that.displayResult = displayResultTmp;
                     } else {
-                        if (configPagination.active && !that.isRemoteMode(configPagination.mode)) {
-                            _displayResult = angular.copy(that._getAllResult().slice((configPagination.pageNumber * configPagination.numberRecordsPerPage), (configPagination.pageNumber * configPagination.numberRecordsPerPage + configPagination.numberRecordsPerPage)));
-                        } else { //to manage all records or server pagination
-                            _displayResult = angular.copy(that._getAllResult());
-                        }
-
+                        if(configPagination.active && !that.isRemoteMode(configPagination.mode)){
+							_displayResult = $.extend(true,[],that._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
+								(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage)));										
+						}else{ //to manage all records or server pagination
+							_displayResult = $.extend(true,[],that._getAllResult());												    					
+						}
                         var displayResultTmp = [];
                         angular.forEach(_displayResult, function(value, key) {
                             var line = {
@@ -1393,7 +1394,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         if (this.config.pagination.active && !this.isRemoteMode(this.config.pagination.mode)) {
                             j = i + (this.config.pagination.pageNumber * this.config.pagination.numberRecordsPerPage);
                         }
-                        this.allResult[j] = angular.copy(this.displayResult[i].data);
+						this.allResult[j] = $.extend(true,{},this.displayResult[i].data);			    					
+
 
                     } else {
                         this.config.save.newData.push(data);
@@ -1661,14 +1663,14 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             this.displayResult[i].line.selected = false;
                             this.displayResult[i].line.trClass = undefined;
                         }
-                        selection.push(angular.copy(this.displayResult[i].data));
+                        selection.push($.extend(true,{},this.displayResult[i].data));
                     } else if (this.displayResult[i].line.groupSelected) {
                         //unselect selection
                         if (unselect) {
                             this.displayResult[i].line.groupSelected = false;
                             this.displayResult[i].line.trClass = undefined;
                         }
-                        selection.push(angular.copy(this.displayResult[i].data));
+                        selection.push($.extend(true,{},this.displayResult[i].data));
                     }
                 }
                 if (unselect) {
@@ -1874,7 +1876,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 
                         if (this.config.group.active && angular.isDefined(this.config.group.by) && (columns[i].property === this.config.group.by || columns[i].property === this.config.group.by.property)) {
                             this.config.group.by = columns[i];
-                            this.config.group.columns[columns[i].id] = true;
+                            this.config.group.start=true;
+							this.config.group.columns[columns[i].id] = true;
                             columns[i].group = true;
                         } else {
                             this.config.group.columns[columns[i].id] = false;
@@ -1907,6 +1910,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     this.config.columns = angular.copy(settings);
                     this.configMaster.columns = angular.copy(settings);
                     this.newExtraHeaderConfig();
+					if(this.allResult){
+						this.computeGroup();
+						this.sortAllResult();
+						this.computePaginationList();
+						this.computeDisplayResult();
+					}
                 }
             },
             setColumnsConfigWithUrl: function() {
@@ -2183,6 +2192,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                         property += that.getFilter(column);
                                         property += that.getFormatter(column);
                                         colValue = $parse(property)(result.data);
+										if(colValue === null)colValue = undefined;
                                         if (colValue === undefined && isFunction === true) { //Because the property here is not $parsable
                                             //The function have to return a $scope value
                                             colValue = property;
@@ -2212,7 +2222,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                         } else {
                                             colValue = undefined;
                                         }
-
+										if(colValue === null)colValue = undefined;
                                         if (colValue !== undefined && column.type === "number") {
                                             colValue = colValue.replace(/\u00a0/g, "");
                                         }
@@ -2220,7 +2230,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                     } else if (!result.line.group && column.url !== undefined && column.url !== null && exportType !== 'groupsOnly') {
                                         var url = $parse(column.url)(result.data);
                                         colValue = $parse(column.property + that.getFilter(column) + that.getFormatter(column))(that.urlCache[url]);
-
+										if(colValue === null)colValue = undefined;
                                         if (colValue !== undefined && column.type === "number") {
                                             colValue = colValue.replace(/\u00a0/g, "");
                                         }
@@ -2874,7 +2884,7 @@ directive('udtConvertvalue',['udtConvertValueServices','$filter', function(udtCo
                 	
                 	//model to view when the user go out of the input
                 	element.bind('blur', function () {
-                		var convertedValue = convertValues.convertValue(ngModel.$modelValue, property.saveMeasureValue, property.displayMeasureValue, ngModel.$viewValue.length);
+                		var convertedValue = convertValues.convertValue(ngModel.$modelValue, property.saveMeasureValue, property.displayMeasureValue);
                 		ngModel.$setViewValue($filter('number')(convertedValue));
 						ngModel.$render();
 						//We restart the watcher when the user is out of the inputs
@@ -3184,9 +3194,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 			    		}
 						
 						if(arg==null || arg==undefined){
-			    			return scope.udtTable.messages.Messages(message);
+			    			return scope.udtTable.config.messages.transformKey(message);
 						}else{
-							return scope.udtTable.messages.Messages(message, arg);
+							return scope.udtTable.config.messages.transformKey(message, arg);
 						}
 			    	};
 			    	
@@ -3281,7 +3291,7 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    			if(scope.udtTable.config.group.active && scope.udtTable.config.group.start && !scope.udtTable.config.group.showOnlyGroups){
 		    				return scope.udtTable.totalNumberRecords + " - "+scope.udtTable.allGroupResult.length;
 		    			}else if(scope.udtTable.config.group.active && scope.udtTable.config.group.start && scope.udtTable.config.group.showOnlyGroups){
-		    				return scope.udtTable.allGroupResult.length
+		    				return (scope.udtTable.allGroupResult)?scope.udtTable.allGroupResult.length:0;
 		    			}else{
 		    				return scope.udtTable.totalNumberRecords;
 		    			}
@@ -3431,8 +3441,6 @@ factory('udtConvertValueServices', [function() {
 									value = value * convert;
 									if(precision !== undefined){
 										value = value.toPrecision(precision);
-									}else{
-										value = value.toPrecision(convert.toString().length);
 									}
 								}else if(convert == undefined){
 									throw "Error: Unknown Conversion "+inputUnit+" to "+outputUnit;
@@ -3448,6 +3456,10 @@ factory('udtConvertValueServices', [function() {
 							return (1/1000);
 						}else if((inputUnit === 'ng' && outputUnit === '�g') || (inputUnit === '�l' && outputUnit === 'ml') || (inputUnit === 'nM' && outputUnit === 'pM')){
 							return 1000;
+						}else if ((inputUnit === 'mM' && outputUnit === 'nM')){
+							return 1000000;
+						}else if ((inputUnit === 'nM' && outputUnit === 'mM')){
+							return 1/1000000;
 						}
 						return undefined;
 					},

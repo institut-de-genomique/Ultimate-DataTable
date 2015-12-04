@@ -10,8 +10,6 @@ factory('udtConvertValueServices', [function() {
 									value = value * convert;
 									if(precision !== undefined){
 										value = value.toPrecision(precision);
-									}else{
-										value = value.toPrecision(convert.toString().length);
 									}
 								}else if(convert == undefined){
 									throw "Error: Unknown Conversion "+inputUnit+" to "+outputUnit;
@@ -27,6 +25,10 @@ factory('udtConvertValueServices', [function() {
 							return (1/1000);
 						}else if((inputUnit === 'ng' && outputUnit === 'µg') || (inputUnit === 'µl' && outputUnit === 'ml') || (inputUnit === 'nM' && outputUnit === 'pM')){
 							return 1000;
+						}else if ((inputUnit === 'mM' && outputUnit === 'nM')){
+							return 1000000;
+						}else if ((inputUnit === 'nM' && outputUnit === 'mM')){
+							return 1/1000000;
 						}
 						return undefined;
 					},
