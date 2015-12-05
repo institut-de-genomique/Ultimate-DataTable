@@ -65,19 +65,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     numberPageListMax: 3,
                     pageList: [],
                     numberRecordsPerPage: 10,
-                    numberRecordsPerPageList: [{
-                        number: 10,
-                        clazz: ''
-                    }, {
-                        number: 25,
-                        clazz: ''
-                    }, {
-                        number: 50,
-                        clazz: ''
-                    }, {
-                        number: 100,
-                        clazz: ''
-                    }]
+                    numberRecordsPerPageList: undefined
                 },
                 order: {
                     active: true,
@@ -1932,6 +1920,24 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             setConfig: function(config) {
                 var settings = $.extend(true, {}, this.configDefault, config);
                 this.config = angular.copy(settings);
+                
+                if(!this.config.pagination.numberRecordsPerPageList){
+                	this.config.pagination.numberRecordsPerPageList = [{
+                        number: 10,
+                        clazz: ''
+                    }, {
+                        number: 25,
+                        clazz: ''
+                    }, {
+                        number: 50,
+                        clazz: ''
+                    }, {
+                        number: 100,
+                        clazz: ''
+                    }];
+                	
+                }
+                
                 this.configMaster = angular.copy(settings);
                 if (this.config.columnsUrl) {
                     this.setColumnsConfigWithUrl();
@@ -1939,6 +1945,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     this.setColumnsConfig(this.config.columns);
                 }
 
+                
+                
                 if (this.displayResult && this.displayResult.length > 0) {
                     this.computePaginationList();
                     this.computeDisplayResult();
