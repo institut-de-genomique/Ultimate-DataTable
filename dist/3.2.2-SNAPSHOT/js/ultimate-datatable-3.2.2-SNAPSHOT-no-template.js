@@ -97,6 +97,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 hide: {
                     active: false,
                     showButton: true,
+                    byDefault:undefined, //Array with column property
                     columns: {} //columnIndex : true / false
                 },
                 edit: {
@@ -387,11 +388,11 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     //call inti method for the new data
                     var newData = this.config.add.init(this);
                     var line = {
-                        edit: true,
-                        selected: true,
-                        trClass: undefined,
-                        group: false,
-                        new: true
+                        "edit": true,
+                        "selected": true,
+                        "trClass": undefined,
+                        "group": false,
+                        "new": true
                     };
 
                     if (this.config.add.after) {
@@ -588,7 +589,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             selected: undefined,
                             trClass: undefined,
                             group: true,
-                            new: false
+                            "new": false
                         };
                         this.push({
                             data: groupConfig.data[groupGetter(element.data)],
@@ -600,17 +601,17 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     /* after mode */
                     if (groupConfig.after && (index === (array.length - 1) || groupGetter(element.data) !== groupGetter(array[index + 1].data))) {
                         var line = {
-                            edit: undefined,
-                            selected: undefined,
-                            trClass: undefined,
-                            group: true,
-                            new: false
+                            "edit": undefined,
+                            "selected": undefined,
+                            "trClass": undefined,
+                            "group": true,
+                            "new": false
                         };
                         this.push({
                             data: groupConfig.data[groupGetter(element.data)],
                             line: line
                         });
-                    }
+                    };
 
                 }, displayResult);
                 return displayResult;
@@ -750,11 +751,11 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         var displayResultTmp = [];
                         angular.forEach(_displayResult, function(value, key) {
                             var line = {
-                                edit: undefined,
-                                selected: undefined,
-                                trClass: undefined,
-                                group: true,
-                                new: false
+                                "edit": undefined,
+                                "selected": undefined,
+                                "trClass": undefined,
+                                "group": true,
+                                "new": false
                             };
                             this.push({
                                 data: value,
@@ -772,11 +773,11 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         var displayResultTmp = [];
                         angular.forEach(_displayResult, function(value, key) {
                             var line = {
-                                edit: undefined,
-                                selected: undefined,
-                                trClass: undefined,
-                                group: false,
-                                new: false
+                                "edit": undefined,
+                                "selected": undefined,
+                                "trClass": undefined,
+                                "group": false,
+                                "new": false
                             };
                             this.push({
                                 data: value,
@@ -1377,7 +1378,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     }
 
                     //update in the all result table
-                    if (!this.displayResult[i].line.new) {
+                    if (!this.displayResult[i].line["new"]) {
                         var j = i;
                         if (this.config.pagination.active && !this.isRemoteMode(this.config.pagination.mode)) {
                             j = i + (this.config.pagination.pageNumber * this.config.pagination.numberRecordsPerPage);
@@ -1588,7 +1589,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         };
                         that.setSpinner(false);
                     });
-                }
+                };
             },
 
             /**
@@ -1839,19 +1840,19 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 
                         columns[i].id = this.generateColumnId();
                         /*
-          if(columns[i].hide && !this.config.hide.active){
-          columns[i].hide = false;
-        }
-        if(columns[i].order && !this.config.order.active){
-        columns[i].order = false;
-      }
-      if(columns[i].edit && !this.config.edit.active){
-      columns[i].edit = false;
-    }
-    if(columns[i].mergeCells && !this.config.mergeCells.active){
-    columns[i].mergeCells = false;
-  }
-  */
+				          if(columns[i].hide && !this.config.hide.active){
+				          columns[i].hide = false;
+				        }
+				        if(columns[i].order && !this.config.order.active){
+				        columns[i].order = false;
+				      }
+				      if(columns[i].edit && !this.config.edit.active){
+				      columns[i].edit = false;
+				    }
+				    if(columns[i].mergeCells && !this.config.mergeCells.active){
+				    columns[i].mergeCells = false;
+				  }
+                         */
                         //TODO: else{Error here ?}
 
                         if (columns[i].choiceInList && !angular.isDefined(columns[i].listStyle)) {
@@ -1892,6 +1893,17 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
                     }
 
+                    if(this.config.hide.active && angular.isDefined(this.config.hide.byDefault)){
+                        if(!angular.isArray(this.config.hide.byDefault))this.config.hide.byDefault = [this.config.hide.byDefault];
+                        angular.forEach(columns, function(column, key){
+                        	angular.forEach(this.config.hide.byDefault,function(value, key){
+                        		if(value === column.property){
+                        			this.setHideColumn(column);
+                        		}
+                        	},this);
+                        }, this);
+                    }
+                    
                     var settings = $.extend(true, [], this.configColumnDefault, columns);
                     settings = $filter('orderBy')(settings, 'position');
 
@@ -2142,11 +2154,11 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     var displayResultTmp = [];
                     angular.forEach(this.allResult, function(value, key) {
                         var line = {
-                            edit: undefined,
-                            selected: undefined,
-                            trClass: undefined,
-                            group: false,
-                            new: false
+                            "edit": undefined,
+                            "selected": undefined,
+                            "trClass": undefined,
+                            "group": false,
+                            "new": false
                         };
                         this.push({
                             data: value,

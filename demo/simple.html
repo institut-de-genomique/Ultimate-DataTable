@@ -72,7 +72,14 @@
 					"columnMode":true
 				},
 				"pagination":{
-					"mode":'local'
+					"mode":'local',
+					numberRecordsPerPageList:[{
+                        number: 10,
+                        clazz: ''
+                    }, {
+                        number: 25,
+                        clazz: ''
+                    }]
 				},
 				"order":{
 					"mode":'local'
@@ -100,6 +107,7 @@
 				},
 				"hide":{
 					"active":true,
+					"byDefault":["about","name"]
 				}
 			};
 			
