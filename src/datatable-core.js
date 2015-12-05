@@ -396,14 +396,14 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         this.displayResult.push({
                             data: newData,
                             line: line
-                        })
+                        });
                     } else {
                         this.displayResult.unshift({
                             data: newData,
                             line: line
-                        })
+                        });
                     }
-                    this.config.edit.all = true
+                    this.config.edit.all = true;
                 }
             },
             /**
@@ -471,7 +471,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                 var result = $filter('udtCollect')(groupData, propertyGetter);
                                 columnSetter.assign(group, result);
                             } else {
-                                console.error("groupMethod is not managed " + column.groupMethod)
+                                console.error("groupMethod is not managed " + column.groupMethod);
                             }
                         });
 
@@ -615,7 +615,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             },
 
             getColumnValue: function(result, column) {
-                var colValue;
+                var colValue = undefined;
                 if (!result.line.group && (column.url === undefined || column.url === null)) {
                     var property = column.property;
                     var isFunction = false;
@@ -640,7 +640,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         if (colValue) {
                             colValue = this.messages.Messages('datatable.export.yes');
                         } else {
-                            colValue = this.messages.Messages('datatable.export.no')
+                            colValue = this.messages.Messages('datatable.export.no');
                         }
                     }
 
@@ -873,7 +873,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
 
                         if (max < configPagination.numberPageListMax) {
-                            max = configPagination.numberPageListMax
+                            max = configPagination.numberPageListMax;
                         } else if (max > nbPages) {
                             max = nbPages;
                         }
@@ -988,14 +988,14 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                 var orderProperty = this.config.order.by.property;
                                 orderProperty += (this.config.order.by.filter) ? '|' + this.config.order.by.filter : '';
                                 var orderSense = (this.config.order.reverse) ? '-' : '+';
-                                orderBy.push(orderSense + orderProperty)
+                                orderBy.push(orderSense + orderProperty);
                             }
                             this.allResult = $filter('orderBy')(this.allResult, orderBy);
                         } else {
                             if (angular.isDefined(this.config.order.by)) {
                                 var orderProperty = "group." + this.config.order.by.id;
                                 var orderSense = (this.config.order.reverse) ? '-' : '+';
-                                orderBy.push(orderSense + orderProperty)
+                                orderBy.push(orderSense + orderProperty);
                             }
                             this.allGroupResult = $filter('orderBy')(this.allGroupResult, orderBy);
                         }
@@ -1005,7 +1005,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             var orderProperty = this.config.order.by.property;
                             orderProperty += (this.config.order.by.filter) ? '|' + this.config.order.by.filter : '';
                             var orderSense = (this.config.order.reverse) ? '-' : '+';
-                            orderBy.push(orderSense + orderProperty)
+                            orderBy.push(orderSense + orderProperty);
                         }
                         this.allResult = $filter('orderBy')(this.allResult, orderBy);
                     }
@@ -1182,7 +1182,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             that.config.edit.start = true;
                             if (column) {
                                 that.config.edit.all = false;
-                                var columnId = column.id
+                                var columnId = column.id;
                                 if (angular.isUndefined(that.config.edit.columns[columnId])) {
                                     that.config.edit.columns[columnId] = {};
                                 }
@@ -1784,12 +1784,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (angular.isObject(url)) {
                     if (angular.isDefined(url.url)) {
                         return function(value) {
-                            return url.url
+                            return url.url;
                         };
                     }
                 } else if (angular.isString(url)) {
                     return function(value) {
-                        return url
+                        return url;
                     };
                 } else if (angular.isFunction(url)) {
                     return url;
@@ -1804,7 +1804,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     return valueFunction;
                 }
                 return function(value) {
-                    return value
+                    return value;
                 };
             },
             /**
@@ -2148,7 +2148,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             exportCSV: function(exportType) {
                 if (this.config.exportCSV.active) {
                     this.config.exportCSV.start = true;
-                    var cas, delimiter = this.config.exportCSV.delimiter,
+                    var delimiter = this.config.exportCSV.delimiter,
                         lineValue = "",
                         colValue, that = this;
 
@@ -2228,7 +2228,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                             if (colValue) {
                                                 colValue = this.messages.Messages('datatable.export.yes');
                                             } else {
-                                                colValue = this.messages.Messages('datatable.export.no')
+                                                colValue = this.messages.Messages('datatable.export.no');
                                             }
                                         }
                                         lineValue = lineValue + ((colValue !== null) && (colValue) ? colValue : "") + delimiter;
@@ -2354,6 +2354,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
         datatable.setConfig(iConfig);
 
         return datatable;
-    }
+    };
     return constructor;
 }]);
