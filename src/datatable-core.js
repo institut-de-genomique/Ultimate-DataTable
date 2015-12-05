@@ -1691,6 +1691,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     this.config.select = angular.copy(this.configMaster.select);
                     this.config.messages = angular.copy(this.configMaster.messages);
                     this.totalNumberRecords = this.allResult.length;
+                    this.setHideColumnByDefault();
+                    this.newExtraHeaderConfig();
                     this.computePaginationList();
                     this.computeDisplayResult();
 
@@ -1815,6 +1817,18 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     return false;
                 }
             },
+            setHideColumnByDefault: function(){
+            	if(this.config.hide.active && angular.isDefined(this.config.hide.byDefault)){
+                    if(!angular.isArray(this.config.hide.byDefault))this.config.hide.byDefault = [this.config.hide.byDefault];
+                    angular.forEach(this.config.columns, function(column, key){
+                    	angular.forEach(this.config.hide.byDefault,function(value, key){
+                    		if(value === column.property){
+                    			this.setHideColumn(column);
+                    		}
+                    	},this);
+                    }, this);
+                }
+            },	
             /**
              * Set columns configuration
              */
@@ -1890,22 +1904,13 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
                     }
 
-                    if(this.config.hide.active && angular.isDefined(this.config.hide.byDefault)){
-                        if(!angular.isArray(this.config.hide.byDefault))this.config.hide.byDefault = [this.config.hide.byDefault];
-                        angular.forEach(columns, function(column, key){
-                        	angular.forEach(this.config.hide.byDefault,function(value, key){
-                        		if(value === column.property){
-                        			this.setHideColumn(column);
-                        		}
-                        	},this);
-                        }, this);
-                    }
                     
                     var settings = $.extend(true, [], this.configColumnDefault, columns);
                     settings = $filter('orderBy')(settings, 'position');
 
                     this.config.columns = angular.copy(settings);
                     this.configMaster.columns = angular.copy(settings);
+                    this.setHideColumnByDefault();
                     this.newExtraHeaderConfig();
 					if(this.allResult){
 						this.computeGroup();
