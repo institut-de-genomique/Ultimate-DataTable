@@ -1,10 +1,10 @@
 ﻿angular.module('ultimateDataTableServices').
 factory('udtI18n', [function() {
-    		var constructor = function(preferedLanguageVar){
+    	var constructor = function(preferedLanguageVar) {
 				var udtI18n = {
-				    preferedLanguage : (preferedLanguageVar !== undefined ? preferedLanguageVar:"en"),
+				  preferedLanguage : (preferedLanguageVar !== undefined ? preferedLanguageVar : "en"),
 					translateTable : {
-						"fr":{
+						"fr": {
 							"result":"Résultats",
 							"date.format":"dd/MM/yyyy",
 							"datetime.format":"dd/MM/yyyy HH:mm:ss",
@@ -38,9 +38,9 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup" : "Grouper toute la sélection",
 							"datatable.button.basicExportCSV" : "Exporter toutes les lignes",
 							"datatable.button.groupedExportCSV" : "Exporter les lignes groupées",
-							"datatable.button.showOnlyGroups" : "Voir uniquement les groupes"	
+							"datatable.button.showOnlyGroups" : "Voir uniquement les groupes"
 						},
-						"en":{
+						"en": {
 							"result":"Results",
 							"date.format":"MM/dd/yyyy",
 							"datetime.format":"MM/dd/yyyy HH:mm:ss",
@@ -76,7 +76,7 @@ factory('udtI18n', [function() {
 							"datatable.button.groupedExportCSV" : "Export only grouped lines",
 							"datatable.button.showOnlyGroups" : "See only group"
 						},
-						"nl":{
+						"nl": {
 							"result": "Resultaten",
 							"date.format": "dd/MM/yyyy",
 							"datetime.format": "dd/MM/yyyy HH:mm:ss",
@@ -113,16 +113,16 @@ factory('udtI18n', [function() {
 							"datatable.button.showOnlyGroups": "Toon alleen de groep"
 						}
 					},
-					
+
 					//Translate the key with the correct language
-					Messages : function(key){
-						  if(this.translateTable[this.preferedLanguage] === undefined){
-							this.preferedLanguage = "en";
+					Messages : function(key) {
+						  if(this.translateTable[this.preferedLanguage] === undefined) {
+						    this.preferedLanguage = "en";
 						  }
-						  
+
 						  var translatedString = this.translateTable[this.preferedLanguage][key];
 						  if(translatedString === undefined){
-							return key;
+							  return key;
 						  }
 						  for (var i=1; i < arguments.length; i++) {
 								translatedString = translatedString.replace("{"+(i-1)+"}", arguments[i]);
@@ -132,5 +132,5 @@ factory('udtI18n', [function() {
 				};
 				return udtI18n;
 			};
-    		return constructor;
+    	return constructor;
 }]);
