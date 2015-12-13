@@ -31,7 +31,7 @@ factory('udtI18n', [function() {
 
               // Then we try with only Primary Language Subtag
               var splitedLanguages = language.split('-');
-              if(splitedLanguages > 1) {
+              if(splitedLanguages.length > 1) {
                 var primaryLanguageSubtag = splitedLanguages[0];
                 if(this.tanslationExist(primaryLanguageSubtag)) {
                   this.preferedLanguage = primaryLanguageSubtag;
@@ -166,7 +166,7 @@ factory('udtI18n', [function() {
 						  return translatedString;
 					}
 				};
-        
+
         udtI18n.init();
 				return udtI18n;
 			};
