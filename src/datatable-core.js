@@ -174,7 +174,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     },
                     text: undefined,
                     clazz: undefined,
-                    messagesService: udtI18n(navigator.language || navigator.userLanguage),
+                    messagesService: udtI18n(navigator.languages || navigator.language || navigator.userLanguage),
                     transformKey: function(key, args) {
                         return this.messagesService.Messages(key, args);
                     }
@@ -762,10 +762,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         that.displayResult = displayResultTmp;
                     } else {
                         if(configPagination.active && !that.isRemoteMode(configPagination.mode)){
-							_displayResult = $.extend(true,[],that._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
-								(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage)));										
+							_displayResult = $.extend(true,[],that._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage),
+								(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage)));
 						}else{ //to manage all records or server pagination
-							_displayResult = $.extend(true,[],that._getAllResult());												    					
+							_displayResult = $.extend(true,[],that._getAllResult());
 						}
                         var displayResultTmp = [];
                         angular.forEach(_displayResult, function(value, key) {
@@ -1380,7 +1380,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         if (this.config.pagination.active && !this.isRemoteMode(this.config.pagination.mode)) {
                             j = i + (this.config.pagination.pageNumber * this.config.pagination.numberRecordsPerPage);
                         }
-						this.allResult[j] = $.extend(true,{},this.displayResult[i].data);			    					
+						this.allResult[j] = $.extend(true,{},this.displayResult[i].data);
 
 
                     } else {
@@ -1828,7 +1828,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     	},this);
                     }, this);
                 }
-            },	
+            },
             /**
              * Set columns configuration
              */
@@ -1898,13 +1898,13 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         if (columns[i].convertValue !== undefined && columns[i].convertValue.active === true && (columns[i].convertValue.displayMeasureValue === undefined || columns[i].convertValue.saveMeasureValue === undefined)) {
                             throw "Columns config error: " + columns[i].property + " convertValue=active but convertValue.displayMeasureValue or convertValue.saveMeasureValue is missing";
                         }
-                        
+
                         if(null === columns[i].showFilter || undefined === columns[i].showFilter){
                             columns[i].showFilter = false;
                         }
                     }
 
-                    
+
                     var settings = $.extend(true, [], this.configColumnDefault, columns);
                     settings = $filter('orderBy')(settings, 'position');
 
@@ -1937,7 +1937,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             setConfig: function(config) {
                 var settings = $.extend(true, {}, this.configDefault, config);
                 this.config = angular.copy(settings);
-                
+
                 if(!this.config.pagination.numberRecordsPerPageList){
                 	this.config.pagination.numberRecordsPerPageList = [{
                         number: 10,
@@ -1952,9 +1952,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         number: 100,
                         clazz: ''
                     }];
-                	
+
                 }
-                
+
                 this.configMaster = angular.copy(settings);
                 if (this.config.columnsUrl) {
                     this.setColumnsConfigWithUrl();
@@ -1962,8 +1962,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     this.setColumnsConfig(this.config.columns);
                 }
 
-                
-                
+
+
                 if (this.displayResult && this.displayResult.length > 0) {
                     this.computePaginationList();
                     this.computeDisplayResult();
