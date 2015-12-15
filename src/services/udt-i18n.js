@@ -1,10 +1,50 @@
 ﻿angular.module('ultimateDataTableServices').
+/* A I18n service, that manage internal translation in udtI18n
+* follow the http://tools.ietf.org/html/rfc4646#section-2.2.4 spec
+* preferedLanguageVar can be a string or an array of string
+* https://developer.mozilla.org/en-US/docs/Web/API/NavigatorLanguage
+*/
 factory('udtI18n', [function() {
-    		var constructor = function(preferedLanguageVar){
+    	var constructor = function(preferedLanguageVar) {
 				var udtI18n = {
-				    preferedLanguage : (preferedLanguageVar !== undefined ? preferedLanguageVar:"en"),
-					translateTable : {
-						"fr":{
+          init: function() {
+            this.preferedLanguage = 'en';
+            // If preferedLanguageVar is undefined we keep the defaultLanguage
+            if(!preferedLanguageVar) {
+              return false;
+            }
+
+            var preferedLanguage = [];
+            if(!Array.isArray(preferedLanguageVar)) {
+              preferedLanguage.push(preferedLanguageVar);
+            } else {
+              preferedLanguage = preferedLanguageVar.slice();
+            }
+
+            preferedLanguage.some(function(language) {
+              // We first try to find the entire language string
+              // Primary Language Subtag with Extended Language Subtags
+              if(this.tanslationExist(language)) {
+                this.preferedLanguage = language;
+                return true;
+              }
+
+              // Then we try with only Primary Language Subtag
+              var splitedLanguages = language.split('-');
+              if(splitedLanguages.length > 1) {
+                var primaryLanguageSubtag = splitedLanguages[0];
+                if(this.tanslationExist(primaryLanguageSubtag)) {
+                  this.preferedLanguage = primaryLanguageSubtag;
+                  return true;
+                }
+              }
+            }, this);
+          },
+          tanslationExist: function(language) {
+            return this.translateTable[language] !== undefined;
+          },
+				  translateTable : {
+						"fr": {
 							"result":"Résultats",
 							"date.format":"dd/MM/yyyy",
 							"datetime.format":"dd/MM/yyyy HH:mm:ss",
@@ -38,9 +78,9 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup" : "Grouper toute la sélection",
 							"datatable.button.basicExportCSV" : "Exporter toutes les lignes",
 							"datatable.button.groupedExportCSV" : "Exporter les lignes groupées",
-							"datatable.button.showOnlyGroups" : "Voir uniquement les groupes"	
+							"datatable.button.showOnlyGroups" : "Voir uniquement les groupes"
 						},
-						"en":{
+						"en": {
 							"result":"Results",
 							"date.format":"MM/dd/yyyy",
 							"datetime.format":"MM/dd/yyyy HH:mm:ss",
@@ -76,7 +116,7 @@ factory('udtI18n', [function() {
 							"datatable.button.groupedExportCSV" : "Export only grouped lines",
 							"datatable.button.showOnlyGroups" : "See only group"
 						},
-						"nl":{
+						"nl": {
 							"result": "Resultaten",
 							"date.format": "dd/MM/yyyy",
 							"datetime.format": "dd/MM/yyyy HH:mm:ss",
@@ -113,24 +153,22 @@ factory('udtI18n', [function() {
 							"datatable.button.showOnlyGroups": "Toon alleen de groep"
 						}
 					},
-					
+
 					//Translate the key with the correct language
-					Messages : function(key){
-						  if(this.translateTable[this.preferedLanguage] === undefined){
-							this.preferedLanguage = "en";
-						  }
-						  
+					Messages : function(key) {
 						  var translatedString = this.translateTable[this.preferedLanguage][key];
-						  if(translatedString === undefined){
-							return key;
+						  if(translatedString === undefined) {
+							  return key;
 						  }
-						  for (var i=1; i < arguments.length; i++) {
+						  for (var i = 1; i < arguments.length; i++) {
 								translatedString = translatedString.replace("{"+(i-1)+"}", arguments[i]);
 						  }
 						  return translatedString;
 					}
 				};
+
+        udtI18n.init();
 				return udtI18n;
 			};
-    		return constructor;
+    	return constructor;
 }]);
