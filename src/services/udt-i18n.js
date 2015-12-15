@@ -24,7 +24,7 @@ factory('udtI18n', [function() {
             preferedLanguage.some(function(language) {
               // We first try to find the entire language string
               // Primary Language Subtag with Extended Language Subtags
-              if(this.tanslationExist(language)) {
+              if(this.translationExist(language)) {
                 this.preferedLanguage = language;
                 return true;
               }
@@ -33,14 +33,14 @@ factory('udtI18n', [function() {
               var splitedLanguages = language.split('-');
               if(splitedLanguages.length > 1) {
                 var primaryLanguageSubtag = splitedLanguages[0];
-                if(this.tanslationExist(primaryLanguageSubtag)) {
+                if(this.translationExist(primaryLanguageSubtag)) {
                   this.preferedLanguage = primaryLanguageSubtag;
                   return true;
                 }
               }
             }, this);
           },
-          tanslationExist: function(language) {
+          translationExist: function(language) {
             return this.translateTable[language] !== undefined;
           },
 				  translateTable : {

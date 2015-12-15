@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2015-12-05 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2015-12-15 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -177,7 +177,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     },
                     text: undefined,
                     clazz: undefined,
-                    messagesService: udtI18n(navigator.language || navigator.userLanguage),
+                    messagesService: udtI18n(navigator.languages || navigator.language || navigator.userLanguage),
                     transformKey: function(key, args) {
                         return this.messagesService.Messages(key, args);
                     }
@@ -399,14 +399,14 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         this.displayResult.push({
                             data: newData,
                             line: line
-                        })
+                        });
                     } else {
                         this.displayResult.unshift({
                             data: newData,
                             line: line
-                        })
+                        });
                     }
-                    this.config.edit.all = true
+                    this.config.edit.all = true;
                 }
             },
             /**
@@ -474,7 +474,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                 var result = $filter('udtCollect')(groupData, propertyGetter);
                                 columnSetter.assign(group, result);
                             } else {
-                                console.error("groupMethod is not managed " + column.groupMethod)
+                                console.error("groupMethod is not managed " + column.groupMethod);
                             }
                         });
 
@@ -618,7 +618,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             },
 
             getColumnValue: function(result, column) {
-                var colValue;
+                var colValue = undefined;
                 if (!result.line.group && (column.url === undefined || column.url === null)) {
                     var property = column.property;
                     var isFunction = false;
@@ -643,7 +643,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         if (colValue) {
                             colValue = this.messages.Messages('datatable.export.yes');
                         } else {
-                            colValue = this.messages.Messages('datatable.export.no')
+                            colValue = this.messages.Messages('datatable.export.no');
                         }
                     }
 
@@ -765,10 +765,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         that.displayResult = displayResultTmp;
                     } else {
                         if(configPagination.active && !that.isRemoteMode(configPagination.mode)){
-							_displayResult = $.extend(true,[],that._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage), 
-								(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage)));										
+							_displayResult = $.extend(true,[],that._getAllResult().slice((configPagination.pageNumber*configPagination.numberRecordsPerPage),
+								(configPagination.pageNumber*configPagination.numberRecordsPerPage+configPagination.numberRecordsPerPage)));
 						}else{ //to manage all records or server pagination
-							_displayResult = $.extend(true,[],that._getAllResult());												    					
+							_displayResult = $.extend(true,[],that._getAllResult());
 						}
                         var displayResultTmp = [];
                         angular.forEach(_displayResult, function(value, key) {
@@ -876,7 +876,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
 
                         if (max < configPagination.numberPageListMax) {
-                            max = configPagination.numberPageListMax
+                            max = configPagination.numberPageListMax;
                         } else if (max > nbPages) {
                             max = nbPages;
                         }
@@ -991,14 +991,14 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                 var orderProperty = this.config.order.by.property;
                                 orderProperty += (this.config.order.by.filter) ? '|' + this.config.order.by.filter : '';
                                 var orderSense = (this.config.order.reverse) ? '-' : '+';
-                                orderBy.push(orderSense + orderProperty)
+                                orderBy.push(orderSense + orderProperty);
                             }
                             this.allResult = $filter('orderBy')(this.allResult, orderBy);
                         } else {
                             if (angular.isDefined(this.config.order.by)) {
                                 var orderProperty = "group." + this.config.order.by.id;
                                 var orderSense = (this.config.order.reverse) ? '-' : '+';
-                                orderBy.push(orderSense + orderProperty)
+                                orderBy.push(orderSense + orderProperty);
                             }
                             this.allGroupResult = $filter('orderBy')(this.allGroupResult, orderBy);
                         }
@@ -1008,7 +1008,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             var orderProperty = this.config.order.by.property;
                             orderProperty += (this.config.order.by.filter) ? '|' + this.config.order.by.filter : '';
                             var orderSense = (this.config.order.reverse) ? '-' : '+';
-                            orderBy.push(orderSense + orderProperty)
+                            orderBy.push(orderSense + orderProperty);
                         }
                         this.allResult = $filter('orderBy')(this.allResult, orderBy);
                     }
@@ -1185,7 +1185,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             that.config.edit.start = true;
                             if (column) {
                                 that.config.edit.all = false;
-                                var columnId = column.id
+                                var columnId = column.id;
                                 if (angular.isUndefined(that.config.edit.columns[columnId])) {
                                     that.config.edit.columns[columnId] = {};
                                 }
@@ -1383,7 +1383,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         if (this.config.pagination.active && !this.isRemoteMode(this.config.pagination.mode)) {
                             j = i + (this.config.pagination.pageNumber * this.config.pagination.numberRecordsPerPage);
                         }
-						this.allResult[j] = $.extend(true,{},this.displayResult[i].data);			    					
+						this.allResult[j] = $.extend(true,{},this.displayResult[i].data);
 
 
                     } else {
@@ -1787,12 +1787,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (angular.isObject(url)) {
                     if (angular.isDefined(url.url)) {
                         return function(value) {
-                            return url.url
+                            return url.url;
                         };
                     }
                 } else if (angular.isString(url)) {
                     return function(value) {
-                        return url
+                        return url;
                     };
                 } else if (angular.isFunction(url)) {
                     return url;
@@ -1807,7 +1807,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     return valueFunction;
                 }
                 return function(value) {
-                    return value
+                    return value;
                 };
             },
             /**
@@ -1831,7 +1831,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     	},this);
                     }, this);
                 }
-            },	
+            },
             /**
              * Set columns configuration
              */
@@ -1901,13 +1901,13 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         if (columns[i].convertValue !== undefined && columns[i].convertValue.active === true && (columns[i].convertValue.displayMeasureValue === undefined || columns[i].convertValue.saveMeasureValue === undefined)) {
                             throw "Columns config error: " + columns[i].property + " convertValue=active but convertValue.displayMeasureValue or convertValue.saveMeasureValue is missing";
                         }
-                        
+
                         if(null === columns[i].showFilter || undefined === columns[i].showFilter){
                             columns[i].showFilter = false;
                         }
                     }
 
-                    
+
                     var settings = $.extend(true, [], this.configColumnDefault, columns);
                     settings = $filter('orderBy')(settings, 'position');
 
@@ -1940,7 +1940,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             setConfig: function(config) {
                 var settings = $.extend(true, {}, this.configDefault, config);
                 this.config = angular.copy(settings);
-                
+
                 if(!this.config.pagination.numberRecordsPerPageList){
                 	this.config.pagination.numberRecordsPerPageList = [{
                         number: 10,
@@ -1955,9 +1955,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         number: 100,
                         clazz: ''
                     }];
-                	
+
                 }
-                
+
                 this.configMaster = angular.copy(settings);
                 if (this.config.columnsUrl) {
                     this.setColumnsConfigWithUrl();
@@ -1965,8 +1965,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     this.setColumnsConfig(this.config.columns);
                 }
 
-                
-                
+
+
                 if (this.displayResult && this.displayResult.length > 0) {
                     this.computePaginationList();
                     this.computeDisplayResult();
@@ -2151,7 +2151,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             exportCSV: function(exportType) {
                 if (this.config.exportCSV.active) {
                     this.config.exportCSV.start = true;
-                    var cas, delimiter = this.config.exportCSV.delimiter,
+                    var delimiter = this.config.exportCSV.delimiter,
                         lineValue = "",
                         colValue, that = this;
 
@@ -2231,7 +2231,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                             if (colValue) {
                                                 colValue = this.messages.Messages('datatable.export.yes');
                                             } else {
-                                                colValue = this.messages.Messages('datatable.export.no')
+                                                colValue = this.messages.Messages('datatable.export.no');
                                             }
                                         }
                                         lineValue = lineValue + ((colValue !== null) && (colValue) ? colValue : "") + delimiter;
@@ -2357,9 +2357,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
         datatable.setConfig(iConfig);
 
         return datatable;
-    }
+    };
     return constructor;
-}]);;angular.module('ultimateDataTableServices').
+}]);
+;angular.module('ultimateDataTableServices').
 //If the select or multiple choices contain 1 element, this directive select it automaticaly
 //EXAMPLE: <select ng-model="x" ng-option="x as x for x in x" udtAutoselect>...</select>
 directive('udtAutoselect',['$parse', function($parse) {
@@ -3504,12 +3505,52 @@ factory('udtConvertValueServices', [function() {
 			};
     		return constructor;
 }]);;angular.module('ultimateDataTableServices').
+/* A I18n service, that manage internal translation in udtI18n
+* follow the http://tools.ietf.org/html/rfc4646#section-2.2.4 spec
+* preferedLanguageVar can be a string or an array of string
+* https://developer.mozilla.org/en-US/docs/Web/API/NavigatorLanguage
+*/
 factory('udtI18n', [function() {
-    		var constructor = function(preferedLanguageVar){
+    	var constructor = function(preferedLanguageVar) {
 				var udtI18n = {
-				    preferedLanguage : (preferedLanguageVar !== undefined ? preferedLanguageVar:"en"),
-					translateTable : {
-						"fr":{
+          init: function() {
+            this.preferedLanguage = 'en';
+            // If preferedLanguageVar is undefined we keep the defaultLanguage
+            if(!preferedLanguageVar) {
+              return false;
+            }
+
+            var preferedLanguage = [];
+            if(!Array.isArray(preferedLanguageVar)) {
+              preferedLanguage.push(preferedLanguageVar);
+            } else {
+              preferedLanguage = preferedLanguageVar.slice();
+            }
+
+            preferedLanguage.some(function(language) {
+              // We first try to find the entire language string
+              // Primary Language Subtag with Extended Language Subtags
+              if(this.translationExist(language)) {
+                this.preferedLanguage = language;
+                return true;
+              }
+
+              // Then we try with only Primary Language Subtag
+              var splitedLanguages = language.split('-');
+              if(splitedLanguages.length > 1) {
+                var primaryLanguageSubtag = splitedLanguages[0];
+                if(this.translationExist(primaryLanguageSubtag)) {
+                  this.preferedLanguage = primaryLanguageSubtag;
+                  return true;
+                }
+              }
+            }, this);
+          },
+          translationExist: function(language) {
+            return this.translateTable[language] !== undefined;
+          },
+				  translateTable : {
+						"fr": {
 							"result":"Résultats",
 							"date.format":"dd/MM/yyyy",
 							"datetime.format":"dd/MM/yyyy HH:mm:ss",
@@ -3543,9 +3584,9 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup" : "Grouper toute la sélection",
 							"datatable.button.basicExportCSV" : "Exporter toutes les lignes",
 							"datatable.button.groupedExportCSV" : "Exporter les lignes groupées",
-							"datatable.button.showOnlyGroups" : "Voir uniquement les groupes"	
+							"datatable.button.showOnlyGroups" : "Voir uniquement les groupes"
 						},
-						"en":{
+						"en": {
 							"result":"Results",
 							"date.format":"MM/dd/yyyy",
 							"datetime.format":"MM/dd/yyyy HH:mm:ss",
@@ -3581,7 +3622,7 @@ factory('udtI18n', [function() {
 							"datatable.button.groupedExportCSV" : "Export only grouped lines",
 							"datatable.button.showOnlyGroups" : "See only group"
 						},
-						"nl":{
+						"nl": {
 							"result": "Resultaten",
 							"date.format": "dd/MM/yyyy",
 							"datetime.format": "dd/MM/yyyy HH:mm:ss",
@@ -3618,27 +3659,26 @@ factory('udtI18n', [function() {
 							"datatable.button.showOnlyGroups": "Toon alleen de groep"
 						}
 					},
-					
+
 					//Translate the key with the correct language
-					Messages : function(key){
-						  if(this.translateTable[this.preferedLanguage] === undefined){
-							this.preferedLanguage = "en";
-						  }
-						  
+					Messages : function(key) {
 						  var translatedString = this.translateTable[this.preferedLanguage][key];
-						  if(translatedString === undefined){
-							return key;
+						  if(translatedString === undefined) {
+							  return key;
 						  }
-						  for (var i=1; i < arguments.length; i++) {
+						  for (var i = 1; i < arguments.length; i++) {
 								translatedString = translatedString.replace("{"+(i-1)+"}", arguments[i]);
 						  }
 						  return translatedString;
 					}
 				};
+
+        udtI18n.init();
 				return udtI18n;
 			};
-    		return constructor;
-}]);;"use strict";
+    	return constructor;
+}]);
+;"use strict";
 
 angular.module('ultimateDataTableServices').
 run(function($templateCache) {
