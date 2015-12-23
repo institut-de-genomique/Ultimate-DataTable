@@ -50,7 +50,7 @@ run(function($templateCache) {
    +                            '<div udt-cell-header/>'
    +                        '</td>'
    +                    '</tr>'
-   +                    '<tr ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
+   +                    '<tr ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.data, value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
    +                        '<td ng-repeat="col in udtTable.config.columns" ng-if="udtTableFunctions.isShowCell(col, $parent.$index, $index)" ng-class="udtTableFunctions.getTdClass(value.data, col, this)" rowspan="{{udtTableFunctions.getRowSpanValue($parent.$parent.$index, $parent.$index)}}">'
    +                            '<div udt-cell/>'
    +                        '</td>'

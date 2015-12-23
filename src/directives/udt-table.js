@@ -35,7 +35,7 @@ directive('udtTable', function(){
 	    			/**
 					 * Select all the table line or just one
 					 */
-					scope.udtTableFunctions.select = function(line){
+					scope.udtTableFunctions.select = function(data, line){
 						var udtTable = scope.udtTable;
 						if(udtTable.config.select.active){
 		    				if(line){
@@ -58,7 +58,9 @@ directive('udtTable', function(){
 			    						line.trClass=undefined;
 									}
 		    					}
-		    					
+		    					if (angular.isFunction(udtTable.config.select.callback)) {
+		    						udtTable.config.select.callback(line, data);
+		                        }
 		    				}
 						}
 	    			};

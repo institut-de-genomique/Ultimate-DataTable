@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2015-12-15 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2015-12-23 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -147,7 +147,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 select: {
                     active: true,
                     showButton: true,
-                    isSelectAll: false
+                    isSelectAll: false,
+                    callback: undefined, //used to have a callback after select element.
                 },
                 cancel: {
                     active: true,
@@ -1632,7 +1633,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                 this.displayResult[i].line.groupSelected = false;
                                 this.displayResult[i].line.trClass = undefined;
                             }
-
+                        }
+                        if (angular.isFunction(this.config.select.callback)) {
+                        	this.config.select.callback(this.displayResult[i].line, this.displayResult[i].data);
                         }
                     }
                 } else {
@@ -3133,7 +3136,7 @@ directive('udtTable', function(){
 	    			/**
 					 * Select all the table line or just one
 					 */
-					scope.udtTableFunctions.select = function(line){
+					scope.udtTableFunctions.select = function(data, line){
 						var udtTable = scope.udtTable;
 						if(udtTable.config.select.active){
 		    				if(line){
@@ -3156,7 +3159,9 @@ directive('udtTable', function(){
 			    						line.trClass=undefined;
 									}
 		    					}
-		    					
+		    					if (angular.isFunction(udtTable.config.select.callback)) {
+		    						udtTable.config.select.callback(line, data);
+		                        }
 		    				}
 						}
 	    			};

@@ -108,6 +108,12 @@
 				"hide":{
 					"active":true,
 					"byDefault":["about","name"]
+				},
+				"select":{
+					"active":true,
+					"callback":function(line,data){
+						console.log("callback select : "+data.name);
+					}
 				}
 			};
 			

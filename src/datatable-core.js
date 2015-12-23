@@ -144,7 +144,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 select: {
                     active: true,
                     showButton: true,
-                    isSelectAll: false
+                    isSelectAll: false,
+                    callback: undefined, //used to have a callback after select element.
                 },
                 cancel: {
                     active: true,
@@ -1629,7 +1630,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                 this.displayResult[i].line.groupSelected = false;
                                 this.displayResult[i].line.trClass = undefined;
                             }
-
+                        }
+                        if (angular.isFunction(this.config.select.callback)) {
+                        	this.config.select.callback(this.displayResult[i].line, this.displayResult[i].data);
                         }
                     }
                 } else {
