@@ -147,6 +147,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     isSelectAll: false,
                     callback: undefined, //used to have a callback after select element.
                 },
+                mouseover: {
+                    active: false,
+                    callback: undefined,  // used to have a callback when the user passes the mouse over a row.
+                },
                 cancel: {
                     active: true,
                     showButton: true

@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-01-08 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-01-13 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -149,6 +149,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     showButton: true,
                     isSelectAll: false,
                     callback: undefined, //used to have a callback after select element.
+                },
+                mouseover: {
+                    active: false,
+                    callback: undefined,  // used to have a callback when the user passes the mouse over a row.
                 },
                 cancel: {
                     active: true,
@@ -3167,6 +3171,28 @@ directive('udtTable', function(){
 		    				}
 						}
 	    			};
+
+                                scope.udtTableFunctions.mouseover = function(data, line){
+                                    var udtTable = scope.udtTable;
+                                    if (udtTable.config.mouseover.active) {
+                                        var cb = udtTable.config.mouseover.callback;
+                                        line.mouseover = true;
+                                        if (angular.isFunction(cb)) {
+                                            cb(line, data);
+                                        }
+                                    }
+                                };
+
+                                scope.udtTableFunctions.mouseleave = function(data, line){
+                                    var udtTable = scope.udtTable;
+                                    if (udtTable.config.mouseover.active) {
+                                        var cb = udtTable.config.mouseover.callback;
+                                        line.mouseover = false;
+                                        if (angular.isFunction(cb)) {
+                                            cb(line, data);
+                                        }
+                                    }
+                                };
 					
 					scope.udtTableFunctions.getRowSpanValue = function(i,j){
 						var udtTable = scope.udtTable;
@@ -3737,7 +3763,7 @@ run(function($templateCache) {
    +                            '<div udt-cell-header/>'
    +                        '</td>'
    +                    '</tr>'
-   +                    '<tr ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.data, value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
+   +                    '<tr ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.data, value.line)" ng-mouseover="udtTableFunctions.mouseover(value.data, value.line)" ng-mouseleave="udtTableFunctions.mouseleave(value.data, value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
    +                        '<td ng-repeat="col in udtTable.config.columns" ng-if="udtTableFunctions.isShowCell(col, $parent.$index, $index)" ng-class="udtTableFunctions.getTdClass(value.data, col, this)" rowspan="{{udtTableFunctions.getRowSpanValue($parent.$parent.$index, $parent.$index)}}">'
    +                            '<div udt-cell/>'
    +                        '</td>'

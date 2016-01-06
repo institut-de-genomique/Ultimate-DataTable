@@ -64,6 +64,28 @@ directive('udtTable', function(){
 		    				}
 						}
 	    			};
+
+                                scope.udtTableFunctions.mouseover = function(data, line){
+                                    var udtTable = scope.udtTable;
+                                    if (udtTable.config.mouseover.active) {
+                                        var cb = udtTable.config.mouseover.callback;
+                                        line.mouseover = true;
+                                        if (angular.isFunction(cb)) {
+                                            cb(line, data);
+                                        }
+                                    }
+                                };
+
+                                scope.udtTableFunctions.mouseleave = function(data, line){
+                                    var udtTable = scope.udtTable;
+                                    if (udtTable.config.mouseover.active) {
+                                        var cb = udtTable.config.mouseover.callback;
+                                        line.mouseover = false;
+                                        if (angular.isFunction(cb)) {
+                                            cb(line, data);
+                                        }
+                                    }
+                                };
 					
 					scope.udtTableFunctions.getRowSpanValue = function(i,j){
 						var udtTable = scope.udtTable;

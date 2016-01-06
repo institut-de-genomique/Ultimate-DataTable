@@ -188,6 +188,14 @@ compact:boolean/boolean
 	"showButton":boolean,//Show the select all button in the toolbar
 }
 ```
+## Mouseover
+> Allow a custom function to be executed when the user a the mouse over a row
+```json
+"mouseover":{
+        "active":boolean,//Active or not
+        "callback":function(line, data),//The action to execute. This function will also be called no mouseleave. Check line.mouseover to know whether the mouse is over the row.
+}
+```
 ## Cancel
 > Cancel and revers all the modification of the user and disable edit
 ```json

@@ -114,7 +114,13 @@
 					"callback":function(line,data){
 						console.log("callback select : "+data.name);
 					}
-				}
+				},
+                                "mouseover":{
+                                    "active": true,
+                                    "callback": function(line, data){
+                                        console.log("callback mouseover:", line.mouseover, data);
+                                    }
+                                }
 			};
 			
 			var datatableData = [
