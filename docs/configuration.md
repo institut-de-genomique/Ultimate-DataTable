@@ -185,7 +185,8 @@ compact:boolean/boolean
 ```json
 "select":{
 	"active":boolean,//Active or not
-	"showButton":boolean,//Show the select all button in the toolbar
+	"showButton":boolean,//Show the select all button in the toolbar,
+        "callback":function(line, data),//The action to execute when a user select a row. Check line.selected to know whether the user selected or unselected a row.
 }
 ```
 ## Mouseover
