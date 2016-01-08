@@ -35,8 +35,10 @@ directive("udtCell", function(){
 	    				}else if(col.choiceInList){
 	    					switch (col.listStyle) {
 	    						case "radio":
-	    							editElement = '<label ng-repeat="opt in col.possibleValues" '+defaultValueDirective+'  for="radio{{col.id}}"><input id="radio{{col.id}}" udt-html-filter="{{col.type}}" '+userDirectives+' type="radio" ng-model="'+this.getEditProperty(col,hearder,filter)+ngChange+' value="{{opt.name}}">{{opt.name}}<br></label>';
-	    							break;
+	    							editElement = '<label class="radio-inline" ng-repeat="opt in '+this.getOptions(col)+' track by $index" '+userDirectives+'>'
+	    										   +'<input udt-html-filter="{{col.type}}" type="radio" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+' ng-value="{{opt.code}}"> {{opt.name}}'
+	    										   +'</label>';
+									break;
 	    						case "multiselect":
 	    							editElement = '<select class="form-control" multiple="true" '+defaultValueDirective+' ng-options="opt.code as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></select>';
 		    						break;
