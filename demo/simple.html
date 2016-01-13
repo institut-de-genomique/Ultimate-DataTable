@@ -109,16 +109,16 @@
 					"active":true,
 					"byDefault":["about","name"]
 				},
-				"select":{
-					"active":true,
-					"callback":function(line,data){
-						console.log("callback select : "+data.name);
-					}
-				},
-                                "mouseover":{
+                                "mouseevents":{
                                     "active": true,
-                                    "callback": function(line, data){
-                                        console.log("callback mouseover:", line.mouseover, data);
+                                    "overCallback": function(line, data){
+                                        console.log("callback mouseover:", line, data);
+                                    },
+                                    "leaveCallback": function(line, data){
+                                        console.log("callback mouseover:", line, data);
+                                    },
+                                    "clickCallback": function(line,data){
+                                        console.log("callback select : "+data.name);
                                     }
                                 }
 			};

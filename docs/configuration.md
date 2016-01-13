@@ -186,15 +186,16 @@ compact:boolean/boolean
 "select":{
 	"active":boolean,//Active or not
 	"showButton":boolean,//Show the select all button in the toolbar,
-        "callback":function(line, data),//The action to execute when a user select a row. Check line.selected to know whether the user selected or unselected a row.
 }
 ```
-## Mouseover
+## Mouseevents
 > Allow a custom function to be executed when the user a the mouse over a row
 ```json
-"mouseover":{
+"mouseevents":{
         "active":boolean,//Active or not
-        "callback":function(line, data),//The action to execute. This function will also be called no mouseleave. Check line.mouseover to know whether the mouse is over the row.
+        "overCallback": function(line, data){}, // Callback called when the mouse enter over a row.
+        "leaveCallback":function(line, data){}, // Callback called when the mouse leave a row.
+        "clickCallback": function(line, data){}, //The action to execute when a user select a row. Check line.selected to know whether the user selected or unselected a row.
 }
 ```
 ## Cancel
