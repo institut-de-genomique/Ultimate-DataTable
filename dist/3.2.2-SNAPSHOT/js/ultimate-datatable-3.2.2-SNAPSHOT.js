@@ -147,7 +147,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 select: {
                     active: true,
                     showButton: true,
-                    isSelectAll: false
+                    isSelectAll: false,
+                    callback: undefined // DEPRECATED in favor of mouseevents.clickCallback.
                 },
                 mouseevents: {
                     active: false,
@@ -3167,7 +3168,10 @@ directive('udtTable', function(){
 									}
 		    					}
 		    				}
-                            if (udtTable.config.mouseevents.active && angular.isFunction(udtTable.config.mouseevents.clickCallback)) {
+                            if (udtTable.config.select.active && angular.isFunction(udtTable.config.select.callback)) {
+                                console.warning('select.callback is deprecated. Use mouseevents.clickCallback instead.');
+                                udtTable.config.select.callback(line, data);
+                            } else if (udtTable.config.mouseevents.active && angular.isFunction(udtTable.config.mouseevents.clickCallback)) {
                                 udtTable.config.mouseevents.clickCallback(line, data);
                             }
 						}

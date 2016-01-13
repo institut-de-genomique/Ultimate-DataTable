@@ -144,7 +144,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 select: {
                     active: true,
                     showButton: true,
-                    isSelectAll: false
+                    isSelectAll: false,
+                    callback: undefined // DEPRECATED in favor of mouseevents.clickCallback.
                 },
                 mouseevents: {
                     active: false,

@@ -186,6 +186,7 @@ compact:boolean/boolean
 "select":{
 	"active":boolean,//Active or not
 	"showButton":boolean,//Show the select all button in the toolbar,
+    "callback": function(line, data){}, // DEPRECATED, use mouseevents.clickCallback instead. Callback executed when the user clicks on a row. This has priority over mouseevents.clickCallback.
 }
 ```
 ## Mouseevents
