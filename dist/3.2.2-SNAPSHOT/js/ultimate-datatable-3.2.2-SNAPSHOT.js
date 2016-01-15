@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-01-08 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-01-15 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -202,6 +202,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 spinner: {
                     start: false
                 },
+				callbackEndDisplayResult : function(){},                
                 compact: true //mode compact pour le nom des bouttons
 
             },
@@ -799,6 +800,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             that.config.edit.withoutSelect = true;
                             that.setEdit();
                         }
+						
+						if(angular.isFunction(that.config.callbackEndDisplayResult)){
+							that.config.callbackEndDisplayResult();
+						}
                     }
                 }, time);
             },
@@ -1021,13 +1026,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
              */
             setOrderColumn: function(column) {
                 if (this.config.order.active) {
-                    var columnPropertyName = column.property;
                     var columnId = column.id;
 
-                    if (angular.isDefined(this.config.group.by) && this.config.group.by.property === columnPropertyName && !this.config.group.showOnlyGroups) {
+                    if (angular.isDefined(this.config.group.by) && this.config.group.by.id === columnId && !this.config.group.showOnlyGroups) {
                         this.config.order.groupReverse = !this.config.order.groupReverse;
                     } else {
-                        if (!angular.isDefined(this.config.order.by) || this.config.order.by.property !== columnPropertyName) {
+                        if (!angular.isDefined(this.config.order.by) || this.config.order.by.id !== columnId) {
                             this.config.order.by = column;
                             this.config.order.reverse = false;
                         } else {
@@ -3089,7 +3093,22 @@ directive("udtHtmlFilter", function($filter) {
 					    	   }
 					    	
 					    	  return convertedData;
-					    });   
+					    }); 
+
+						ngModelController.$parsers.push(function(data) {
+					    	var convertedData = data;
+					    	   if(attrs.udtHtmlFilter == "number" && null != convertedData && undefined != convertedData 
+					    			   && angular.isString(convertedData)){
+					    		   convertedData = convertedData.replace(",",".");
+					    		   if(!isNaN(convertedData) && convertedData !== ""){						    			   
+					    			   convertedData = convertedData*1;
+					    		   }else if( isNaN(convertedData) || convertedData === ""){
+					    			   convertedData = undefined;
+					    		   }
+					    	   }					
+					    	   //TODO GA date and datetime quiz about timestamps
+					    	  return convertedData;
+					    }); 
 					  }
 					};
 			});;angular.module('ultimateDataTableServices').

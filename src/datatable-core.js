@@ -199,6 +199,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 spinner: {
                     start: false
                 },
+				callbackEndDisplayResult : function(){},                
                 compact: true //mode compact pour le nom des bouttons
 
             },
@@ -796,6 +797,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             that.config.edit.withoutSelect = true;
                             that.setEdit();
                         }
+						
+						if(angular.isFunction(that.config.callbackEndDisplayResult)){
+							that.config.callbackEndDisplayResult();
+						}
                     }
                 }, time);
             },
@@ -1018,13 +1023,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
              */
             setOrderColumn: function(column) {
                 if (this.config.order.active) {
-                    var columnPropertyName = column.property;
                     var columnId = column.id;
 
-                    if (angular.isDefined(this.config.group.by) && this.config.group.by.property === columnPropertyName && !this.config.group.showOnlyGroups) {
+                    if (angular.isDefined(this.config.group.by) && this.config.group.by.id === columnId && !this.config.group.showOnlyGroups) {
                         this.config.order.groupReverse = !this.config.order.groupReverse;
                     } else {
-                        if (!angular.isDefined(this.config.order.by) || this.config.order.by.property !== columnPropertyName) {
+                        if (!angular.isDefined(this.config.order.by) || this.config.order.by.id !== columnId) {
                             this.config.order.by = column;
                             this.config.order.reverse = false;
                         } else {

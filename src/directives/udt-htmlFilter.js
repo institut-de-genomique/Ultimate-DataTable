@@ -14,7 +14,22 @@ directive("udtHtmlFilter", function($filter) {
 					    	   }
 					    	
 					    	  return convertedData;
-					    });   
+					    }); 
+
+						ngModelController.$parsers.push(function(data) {
+					    	var convertedData = data;
+					    	   if(attrs.udtHtmlFilter == "number" && null != convertedData && undefined != convertedData 
+					    			   && angular.isString(convertedData)){
+					    		   convertedData = convertedData.replace(",",".");
+					    		   if(!isNaN(convertedData) && convertedData !== ""){						    			   
+					    			   convertedData = convertedData*1;
+					    		   }else if( isNaN(convertedData) || convertedData === ""){
+					    			   convertedData = undefined;
+					    		   }
+					    	   }					
+					    	   //TODO GA date and datetime quiz about timestamps
+					    	  return convertedData;
+					    }); 
 					  }
 					};
 			});
