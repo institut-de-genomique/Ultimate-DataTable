@@ -1,6 +1,6 @@
 #Customization
 
-##Tempaltes
+##Templates
 > All the templates used in the Ultimate DataTable directive are in the folder src/templates/templates.js, you can use it directly, it will required bootstrap.
 But you can also use the Ultimate DataTable No Template javascript file that allow you to load your own template file.
 

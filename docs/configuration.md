@@ -270,3 +270,8 @@ extraHeaders:{
 	dynamic:boolean //If dynamic:true, the headers will be auto generated
 }
 ```
+
+## Callback display function		
+```json
+callbackEndDisplayResult: function(){} // function call after compute display data
+```
