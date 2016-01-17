@@ -145,7 +145,13 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     active: true,
                     showButton: true,
                     isSelectAll: false,
-                    callback: undefined, //used to have a callback after select element.
+                    callback: undefined // DEPRECATED in favor of mouseevents.clickCallback.
+                },
+                mouseevents: {
+                    active: false,
+                    overCallback: undefined,  // used to have a callback when the user passes the mouse over a row.
+                    leaveCallback: undefined,  // used to have a callback when the mouse of the user leaves a row.
+                    clickCallback: undefined  // used to have a callback when the user clicks on a row.
                 },
                 cancel: {
                     active: true,

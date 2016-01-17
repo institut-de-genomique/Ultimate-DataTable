@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-01-08 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-01-13 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -148,7 +148,13 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     active: true,
                     showButton: true,
                     isSelectAll: false,
-                    callback: undefined, //used to have a callback after select element.
+                    callback: undefined // DEPRECATED in favor of mouseevents.clickCallback.
+                },
+                mouseevents: {
+                    active: false,
+                    overCallback: undefined,  // used to have a callback when the user passes the mouse over a row.
+                    leaveCallback: undefined,  // used to have a callback when the mouse of the user leaves a row.
+                    clickCallback: undefined  // used to have a callback when the user clicks on a row.
                 },
                 cancel: {
                     active: true,
@@ -3140,8 +3146,8 @@ directive('udtTable', function(){
 					 */
 					scope.udtTableFunctions.select = function(data, line){
 						var udtTable = scope.udtTable;
-						if(udtTable.config.select.active){
-		    				if(line){
+                        if(line){
+                            if(udtTable.config.select.active){
 		    					//separation of line type group and normal to simplify backward compatibility and avoid bugs
 		    					//selected is used with edit, remove, save and show button
 		    					if(!line.group){
@@ -3161,12 +3167,35 @@ directive('udtTable', function(){
 			    						line.trClass=undefined;
 									}
 		    					}
-		    					if (angular.isFunction(udtTable.config.select.callback)) {
-		    						udtTable.config.select.callback(line, data);
-		                        }
 		    				}
+                            if (udtTable.config.select.active && angular.isFunction(udtTable.config.select.callback)) {
+                                console.warning('select.callback is deprecated. Use mouseevents.clickCallback instead.');
+                                udtTable.config.select.callback(line, data);
+                            } else if (udtTable.config.mouseevents.active && angular.isFunction(udtTable.config.mouseevents.clickCallback)) {
+                                udtTable.config.mouseevents.clickCallback(line, data);
+                            }
 						}
 	    			};
+
+                                scope.udtTableFunctions.mouseover = function(data, line){
+                                    var udtTable = scope.udtTable;
+                                    if (udtTable.config.mouseevents.active) {
+                                        var cb = udtTable.config.mouseevents.overCallback;
+                                        if (angular.isFunction(cb)) {
+                                            cb(line, data);
+                                        }
+                                    }
+                                };
+
+                                scope.udtTableFunctions.mouseleave = function(data, line){
+                                    var udtTable = scope.udtTable;
+                                    if (udtTable.config.mouseevents.active) {
+                                        var cb = udtTable.config.mouseevents.leaveCallback;
+                                        if (angular.isFunction(cb)) {
+                                            cb(line, data);
+                                        }
+                                    }
+                                };
 					
 					scope.udtTableFunctions.getRowSpanValue = function(i,j){
 						var udtTable = scope.udtTable;
@@ -3737,7 +3766,7 @@ run(function($templateCache) {
    +                            '<div udt-cell-header/>'
    +                        '</td>'
    +                    '</tr>'
-   +                    '<tr ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.data, value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
+   +                    '<tr ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.data, value.line)" ng-mouseover="udtTableFunctions.mouseover(value.data, value.line)" ng-mouseleave="udtTableFunctions.mouseleave(value.data, value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
    +                        '<td ng-repeat="col in udtTable.config.columns" ng-if="udtTableFunctions.isShowCell(col, $parent.$index, $index)" ng-class="udtTableFunctions.getTdClass(value.data, col, this)" rowspan="{{udtTableFunctions.getRowSpanValue($parent.$parent.$index, $parent.$index)}}">'
    +                            '<div udt-cell/>'
    +                        '</td>'
