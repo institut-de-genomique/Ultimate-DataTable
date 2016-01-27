@@ -37,8 +37,8 @@ directive('udtTable', function(){
 					 */
 					scope.udtTableFunctions.select = function(data, line){
 						var udtTable = scope.udtTable;
-						if(udtTable.config.select.active){
-		    				if(line){
+                        if(line){
+                            if(udtTable.config.select.active){
 		    					//separation of line type group and normal to simplify backward compatibility and avoid bugs
 		    					//selected is used with edit, remove, save and show button
 		    					if(!line.group){
@@ -58,12 +58,35 @@ directive('udtTable', function(){
 			    						line.trClass=undefined;
 									}
 		    					}
-		    					if (angular.isFunction(udtTable.config.select.callback)) {
-		    						udtTable.config.select.callback(line, data);
-		                        }
 		    				}
+                            if (udtTable.config.select.active && angular.isFunction(udtTable.config.select.callback)) {
+                                console.warning('select.callback is deprecated. Use mouseevents.clickCallback instead.');
+                                udtTable.config.select.callback(line, data);
+                            } else if (udtTable.config.mouseevents.active && angular.isFunction(udtTable.config.mouseevents.clickCallback)) {
+                                udtTable.config.mouseevents.clickCallback(line, data);
+                            }
 						}
 	    			};
+
+                                scope.udtTableFunctions.mouseover = function(data, line){
+                                    var udtTable = scope.udtTable;
+                                    if (udtTable.config.mouseevents.active) {
+                                        var cb = udtTable.config.mouseevents.overCallback;
+                                        if (angular.isFunction(cb)) {
+                                            cb(line, data);
+                                        }
+                                    }
+                                };
+
+                                scope.udtTableFunctions.mouseleave = function(data, line){
+                                    var udtTable = scope.udtTable;
+                                    if (udtTable.config.mouseevents.active) {
+                                        var cb = udtTable.config.mouseevents.leaveCallback;
+                                        if (angular.isFunction(cb)) {
+                                            cb(line, data);
+                                        }
+                                    }
+                                };
 					
 					scope.udtTableFunctions.getRowSpanValue = function(i,j){
 						var udtTable = scope.udtTable;

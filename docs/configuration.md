@@ -185,7 +185,18 @@ compact:boolean/boolean
 ```json
 "select":{
 	"active":boolean,//Active or not
-	"showButton":boolean,//Show the select all button in the toolbar
+	"showButton":boolean,//Show the select all button in the toolbar,
+    "callback": function(line, data){}, // DEPRECATED, use mouseevents.clickCallback instead. Callback executed when the user clicks on a row. This has priority over mouseevents.clickCallback.
+}
+```
+## Mouseevents
+> Allow a custom function to be executed when the user a the mouse over a row
+```json
+"mouseevents":{
+        "active":boolean,//Active or not
+        "overCallback": function(line, data){}, // Callback called when the mouse enter over a row.
+        "leaveCallback":function(line, data){}, // Callback called when the mouse leave a row.
+        "clickCallback": function(line, data){}, //The action to execute when a user select a row. Check line.selected to know whether the user selected or unselected a row.
 }
 ```
 ## Cancel
