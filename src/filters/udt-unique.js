@@ -1,5 +1,5 @@
 angular.module('ultimateDataTableServices').
-filter('udtUnique', function($parse) {
+filter('udtUnique', ['$parse', function($parse) {
     		return function (collection, property) {
     			var isDefined = angular.isDefined,
     		    isUndefined = angular.isUndefined,
@@ -63,4 +63,4 @@ filter('udtUnique', function($parse) {
     		        });
     		      }
     		    }
-    	});
+    	}]);

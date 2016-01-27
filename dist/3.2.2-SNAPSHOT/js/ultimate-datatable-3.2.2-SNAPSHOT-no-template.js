@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-01-13 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-01-27 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -2768,7 +2768,7 @@ directive("udtCell", function(){
   		    	}
 
     		};
-    	}).directive("udtCellRead", function($http){
+    	}).directive("udtCellRead", function(){
     		return {
     			restrict: 'A',
   		    	replace:true,
@@ -2864,7 +2864,7 @@ directive('udtChange', ['$interval', function($interval) {
 		}
 	};	    	
 }]);;angular.module('ultimateDataTableServices').
-directive('udtCompile', function($compile) {
+directive('udtCompile', ['$compile', function($compile) {
 			// directive factory creates a link function
 			return {
 				restrict: 'A',
@@ -2889,7 +2889,7 @@ directive('udtCompile', function($compile) {
   				}
 			};
 						
-		});;angular.module('ultimateDataTableServices').
+		}]);;angular.module('ultimateDataTableServices').
 //This directive convert the ngModel value to a view value and then the view value to the ngModel unit value
 //The value passed to the directive must be an object with displayMeasureValue and saveMeasureValue
 directive('udtConvertvalue',['udtConvertValueServices','$filter', function(udtConvertValueServices, $filter) {
@@ -3427,7 +3427,7 @@ filter('udtCountdistinct', ['$parse',function($parse) {
     	    	return possibleValues.length;    	    	
     	    };
 }]);;angular.module('ultimateDataTableServices').
-filter('udtUnique', function($parse) {
+filter('udtUnique', ['$parse', function($parse) {
     		return function (collection, property) {
     			var isDefined = angular.isDefined,
     		    isUndefined = angular.isUndefined,
@@ -3491,7 +3491,7 @@ filter('udtUnique', function($parse) {
     		        });
     		      }
     		    }
-    	});;angular.module('ultimateDataTableServices').
+    	}]);;angular.module('ultimateDataTableServices').
 factory('udtConvertValueServices', [function() {
     		var constructor = function($scope){
 				var udtConvertValueServices = {
