@@ -1,7 +1,7 @@
 "use strict";
 
 angular.module('ultimateDataTableServices').
-run(function($templateCache) {
+run(['$templateCache', function($templateCache) {
   $templateCache.put('ultimate-datatable.html',
     '<div name="datatable" class="datatable">'
    +    '<div ng-transclude/>'
@@ -9,8 +9,8 @@ run(function($templateCache) {
    +    '<div udt-messages ng-if="udtTable.config.messages.active"/>'
    +    '<div udt-table/>'
    +'</div>');
-})
-.run(function($templateCache) {
+}])
+.run(['$templateCache', function($templateCache) {
   $templateCache.put('udt-table.html',
     '<div name="udt-table" class="row">'
    +    '<div class="col-md-12 col-lg-12">'
@@ -60,15 +60,15 @@ run(function($templateCache) {
    +        '</form>'
    +    '</div>'
    +'</div>');
-})
-.run(function($templateCache) {
+}])
+.run(['$templateCache', function($templateCache) {
   $templateCache.put('udt-cell.html',
     '<div>'
    +    '<div ng-if="col.edit" udt-editable-cell></div>'
    +    '<div ng-if="!col.edit" udt-cell-read></div>'
    +'</div>');
-})
-.run(function($templateCache) {
+}])
+.run(['$templateCache', function($templateCache) {
   $templateCache.put('udt-editableCell.html',
     '<div ng-switch on="udtTable.isEdit(col.id, value.line)">'
    +    '<div ng-switch-when="true" >'
@@ -76,27 +76,27 @@ run(function($templateCache) {
    +    '</div>'
    +    '<div ng-switch-default udt-cell-read></div>'
    +'</div>');
-})
-.run(function($templateCache) {
+}])
+.run(['$templateCache', function($templateCache) {
   $templateCache.put('udt-cellRead.html',
     '<div udt-compile="udtTableFunctions.getDisplayElement(col)"></div>');
-})
-.run(function($templateCache) {
+}])
+.run(['$templateCache', function($templateCache) {
   $templateCache.put('udt-cellEdit.html',
     '<div udt-compile="udtTableFunctions.getEditElement(col)"></div>');
-})
-.run(function($templateCache) {
+}])
+.run(['$templateCache', function($templateCache) {
   $templateCache.put('udt-cellFilter.html',
     '<div udt-compile="udtTableFunctions.getEditElement(col, false, true)"></div>');
-})
-.run(function($templateCache) {
+}])
+.run(['$templateCache', function($templateCache) {
   $templateCache.put('udt-cellHeader.html',
     '<div ng-if="col.edit" ng-switch on="udtTable.isEdit(col.id)">'
    +    '<div ng-switch-when="true" udt-compile="udtTableFunctions.getEditElement(col, true)"></div>'
    +    '<div ng-switch-default></div>'
    +'</div>');
-})
-.run(function($templateCache) {
+}])
+.run(['$templateCache', function($templateCache) {
   $templateCache.put('udt-messages.html',
     '<div name="udt-messages" class="row">'
    +    '<div class="col-md-12 col-lg-12">'
@@ -105,12 +105,12 @@ run(function($templateCache) {
    +        '</div>'
    +    '</div>'
    +'</div>');
-})
-.run(function($templateCache) {
+}])
+.run(['$templateCache', function($templateCache) {
   $templateCache.put('udt-form.html',
     '<div name="udt-form"  class="row"><div class="col-md-12 col-lg-12" ng-transclude/></div>');
-})
-.run(function($templateCache) {
+}])
+.run(['$templateCache', function($templateCache) {
   $templateCache.put('udt-toolbar.html',
     '<div name="udt-toolbar" class="row margin-bottom-3">'
    +    '<div class="col-md-12 col-lg-12">'
@@ -275,4 +275,4 @@ run(function($templateCache) {
    +        '</div>'
    +    '</div>'
    +'</div>');
-});
+}]);
