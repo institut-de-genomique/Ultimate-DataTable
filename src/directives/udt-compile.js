@@ -1,5 +1,5 @@
 angular.module('ultimateDataTableServices').
-directive('udtCompile', function($compile) {
+directive('udtCompile', ['$compile', function($compile) {
 			// directive factory creates a link function
 			return {
 				restrict: 'A',
@@ -24,4 +24,4 @@ directive('udtCompile', function($compile) {
   				}
 			};
 						
-		});
+		}]);

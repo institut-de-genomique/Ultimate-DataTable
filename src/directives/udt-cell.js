@@ -153,7 +153,7 @@ directive("udtCell", function(){
   		    	}
 
     		};
-    	}).directive("udtCellRead", function($http){
+    	}).directive("udtCellRead", function(){
     		return {
     			restrict: 'A',
   		    	replace:true,
