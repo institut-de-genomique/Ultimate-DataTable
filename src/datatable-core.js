@@ -918,6 +918,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
                         //reinit to first page
                         this.config.pagination.pageNumber = 0;
+                        this.computePaginationList();
                         if (this.isRemoteMode(this.config.pagination.mode)) {
                             this.searchWithLastParams();
                         } else {
