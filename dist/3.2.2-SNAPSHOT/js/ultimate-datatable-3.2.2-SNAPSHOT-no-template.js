@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-01-28 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-02-11 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -2648,7 +2648,9 @@ directive("udtCell", function(){
 
 	    				if(col.type === "boolean"){
 	    					editElement = '<input class="form-control"' +defaultValueDirective+' udt-html-filter="{{col.type}}" '+userDirectives+' type="checkbox" class="input-small" ng-model="'+this.getEditProperty(col, header, filter)+ngChange+'/>';
-	    				}else if(!col.choiceInList){
+	    				}else if (col.type === "textarea") {
+                            editElement = '<textarea class="form-control"' + defaultValueDirective + userDirectives + 'ng-model="' + this.getEditProperty(col, header, filter) + ngChange + '></textarea>';
+                        }else if(!col.choiceInList){
 							//TODO: type='text' because html5 autoformat return a string before that we can format the number ourself
 	    					editElement = '<input class="form-control" '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" '+userDirectives+' type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+this.getDateTimestamp(col.type)+'/>';
 	    				}else if(col.choiceInList){
@@ -3060,7 +3062,7 @@ directive('udtForm', function(){
 		scope.$watch('keywords', function(newValue, oldValue) {
 			if (!newValue || newValue == '' || !scope.active) {
 				if(scope.udtHighlight !== undefined && scope.udtHighlight !== null)
-					element.html(scope.udtHighlight.toString());
+					element.html(scope.udtHighlight.replace(/\n/g, '<br />').toString());
 				return false;
 			}
 			
@@ -3069,7 +3071,7 @@ directive('udtForm', function(){
 			var regex = new RegExp(tokenized.join('|'), 'gmi');
 			
 			// Find the words
-			var html = scope.udtHighlight.toString().replace(regex, replacer);
+			var html = scope.udtHighlight.replace(/\n/g, '<br />').toString().replace(regex, replacer);
 			
 			element.html(html);
 		}, true);
