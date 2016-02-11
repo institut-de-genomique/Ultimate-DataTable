@@ -85,7 +85,7 @@
 ##Possible values
 > The list of possible choices to display in the list
 ```json
-"possibleValues" : ["choice1", "choice2", ...]
+"possibleValues" : [{code: 1, name: "choice1"}, {code: 2, name: "choice2"}, ...]
 ```
 ##Format
 > The format used to diplay the data
