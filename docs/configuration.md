@@ -60,6 +60,7 @@
 	"batch":boolean, //for batch mode one url with all data
 	"method":'post' or function(line){ return 'method'},//The HTTP verb
 	"value":function(value){ return value;}, //used to transform the value send to the server
+    "httpConfig": { headers: { "Authorization": "ixxx" } }, // Pass these options to the $http service.
 	"callback":function(datatable, errorsNumber){} //used to have a callback after save all elements.
 }
 ```

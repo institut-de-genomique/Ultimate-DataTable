@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-01-28 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-02-11 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -1355,17 +1355,18 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (angular.isFunction(method)) {
                     method = method(value);
                 }
+                var httpConfig = {};
+                if (angular.isObject(this.config.save.httpConfig)) {
+                    angular.merge(httpConfig, this.config.save.httpConfig);
+                }
+                httpConfig.datatable = this;
                 if (urlFunction) {
                     if (this.config.save.batch) {
-                        return $http[method](urlFunction(value), value, {
-                            datatable: this
-                        });
+                        return $http[method](urlFunction(value), value, httpConfig);
                     } else {
                         var valueFunction = this.getValueFunction(this.config.save.value);
-                        return $http[method](urlFunction(value), valueFunction(value), {
-                            datatable: this,
-                            index: i
-                        }).
+                        httpConfig.index = i;
+                        return $http[method](urlFunction(value), valueFunction(value), httpConfig).
                         success(function(data, status, headers, config) {
                             config.datatable.saveRemoteOneElement(status, data, config.index);
                         }).
