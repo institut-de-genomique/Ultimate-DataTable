@@ -1352,17 +1352,19 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (angular.isFunction(method)) {
                     method = method(value);
                 }
+                var httpConfig = {
+                    datatable: this
+                };
+                if (angular.isObject(this.config.save.httpConfig)) {
+                    angular.merge(httpConfig, this.config.save.httpConfig);
+                }
                 if (urlFunction) {
                     if (this.config.save.batch) {
-                        return $http[method](urlFunction(value), value, {
-                            datatable: this
-                        });
+                        return $http[method](urlFunction(value), value, httpConfig);
                     } else {
                         var valueFunction = this.getValueFunction(this.config.save.value);
-                        return $http[method](urlFunction(value), valueFunction(value), {
-                            datatable: this,
-                            index: i
-                        }).
+                        httpConfig.index = i;
+                        return $http[method](urlFunction(value), valueFunction(value), httpConfig).
                         success(function(data, status, headers, config) {
                             config.datatable.saveRemoteOneElement(status, data, config.index);
                         }).
