@@ -26,7 +26,7 @@ angular.module('ultimateDataTableServices').directive('udtHighlight', function()
 		scope.$watch('keywords', function(newValue, oldValue) {
 			if (!newValue || newValue == '' || !scope.active) {
 				if(scope.udtHighlight !== undefined && scope.udtHighlight !== null)
-					element.html(scope.udtHighlight.toString());
+					element.html(scope.udtHighlight.replace(/\n/g, '<br />').toString());
 				return false;
 			}
 			
@@ -35,7 +35,7 @@ angular.module('ultimateDataTableServices').directive('udtHighlight', function()
 			var regex = new RegExp(tokenized.join('|'), 'gmi');
 			
 			// Find the words
-			var html = scope.udtHighlight.toString().replace(regex, replacer);
+			var html = scope.udtHighlight.replace(/\n/g, '<br />').toString().replace(regex, replacer);
 			
 			element.html(html);
 		}, true);
