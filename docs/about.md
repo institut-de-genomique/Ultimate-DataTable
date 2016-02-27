@@ -8,3 +8,6 @@
 > Ultimate DataTable creator is : [Albini Guillaume](https://www.linkedin.com/in/agconsulting/fr)<br>
 
 > Ultimate DataTable developpers are : [Albini Guillaume](https://www.linkedin.com/in/agconsulting/fr), [Deshayes Yann](https://github.com/ydeshayes), Nicolza Xavier, Jacoby Ekrame, Gas Shahinaz, Haquelle Maud, Dos-Santos Fernando, Margetic Vesna, Samair Sumitta
+
+## The logo
+(udt-logo.png)

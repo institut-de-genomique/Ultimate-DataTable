@@ -1,4 +1,4 @@
-# Welcome to the Ultimate DataTable project page
+# <img src="udt-logo.png" height="42px" width="42px">  Welcome to the Ultimate DataTable project page
 
 > This [AngularJS](http://www.angularjs.org) directive generate a HTML table with build-in fonctionnality like save, edit, remove, pagination etc...
 You can [fork this project in GitHub](https://github.com/institut-de-genomique/Ultimate-DataTable/) to help us out !
