@@ -1,4 +1,4 @@
-# Ultimate DataTable
+# Ultimate DataTable ![Image of UDT](docs/udt-logo.png)
 
 > This [AngularJS](http://www.angularjs.org) directive generate a HTML table with build-in fonctionnality like save, edit, remove, pagination etc...
 
