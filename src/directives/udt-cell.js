@@ -30,7 +30,17 @@ directive("udtCell", function(){
 	    				if(col.type === "boolean"){
 	    					editElement = '<input class="form-control"' +defaultValueDirective+' udt-html-filter="{{col.type}}" '+userDirectives+' type="checkbox" class="input-small" ng-model="'+this.getEditProperty(col, header, filter)+ngChange+'/>';
 	    				}else if (col.type === "textarea") {
-                            editElement = '<textarea class="form-control"' + defaultValueDirective + userDirectives + 'ng-model="' + this.getEditProperty(col, header, filter) + ngChange + '></textarea>';
+                            var rows = 3;
+                            var cols = 35;
+                            var value = scope.value.data[col.property];
+                            if (value) {
+                                var lines = value.split('\n');
+                                rows = lines.length;
+                                lines.forEach(function(line) {
+                                    cols = Math.max(cols, line.length);
+                                });
+                            }
+                            editElement = '<textarea class="form-control"' + defaultValueDirective + userDirectives + 'ng-model="' + this.getEditProperty(col, header, filter) + ngChange + 'rows="' + rows + '" cols="' + cols + '"></textarea>';
                         }else if(!col.choiceInList){
 							//TODO: type='text' because html5 autoformat return a string before that we can format the number ourself
 	    					editElement = '<input class="form-control" '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" '+userDirectives+' type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+this.getDateTimestamp(col.type)+'/>';
