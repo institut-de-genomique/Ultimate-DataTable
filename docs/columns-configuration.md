@@ -100,6 +100,7 @@
 ```
 ##Edit directives
 > Add directive to the html input when editing, for example "editDirectives":'ng-keydown="scan($event,value.data)"'.
+> udt provides the `udt-textarea-resize` directive to allow textareas to be automatically resized to their content when edited. Use it as follow: `editDirectives: ' udt-textarea-resize '`.
 ```json
 "editDirectives" : "directive [| directive...]"
 ```
