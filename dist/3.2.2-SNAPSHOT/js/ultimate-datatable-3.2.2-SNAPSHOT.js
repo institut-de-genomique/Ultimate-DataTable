@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-05-25 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-05-27 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -38,6 +38,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                      "format" : null, //number format or date format or datetime format
                      "extraHeaders":{"0":"Inputs"}, //the extraHeaders list
                      "tdClass" : function with data and property as parameter than return css class or just the css class",
+					 "thClass" : function with data and property as parameter than return css class or just the css class",                     
                      "position": position of the column,
                      "group": false //if column can be used to group data
                      "groupMethod": sum, average, countDistinct, collect
