@@ -31,7 +31,16 @@ directive('udtTable', function(){
 	    					return '';
 	    				}
 	    			};
-	    		
+					scope.udtTableFunctions.getThClass = function(col, currentScope){
+	    				if(angular.isFunction(col.thClass)){
+	    					return col.thClass(col);
+	    				} else if(angular.isString(col.thClass)){
+	    					//we try to evaluation the string against the scope
+	    					return currentScope.$eval(col.thClass) || col.thClass;
+	    				}else{
+	    					return '';
+	    				}
+	    			};
 	    			/**
 					 * Select all the table line or just one
 					 */
@@ -68,25 +77,25 @@ directive('udtTable', function(){
 						}
 	    			};
 
-                                scope.udtTableFunctions.mouseover = function(data, line){
-                                    var udtTable = scope.udtTable;
-                                    if (udtTable.config.mouseevents.active) {
-                                        var cb = udtTable.config.mouseevents.overCallback;
-                                        if (angular.isFunction(cb)) {
-                                            cb(line, data);
-                                        }
-                                    }
-                                };
+					scope.udtTableFunctions.mouseover = function(data, line){
+						var udtTable = scope.udtTable;
+						if (udtTable.config.mouseevents.active) {
+							var cb = udtTable.config.mouseevents.overCallback;
+							if (angular.isFunction(cb)) {
+								cb(line, data);
+							}
+						}
+					};
 
-                                scope.udtTableFunctions.mouseleave = function(data, line){
-                                    var udtTable = scope.udtTable;
-                                    if (udtTable.config.mouseevents.active) {
-                                        var cb = udtTable.config.mouseevents.leaveCallback;
-                                        if (angular.isFunction(cb)) {
-                                            cb(line, data);
-                                        }
-                                    }
-                                };
+					scope.udtTableFunctions.mouseleave = function(data, line){
+						var udtTable = scope.udtTable;
+						if (udtTable.config.mouseevents.active) {
+							var cb = udtTable.config.mouseevents.leaveCallback;
+							if (angular.isFunction(cb)) {
+								cb(line, data);
+							}
+						}
+					};
 					
 					scope.udtTableFunctions.getRowSpanValue = function(i,j){
 						var udtTable = scope.udtTable;

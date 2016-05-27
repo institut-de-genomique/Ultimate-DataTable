@@ -19,7 +19,7 @@ directive('udtBtselect',  ['$parse', '$document', '$window', '$filter', function
   		    			+'<div class="input-group">'
   		    			+'<input type="text" style="background:white" ng-class="inputClass" ng-model="selectedLabels" placeholder="{{placeholder}}" title="{{placeholder}}" readonly/>'
   		    			+'<div class="input-group-btn">'
-  		    			+'<button tabindex="-1" data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" ng-disabled="isDisabled()" ng-click="open()">'
+  		    			+'<button tabindex="-1" data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle" type="button" ng-disabled="isDisabled()" ng-click="open()">'
   		    			+'<span class="caret"></span>'
   		    			+'</button>'
   				        +'<ul class="dropdown-menu dropdown-menu-right"  role="menu">'
@@ -131,11 +131,11 @@ directive('udtBtselect',  ['$parse', '$document', '$window', '$filter', function
       		      }
       		      
       		      scope.itemLabel = function(item){	      		    	
-      		    	 return item[optionsConfig.viewMapper.replace(optionsConfig.itemName+'.','')];  
+      		    	return $parse(optionsConfig.viewMapper.replace(optionsConfig.itemName+'.',''))(item);
       		      };
       		      
       		      scope.itemValue = function(item){
-      		    	 return item[optionsConfig.modelMapper.replace(optionsConfig.itemName+'.','')];  
+      		    	 return $parse(optionsConfig.modelMapper.replace(optionsConfig.itemName+'.',''))(item);
       		      };
       		      
       		      scope.selectItem = function(item, $event){

@@ -11,10 +11,6 @@
 	background-color: #f1f1f1;
 }
 
-.datatable .xheader {
-	text-align: center;
-}
-
 .row_selected {
 	background-color: #f1f1f1;
 }
@@ -45,11 +41,22 @@
 	margin-bottom: 7px;
 }
 
+.datatable .table>tbody>tr>td,
+.datatable .table>thead>tr>th{
+	overflow-wrap: break-word;
+}
+
+.datatable .table .form-group input.form-control:not([type="checkbox"]) {
+	padding: 3px 3px 3px 3px;
+}
+
 .datatable form .form-group:last-child {
 	margin-bottom: 0px;
 }
 
-
+.datatable .xheader {
+	text-align: center;
+}
 .datatable .form-group input.form-control:not([type="checkbox"]) {
 	width: 100%;
 	margin:0px;
@@ -80,4 +87,13 @@
 .datatable .udt-highlight {
 	background-color:	rgba(89,186,238,0.4);
 	font-weight:		bold;
+}
+
+.editParent {
+	/*background-color: #9d8ba7;*/
+	background-color: #d1d7b3;
+}
+
+.datatable .thumbnail {
+	margin-bottom:0px;
 }

@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-02-14 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-05-25 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -320,7 +320,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             params: this.getParams(params),
                             datatable: this
                         }).success(function(data, status, headers, config) {
-                            config.datatable.setData(data.data, data.recordsNumber);
+                            config.datatable._setData(data.data, data.recordsNumber);
                             that.computeDisplayResultTimeOut.then(function() {
                                 that.setSpinner(false);
                             });
@@ -343,6 +343,15 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
              * Set all data used by search method or directly when local data
              */
             setData: function(data, recordsNumber) {
+            	this.config.edit = angular.copy(this.configMaster.edit);
+                this.config.remove = angular.copy(this.configMaster.remove);
+                this.config.select = angular.copy(this.configMaster.select);
+                this.config.messages = angular.copy(this.configMaster.messages);
+                this.config.pagination.pageNumber = 0;
+                this._setData(data, recordsNumber);
+            },
+            
+            _setData: function(data, recordsNumber) {
                 var configPagination = this.config.pagination;
                 if (configPagination.active && !this.isRemoteMode(configPagination.mode)) {
                     this.config.pagination.pageNumber = 0;
@@ -466,7 +475,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                     console.log("computeGroup Error : " + e);
                                 }
                             } else if ('unique' === column.groupMethod) {
-                                var result = $filter('unique')(groupData, column.property);
+                                var result = $filter('udtUnique')(groupData, column.property);
                                 if (result.length > 1) {
                                     result = '#MULTI';
                                 } else if (result.length === 1) {
@@ -759,7 +768,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         var displayResultTmp = [];
                         angular.forEach(_displayResult, function(value, key) {
                             var line = {
-                                "edit": undefined,
+                                "edit": (that.config.edit.start)?true:undefined,                                
                                 "selected": undefined,
                                 "trClass": undefined,
                                 "group": true,
@@ -781,7 +790,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         var displayResultTmp = [];
                         angular.forEach(_displayResult, function(value, key) {
                             var line = {
-                                "edit": undefined,
+                                "edit": (that.config.edit.start)?true:undefined,
                                 "selected": undefined,
                                 "trClass": undefined,
                                 "group": false,
@@ -803,7 +812,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
 
                         if (that.config.edit.byDefault) {
-                            that.config.edit.withoutSelect = true;
                             that.setEdit();
                         }
 						
@@ -1180,7 +1188,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         var find = false;
                         for (var i = 0; i < that.displayResult.length; i++) {
 
-                            if (that.displayResult[i].line.selected || that.config.edit.withoutSelect) {
+                            if (that.displayResult[i].line.selected || that.config.edit.withoutSelect || that.config.edit.byDefault) {
                                 if (angular.isUndefined(that.config.edit.lineMode) || (angular.isFunction(that.config.edit.lineMode) && that.config.edit.lineMode(that.displayResult[i].data))) {
                                     that.displayResult[i].line.edit = true;
                                     find = true;
@@ -1913,7 +1921,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             columns[i].position = initPosition++;
                         }
 
-                        if (columns[i].convertValue !== undefined && columns[i].convertValue.active === true && (columns[i].convertValue.displayMeasureValue === undefined || columns[i].convertValue.saveMeasureValue === undefined)) {
+                        if (columns[i].convertValue !== undefined && columns[i].convertValue !== null && columns[i].convertValue.active === true && (columns[i].convertValue.displayMeasureValue === undefined || columns[i].convertValue.saveMeasureValue === undefined)) {
                             throw "Columns config error: " + columns[i].property + " convertValue=active but convertValue.displayMeasureValue or convertValue.saveMeasureValue is missing";
                         }
 
@@ -2090,7 +2098,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         for (var j = 0; j < this.config.columns.length; j++) {
                             if (!this.isHide(this.config.columns[j].id)) {
                                 //if the column have a extra header for this level
-                                if (this.config.columns[j].extraHeaders != undefined && this.config.columns[j].extraHeaders[i] != undefined) {
+                                if (this.config.columns[j].extraHeaders !== undefined && this.config.columns[j].extraHeaders[i] !== undefined) {
                                     lineUsed = true;
                                     if (count > 0) {
                                         //adding the empty header of undefined extraHeader columns
@@ -2101,7 +2109,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                         count = 0; //Reset the count to 0
                                     }
                                     //The first time the header will be undefined
-                                    if (header == undefined) {
+                                    if (header === undefined) {
                                         //create the new header with colspan 0 (the current column will be counted)
                                         header = {
                                             "label": this.config.columns[j].extraHeaders[i],
@@ -2110,7 +2118,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                     }
 
                                     //if two near columns have the same header
-                                    if (this.config.columns[j].extraHeaders[i] == header.label) {
+                                    if (this.config.columns[j].extraHeaders[i] === header.label) {
                                         header.colspan += 1;
                                     } else {
                                         //We have a new header
@@ -2124,7 +2132,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                         };
                                     }
 
-                                } else if (header != undefined) {
+                                } else if (header !== undefined) {
                                     lineUsed = true;
                                     //If we find a undefined column, we add the old header
                                     this.addToExtraHeaderConfig(i, header);
@@ -2143,7 +2151,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         //At the end of the level loop
                         //If we have undefined column left
                         //And the line have at least one item
-                        if (count > 0 && (lineUsed === true || header != undefined)) {
+                        if (count > 0 && (lineUsed === true || header !== undefined)) {
                             this.addToExtraHeaderConfig(i, {
                                 "label": "",
                                 "colspan": count
@@ -2152,7 +2160,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
 
                         //If we have defined column left
-                        if (header != undefined) {
+                        if (header !== undefined) {
                             this.addToExtraHeaderConfig(i, header);
                         }
                     }
@@ -2319,7 +2327,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 
             getFilter: function(col) {
                 var filter = '';
-                if (col.convertValue != undefined && col.convertValue.active == true && col.convertValue.saveMeasureValue != col.convertValue.displayMeasureValue) {
+                if (col.convertValue !== undefined && col.convertValue !== null && col.convertValue.active === true && col.convertValue.saveMeasureValue != col.convertValue.displayMeasureValue) {
                     filter += '|udtConvert:' + JSON.stringify(col.convertValue);
 
                 }
@@ -2364,7 +2372,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 
         };
 
-        if (arguments.length == 2) {
+        if (arguments.length === 2) {
             iConfig = arguments[1];
             console.log("used bad constructor for datatable, only one argument is required the config");
         }
@@ -2390,12 +2398,12 @@ directive('udtAutoselect',['$parse', function($parse) {
 						valOption = attrs.btOptions;
 					}
 					
-					if(valOption != undefined){
+					if(valOption !== undefined){
 						var match = valOption.match(OPTIONS_REGEXP);
 						var model = $parse(match[7]);
 						scope.$watch(model, function(value){
 							if(value){
-				                if(value.length === 1 && (ngModel.$modelValue == undefined || ngModel.$modelValue == "")){
+				                if(value.length === 1 && (ngModel.$modelValue === undefined || ngModel.$modelValue === "")){
 									ngModel.$setViewValue(value[0].code);
 									ngModel.$render();
 								}
@@ -2427,7 +2435,7 @@ directive('udtBtselect',  ['$parse', '$document', '$window', '$filter', function
   		    			+'<div class="input-group">'
   		    			+'<input type="text" style="background:white" ng-class="inputClass" ng-model="selectedLabels" placeholder="{{placeholder}}" title="{{placeholder}}" readonly/>'
   		    			+'<div class="input-group-btn">'
-  		    			+'<button tabindex="-1" data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" ng-disabled="isDisabled()" ng-click="open()">'
+  		    			+'<button tabindex="-1" data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle" type="button" ng-disabled="isDisabled()" ng-click="open()">'
   		    			+'<span class="caret"></span>'
   		    			+'</button>'
   				        +'<ul class="dropdown-menu dropdown-menu-right"  role="menu">'
@@ -2539,11 +2547,11 @@ directive('udtBtselect',  ['$parse', '$document', '$window', '$filter', function
       		      }
       		      
       		      scope.itemLabel = function(item){	      		    	
-      		    	 return item[optionsConfig.viewMapper.replace(optionsConfig.itemName+'.','')];  
+      		    	return $parse(optionsConfig.viewMapper.replace(optionsConfig.itemName+'.',''))(item);
       		      };
       		      
       		      scope.itemValue = function(item){
-      		    	 return item[optionsConfig.modelMapper.replace(optionsConfig.itemName+'.','')];  
+      		    	 return $parse(optionsConfig.modelMapper.replace(optionsConfig.itemName+'.',''))(item);
       		      };
       		      
       		      scope.selectItem = function(item, $event){
@@ -2633,11 +2641,12 @@ directive("udtCell", function(){
 	    				var ngChange = '"';
 	    				var defaultValueDirective = "";
     			    	if(header){
-    			    		ngChange = '" ng-change="udtTable.updateColumn(col.property, col.id)"';
+    			    		//we need used udt-change when we used typehead directive
+    			    		ngChange = '" udt-change="udtTable.updateColumn(col.property, col.id)"';
 						}else if(filter){
 							ngChange = '" udt-change="udtTable.searchLocal(udtTable.searchTerms)"';
     			    	}else{
-    			    		defaultValueDirective = 'udt-default-value="col.defaultValues"';
+    			    		defaultValueDirective = 'udt-default-value="col"';
     			    	}
 
 						var userDirectives = "";
@@ -2647,14 +2656,15 @@ directive("udtCell", function(){
 								userDirectives = userDirectives();
 							}
 						}
-
-	    				if(col.type === "boolean"){
-	    					editElement = '<input class="form-control"' +defaultValueDirective+' udt-html-filter="{{col.type}}" '+userDirectives+' type="checkbox" class="input-small" ng-model="'+this.getEditProperty(col, header, filter)+ngChange+'/>';
+						if(col.editTemplate){
+							editElement = col.editTemplate.replace("#ng-model", 'ng-model="'+this.getEditProperty(col, header, filter)+ngChange);														
+						}else if(col.type === "boolean"){
+	    					editElement = '<input class="form-control"' +defaultValueDirective+'type="checkbox" class="input-small" ng-model="'+this.getEditProperty(col, header, filter)+ngChange+'/>';	    					
 	    				}else if (col.type === "textarea") {
                             editElement = '<textarea class="form-control"' + defaultValueDirective + userDirectives + 'ng-model="' + this.getEditProperty(col, header, filter) + ngChange + '></textarea>';
                         }else if(!col.choiceInList){
 							//TODO: type='text' because html5 autoformat return a string before that we can format the number ourself
-	    					editElement = '<input class="form-control" '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" '+userDirectives+' type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+this.getDateTimestamp(col.type)+'/>';
+	    					editElement = '<input class="form-control" '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+this.getDateTimestamp(col.type)+'/>';
 	    				}else if(col.choiceInList){
 	    					switch (col.listStyle) {
 	    						case "radio":
@@ -2663,19 +2673,21 @@ directive("udtCell", function(){
 	    										   +'</label>';
 									break;
 	    						case "multiselect":
-	    							editElement = '<select class="form-control" multiple="true" '+defaultValueDirective+' ng-options="opt.code as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></select>';
+	    							editElement = '<select class="form-control" multiple="true" '+defaultValueDirective+' ng-options="opt.code '+this.getFormatter(col)+' as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></select>';
 		    						break;
 	    						case "bt-select":
-	    							editElement = '<div class="form-control" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
+	    							editElement = '<div udt-html-filter="{{col.type}}" class="form-control" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
 	    							break;
 								case "bt-select-filter":
-	    							editElement = '<div class="form-control" filter="true" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
+	    							editElement = '<div udt-html-filter="{{col.type}}" class="form-control" filter="true" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
 	    							break;
 	    						case "bt-select-multiple":
 	    							editElement = '<div class="form-control" '+defaultValueDirective+' udt-btselect multiple="true" bt-dropdown-class="dropdown-menu-right" placeholder="" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
 	    							break;
 	    						default:
-	    							editElement = '<select class="form-control" '+defaultValueDirective+' ng-options="opt.code as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></select>';
+	    							editElement = '<select udt-html-filter="{{col.type}}" class="form-control" '+defaultValueDirective+' ng-options="opt.code '+this.getFormatter(col)+' as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'>'
+	    										  + '<option></option>'
+	    										  + '</select>';
 		    						break;
 		  	    			}
 	    				}else{
@@ -2698,7 +2710,7 @@ directive("udtCell", function(){
 			    	};
 
 			    	scope.udtTableFunctions.getConvertDirective = function(col, header){
-			    		if(col.convertValue != undefined && col.convertValue.active == true && col.convertValue.saveMeasureValue != col.convertValue.displayMeasureValue){
+			    		if(col.convertValue !== undefined && col.convertValue !== null && col.convertValue.active === true && col.convertValue.saveMeasureValue !== col.convertValue.displayMeasureValue){
 			    			return 'udt-convertvalue="col.convertValue"';
 			    		}
 			    		return "";
@@ -2814,10 +2826,24 @@ directive("udtCell", function(){
 
 			    	var getDisplayValue = function(column, value, onlyProperty, currentScope){
 			    		if(onlyProperty){
+							if(column.watch === true){
+                                scope.$watch("value.data."+column.property, function(newValue, oldValue) {
+                                    if ( newValue !== oldValue ) {
+                                        scope.cellValue = getDisplayFunction(column, false);
+                                     }
+                                });
+                            }
 			    			return currentScope.$eval(column.property, value.data);
 			    		}else{
 			    			if(!value.line.group && (column.url === undefined || column.url === null)){
-			    				return currentScope.$eval(column.property+currentScope.udtTableFunctions.getFilter(column)+currentScope.udtTableFunctions.getFormatter(column), value.data);
+			    				if(column.watch === true){
+                                    scope.$watch("value.data."+column.property, function(newValue, oldValue) {
+                                        if ( newValue !== oldValue ) {
+                                            scope.cellValue = getDisplayFunction(column, false);
+                                         }
+                                    });
+                                }
+								return currentScope.$eval(column.property+currentScope.udtTableFunctions.getFilter(column)+currentScope.udtTableFunctions.getFormatter(column), value.data);
 			    			}else if(value.line.group){
 			    				var v = currentScope.$eval("group."+column.id, value.data);
 			    				//if error in group function
@@ -2848,27 +2874,11 @@ directive('udtChange', ['$interval', function($interval) {
 	return {
 		require: 'ngModel',
 		link: function(scope, element, attrs, ngModel) {
-			scope.oldValue = undefined;
-			scope.needRefresh = false;
-			scope.runFunction = function(){
-				var unbindWatcher  = scope.$watch(attrs.udtChange, function(newValue){
-					unbindWatcher();
-				});
-			};
-			
-			scope.$watch(attrs.ngModel, function(value){
-				if(scope.oldValue !== value){
-					scope.needRefresh = true;
-					scope.oldValue = value;
+			scope.$watch(attr.ngModel, function(newValue, oldValue){
+				if(newValue !== oldValue){
+					scope.$eval(attr.udtChange);
 				}
-			});
-			
-			$interval(function(){ 
-				if(scope.needRefresh){
-					scope.runFunction();
-					scope.needRefresh = false;
-				}
-			}, 10);
+			}); 
 		}
 	};	    	
 }]);;angular.module('ultimateDataTableServices').
@@ -3011,17 +3021,28 @@ directive('udtDefaultValue',['$parse', function($parse) {
 	    		return {
 	    			require: 'ngModel',
 	    			link: function(scope, element, attrs, ngModel) {
-	    				var defaultValue = null;
-	    				scope.$watch(attrs.udtDefaultValue, function(defaultValues){
-	    					if(defaultValues != undefined){
-	    						defaultValue = defaultValues;
+	    				var _col = null;
+	    				scope.$watch(attrs.udtDefaultValue, function(col){
+	    					if(col !== null && col !== undefined && col.defaultValues !== undefined && col.defaultValues !== null ){
+	    						_col = col;
 	    					}
 	    				});
-	    				
+	    				//TODO GA ?? better way with formatter
 						scope.$watch(ngModel, function(value){
-				                if(defaultValue!= null && (ngModel.$modelValue == undefined || ngModel.$modelValue == "")){
-									ngModel.$setViewValue(defaultValue);
-									ngModel.$render();
+				                if(_col != null && (ngModel.$modelValue === undefined || ngModel.$modelValue === "")){
+									if(_col.type === "boolean"){
+										if(_col.defaultValues === "true" || _col.defaultValues === true){
+											ngModel.$setViewValue(true);
+											ngModel.$render();
+										}else if(_col.defaultValues === "false" || _col.defaultValues === false){
+											ngModel.$setViewValue(false);
+											ngModel.$render();
+										}											
+									}else{
+										ngModel.$setViewValue(_col.defaultValues);
+										ngModel.$render();
+									}
+				                	
 								}
 					    });
 	    			}
@@ -3062,7 +3083,7 @@ directive('udtForm', function(){
 		}
 		
 		scope.$watch('keywords', function(newValue, oldValue) {
-			if (!newValue || newValue == '' || !scope.active) {
+			if (!newValue || newValue === '' || !scope.active) {
 				if(scope.udtHighlight !== undefined && scope.udtHighlight !== null)
 					element.html(scope.udtHighlight.replace(/\n/g, '<br />').toString());
 				return false;
@@ -3094,20 +3115,19 @@ directive("udtHtmlFilter", function($filter) {
 					  link: function(scope, element, attrs, ngModelController) {
 					    ngModelController.$formatters.push(function(data) {
 					    	var convertedData = data;
-					    	  if(attrs.udtHtmlFilter == "datetime"){
+					    	  if(attrs.udtHtmlFilter === "datetime"){
 					    			convertedData = $filter('date')(convertedData, scope.udtTableFunctions.messages.Messages("datetime.format"));
-					    	   }else if(attrs.udtHtmlFilter == "date"){
+					    	   }else if(attrs.udtHtmlFilter === "date"){
 					    		   	convertedData = $filter('date')(convertedData, scope.udtTableFunctions.messages.Messages("date.format"));
-					    	   }else if(attrs.udtHtmlFilter == "number"){
+					    	   }else if(attrs.udtHtmlFilter === "number"){
 					    		   	convertedData = $filter('number')(convertedData);
-					    	   }
-					    	
+					    	   }					    	
 					    	  return convertedData;
 					    }); 
 
 						ngModelController.$parsers.push(function(data) {
 					    	var convertedData = data;
-					    	   if(attrs.udtHtmlFilter == "number" && null != convertedData && undefined != convertedData 
+					    	   if(attrs.udtHtmlFilter === "number" && null !== convertedData && undefined !== convertedData 
 					    			   && angular.isString(convertedData)){
 					    		   convertedData = convertedData.replace(",",".");
 					    		   if(!isNaN(convertedData) && convertedData !== ""){						    			   
@@ -3163,7 +3183,16 @@ directive('udtTable', function(){
 	    					return '';
 	    				}
 	    			};
-	    		
+					scope.udtTableFunctions.getThClass = function(col, currentScope){
+	    				if(angular.isFunction(col.thClass)){
+	    					return col.thClass(col);
+	    				} else if(angular.isString(col.thClass)){
+	    					//we try to evaluation the string against the scope
+	    					return currentScope.$eval(col.thClass) || col.thClass;
+	    				}else{
+	    					return '';
+	    				}
+	    			};
 	    			/**
 					 * Select all the table line or just one
 					 */
@@ -3200,25 +3229,25 @@ directive('udtTable', function(){
 						}
 	    			};
 
-                                scope.udtTableFunctions.mouseover = function(data, line){
-                                    var udtTable = scope.udtTable;
-                                    if (udtTable.config.mouseevents.active) {
-                                        var cb = udtTable.config.mouseevents.overCallback;
-                                        if (angular.isFunction(cb)) {
-                                            cb(line, data);
-                                        }
-                                    }
-                                };
+					scope.udtTableFunctions.mouseover = function(data, line){
+						var udtTable = scope.udtTable;
+						if (udtTable.config.mouseevents.active) {
+							var cb = udtTable.config.mouseevents.overCallback;
+							if (angular.isFunction(cb)) {
+								cb(line, data);
+							}
+						}
+					};
 
-                                scope.udtTableFunctions.mouseleave = function(data, line){
-                                    var udtTable = scope.udtTable;
-                                    if (udtTable.config.mouseevents.active) {
-                                        var cb = udtTable.config.mouseevents.leaveCallback;
-                                        if (angular.isFunction(cb)) {
-                                            cb(line, data);
-                                        }
-                                    }
-                                };
+					scope.udtTableFunctions.mouseleave = function(data, line){
+						var udtTable = scope.udtTable;
+						if (udtTable.config.mouseevents.active) {
+							var cb = udtTable.config.mouseevents.leaveCallback;
+							if (angular.isFunction(cb)) {
+								cb(line, data);
+							}
+						}
+					};
 					
 					scope.udtTableFunctions.getRowSpanValue = function(i,j){
 						var udtTable = scope.udtTable;
@@ -3240,6 +3269,33 @@ directive('udtTable', function(){
   		    	}
     		};
     	});;angular.module('ultimateDataTableServices').
+directive('udtTextareaResize', function(){
+    		return {
+    			restrict: 'A',
+                require: 'ngModel',
+  		    	replace: false,
+  		    	template: '',
+                link: function(scope, element, attr, ngModel) {
+                    var rows = 3;
+                    var cols = 35;
+                    scope.$watch(ngModel.$modelValue, function() {
+                        var value = ngModel.$modelValue;
+
+                        if (value) {
+                            var lines = value.split('\n');
+                            rows = Math.max(lines.length, rows);
+                            lines.forEach(function(line) {
+                                cols = Math.max(cols, line.length);
+                            });
+
+                            attr.$set('cols', cols);
+                            attr.$set('rows', rows);
+                        }
+                    });
+  		    	}
+    		};
+    	});
+;angular.module('ultimateDataTableServices').
 directive('udtToolbar', function(){ 
     		return {
     			restrict: 'A',
@@ -3506,9 +3562,11 @@ filter('udtUnique', ['$parse', function($parse) {
 
     		      //checked if the unique identifier is already exist
     		      function some(array, member) {
+					/*
     		        if(isUndefined(member)) {
     		          return false;
     		        }
+					*/
     		        return array.some(function(el) {
     		          return equals(el, member);
     		        });
@@ -3527,7 +3585,7 @@ factory('udtConvertValueServices', [function() {
 									if(precision !== undefined){
 										value = value.toPrecision(precision);
 									}
-								}else if(convert == undefined){
+								}else if(convert === undefined || convert === null){
 									throw "Error: Unknown Conversion "+inputUnit+" to "+outputUnit;
 									return undefined;
 								}

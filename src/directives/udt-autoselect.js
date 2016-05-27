@@ -13,12 +13,12 @@ directive('udtAutoselect',['$parse', function($parse) {
 						valOption = attrs.btOptions;
 					}
 					
-					if(valOption != undefined){
+					if(valOption !== undefined){
 						var match = valOption.match(OPTIONS_REGEXP);
 						var model = $parse(match[7]);
 						scope.$watch(model, function(value){
 							if(value){
-				                if(value.length === 1 && (ngModel.$modelValue == undefined || ngModel.$modelValue == "")){
+				                if(value.length === 1 && (ngModel.$modelValue === undefined || ngModel.$modelValue === "")){
 									ngModel.$setViewValue(value[0].code);
 									ngModel.$render();
 								}

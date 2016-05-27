@@ -55,9 +55,11 @@ filter('udtUnique', ['$parse', function($parse) {
 
     		      //checked if the unique identifier is already exist
     		      function some(array, member) {
+					/*
     		        if(isUndefined(member)) {
     		          return false;
     		        }
+					*/
     		        return array.some(function(el) {
     		          return equals(el, member);
     		        });

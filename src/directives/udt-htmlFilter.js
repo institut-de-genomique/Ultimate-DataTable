@@ -5,20 +5,19 @@ directive("udtHtmlFilter", function($filter) {
 					  link: function(scope, element, attrs, ngModelController) {
 					    ngModelController.$formatters.push(function(data) {
 					    	var convertedData = data;
-					    	  if(attrs.udtHtmlFilter == "datetime"){
+					    	  if(attrs.udtHtmlFilter === "datetime"){
 					    			convertedData = $filter('date')(convertedData, scope.udtTableFunctions.messages.Messages("datetime.format"));
-					    	   }else if(attrs.udtHtmlFilter == "date"){
+					    	   }else if(attrs.udtHtmlFilter === "date"){
 					    		   	convertedData = $filter('date')(convertedData, scope.udtTableFunctions.messages.Messages("date.format"));
-					    	   }else if(attrs.udtHtmlFilter == "number"){
+					    	   }else if(attrs.udtHtmlFilter === "number"){
 					    		   	convertedData = $filter('number')(convertedData);
-					    	   }
-					    	
+					    	   }					    	
 					    	  return convertedData;
 					    }); 
 
 						ngModelController.$parsers.push(function(data) {
 					    	var convertedData = data;
-					    	   if(attrs.udtHtmlFilter == "number" && null != convertedData && undefined != convertedData 
+					    	   if(attrs.udtHtmlFilter === "number" && null !== convertedData && undefined !== convertedData 
 					    			   && angular.isString(convertedData)){
 					    		   convertedData = convertedData.replace(",",".");
 					    		   if(!isNaN(convertedData) && convertedData !== ""){						    			   

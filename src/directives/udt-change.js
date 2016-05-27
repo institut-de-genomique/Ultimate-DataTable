@@ -3,27 +3,11 @@ directive('udtChange', ['$interval', function($interval) {
 	return {
 		require: 'ngModel',
 		link: function(scope, element, attrs, ngModel) {
-			scope.oldValue = undefined;
-			scope.needRefresh = false;
-			scope.runFunction = function(){
-				var unbindWatcher  = scope.$watch(attrs.udtChange, function(newValue){
-					unbindWatcher();
-				});
-			};
-			
-			scope.$watch(attrs.ngModel, function(value){
-				if(scope.oldValue !== value){
-					scope.needRefresh = true;
-					scope.oldValue = value;
+			scope.$watch(attr.ngModel, function(newValue, oldValue){
+				if(newValue !== oldValue){
+					scope.$eval(attr.udtChange);
 				}
-			});
-			
-			$interval(function(){ 
-				if(scope.needRefresh){
-					scope.runFunction();
-					scope.needRefresh = false;
-				}
-			}, 10);
+			}); 
 		}
 	};	    	
 }]);

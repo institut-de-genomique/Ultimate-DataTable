@@ -35,6 +35,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                      "format" : null, //number format or date format or datetime format
                      "extraHeaders":{"0":"Inputs"}, //the extraHeaders list
                      "tdClass" : function with data and property as parameter than return css class or just the css class",
+					 "thClass" : function with data and property as parameter than return css class or just the css class",                     
                      "position": position of the column,
                      "group": false //if column can be used to group data
                      "groupMethod": sum, average, countDistinct, collect
@@ -317,7 +318,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             params: this.getParams(params),
                             datatable: this
                         }).success(function(data, status, headers, config) {
-                            config.datatable.setData(data.data, data.recordsNumber);
+                            config.datatable._setData(data.data, data.recordsNumber);
                             that.computeDisplayResultTimeOut.then(function() {
                                 that.setSpinner(false);
                             });
@@ -340,6 +341,15 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
              * Set all data used by search method or directly when local data
              */
             setData: function(data, recordsNumber) {
+            	this.config.edit = angular.copy(this.configMaster.edit);
+                this.config.remove = angular.copy(this.configMaster.remove);
+                this.config.select = angular.copy(this.configMaster.select);
+                this.config.messages = angular.copy(this.configMaster.messages);
+                this.config.pagination.pageNumber = 0;
+                this._setData(data, recordsNumber);
+            },
+            
+            _setData: function(data, recordsNumber) {
                 var configPagination = this.config.pagination;
                 if (configPagination.active && !this.isRemoteMode(configPagination.mode)) {
                     this.config.pagination.pageNumber = 0;
@@ -463,7 +473,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                     console.log("computeGroup Error : " + e);
                                 }
                             } else if ('unique' === column.groupMethod) {
-                                var result = $filter('unique')(groupData, column.property);
+                                var result = $filter('udtUnique')(groupData, column.property);
                                 if (result.length > 1) {
                                     result = '#MULTI';
                                 } else if (result.length === 1) {
@@ -756,7 +766,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         var displayResultTmp = [];
                         angular.forEach(_displayResult, function(value, key) {
                             var line = {
-                                "edit": undefined,
+                                "edit": (that.config.edit.start)?true:undefined,                                
                                 "selected": undefined,
                                 "trClass": undefined,
                                 "group": true,
@@ -778,7 +788,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         var displayResultTmp = [];
                         angular.forEach(_displayResult, function(value, key) {
                             var line = {
-                                "edit": undefined,
+                                "edit": (that.config.edit.start)?true:undefined,
                                 "selected": undefined,
                                 "trClass": undefined,
                                 "group": false,
@@ -800,7 +810,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
 
                         if (that.config.edit.byDefault) {
-                            that.config.edit.withoutSelect = true;
                             that.setEdit();
                         }
 						
@@ -1177,7 +1186,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         var find = false;
                         for (var i = 0; i < that.displayResult.length; i++) {
 
-                            if (that.displayResult[i].line.selected || that.config.edit.withoutSelect) {
+                            if (that.displayResult[i].line.selected || that.config.edit.withoutSelect || that.config.edit.byDefault) {
                                 if (angular.isUndefined(that.config.edit.lineMode) || (angular.isFunction(that.config.edit.lineMode) && that.config.edit.lineMode(that.displayResult[i].data))) {
                                     that.displayResult[i].line.edit = true;
                                     find = true;
@@ -1910,7 +1919,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             columns[i].position = initPosition++;
                         }
 
-                        if (columns[i].convertValue !== undefined && columns[i].convertValue.active === true && (columns[i].convertValue.displayMeasureValue === undefined || columns[i].convertValue.saveMeasureValue === undefined)) {
+                        if (columns[i].convertValue !== undefined && columns[i].convertValue !== null && columns[i].convertValue.active === true && (columns[i].convertValue.displayMeasureValue === undefined || columns[i].convertValue.saveMeasureValue === undefined)) {
                             throw "Columns config error: " + columns[i].property + " convertValue=active but convertValue.displayMeasureValue or convertValue.saveMeasureValue is missing";
                         }
 
@@ -2087,7 +2096,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         for (var j = 0; j < this.config.columns.length; j++) {
                             if (!this.isHide(this.config.columns[j].id)) {
                                 //if the column have a extra header for this level
-                                if (this.config.columns[j].extraHeaders != undefined && this.config.columns[j].extraHeaders[i] != undefined) {
+                                if (this.config.columns[j].extraHeaders !== undefined && this.config.columns[j].extraHeaders[i] !== undefined) {
                                     lineUsed = true;
                                     if (count > 0) {
                                         //adding the empty header of undefined extraHeader columns
@@ -2098,7 +2107,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                         count = 0; //Reset the count to 0
                                     }
                                     //The first time the header will be undefined
-                                    if (header == undefined) {
+                                    if (header === undefined) {
                                         //create the new header with colspan 0 (the current column will be counted)
                                         header = {
                                             "label": this.config.columns[j].extraHeaders[i],
@@ -2107,7 +2116,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                     }
 
                                     //if two near columns have the same header
-                                    if (this.config.columns[j].extraHeaders[i] == header.label) {
+                                    if (this.config.columns[j].extraHeaders[i] === header.label) {
                                         header.colspan += 1;
                                     } else {
                                         //We have a new header
@@ -2121,7 +2130,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                         };
                                     }
 
-                                } else if (header != undefined) {
+                                } else if (header !== undefined) {
                                     lineUsed = true;
                                     //If we find a undefined column, we add the old header
                                     this.addToExtraHeaderConfig(i, header);
@@ -2140,7 +2149,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         //At the end of the level loop
                         //If we have undefined column left
                         //And the line have at least one item
-                        if (count > 0 && (lineUsed === true || header != undefined)) {
+                        if (count > 0 && (lineUsed === true || header !== undefined)) {
                             this.addToExtraHeaderConfig(i, {
                                 "label": "",
                                 "colspan": count
@@ -2149,7 +2158,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
 
                         //If we have defined column left
-                        if (header != undefined) {
+                        if (header !== undefined) {
                             this.addToExtraHeaderConfig(i, header);
                         }
                     }
@@ -2316,7 +2325,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 
             getFilter: function(col) {
                 var filter = '';
-                if (col.convertValue != undefined && col.convertValue.active == true && col.convertValue.saveMeasureValue != col.convertValue.displayMeasureValue) {
+                if (col.convertValue !== undefined && col.convertValue !== null && col.convertValue.active === true && col.convertValue.saveMeasureValue != col.convertValue.displayMeasureValue) {
                     filter += '|udtConvert:' + JSON.stringify(col.convertValue);
 
                 }
@@ -2361,7 +2370,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 
         };
 
-        if (arguments.length == 2) {
+        if (arguments.length === 2) {
             iConfig = arguments[1];
             console.log("used bad constructor for datatable, only one argument is required the config");
         }
