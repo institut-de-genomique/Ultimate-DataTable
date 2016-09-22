@@ -96,6 +96,7 @@ The server have to respond with data in JSON:
 	"active":boolean,//Active or not
 	"withoutSelect":boolean, //edit all line without selected it								
 	"showButton":boolean,//Show the edit button in the toolbar
+        "showLineButton": false, // Show the edit buttons left of each line
 	"columnMode":boolean,//Edit column
 	"byDefault":boolean, //Set in edit mode when the datatable is build
 	"lineMode":funtion(line){ return boolean;} //function used to define if line is editable

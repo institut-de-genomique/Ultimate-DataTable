@@ -101,6 +101,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     active: false,
                     withoutSelect: false, //edit all line without selected it
                     showButton: true,
+                    showLineButton: false, // Show the edit button left of each line
                     columnMode: false,
                     byDefault: false, //put in edit mode when the datatable is build
                     start: false,
@@ -1225,6 +1226,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
                         var columnEdit = this.config.edit.columns[columnId].edit;
                         isEdit = (columnEdit || this.config.edit.all);
+                    } else if (line) {
+                        isEdit = line.edit && this.config.edit.all;
                     } else {
                         isEdit = (this.config.edit.columnMode && this.config.edit.start);
                     }
@@ -1762,6 +1765,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 } else {
                     return (this.config[configParam].active && this.config[configParam].showButton);
                 }
+            },
+
+            isShowLineEditButton: function() {
+                return this.config.edit.active && this.config.edit.showLineButton;
             },
 
             setShowButton: function(configParam, value) {
