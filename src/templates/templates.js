@@ -28,9 +28,8 @@ run(['$templateCache', function($templateCache) {
    +                        '</th>'
    +                    '</tr>'
    +                    '<tr>'
-
-							'<th ng-if="udtTable.isShowLineEditButton()" ng-class="udtTableFunctions.getThClass(column, this)"><!-- Edit button column --></th>'
-							'<th id="{{column.id}}" ng-repeat="column in udtTable.getColumnsConfig()" ng-model="column" ng-if="!udtTable.isHide(column.id)" ng-class="udtTableFunctions.getThClass(column, this)">'
+   +						'<th ng-if="udtTable.isShowLineEditButton()" ng-class="udtTableFunctions.getThClass(column, this)"><!-- Edit button column --></th>'
+   +						'<th id="{{column.id}}" ng-repeat="column in udtTable.getColumnsConfig()" ng-model="column" ng-if="!udtTable.isHide(column.id)" ng-class="udtTableFunctions.getThClass(column, this)">'
    +                            '<span ng-model="udtTable" ng-bind="udtTableFunctions.messages.Messages(column.header)"/>'
    +                            '<div class="btn-group pull-right">'
    +                                '<button class="btn btn-xs" ng-click="udtTableFunctions.setEdit(column)"        ng-if="udtTable.isShowButton(\'edit\', column)"  ng-disabled="!udtTable.canEdit()" data-toggle="tooltip" title="{{udtTableFunctions.messages.Messages(\'datatable.button.edit\')}}"><i class="fa fa-edit"></i></button>'

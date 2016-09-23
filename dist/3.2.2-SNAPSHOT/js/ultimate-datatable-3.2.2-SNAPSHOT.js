@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-06-01 
+/*! ultimate-datatable version 3.2.2-SNAPSHOT 2016-09-23 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -105,6 +105,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     active: false,
                     withoutSelect: false, //edit all line without selected it
                     showButton: true,
+                    showLineButton: false, // Show the edit button left of each line
                     columnMode: false,
                     byDefault: false, //put in edit mode when the datatable is build
                     start: false,
@@ -1237,6 +1238,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
                         var columnEdit = this.config.edit.columns[columnId].edit;
                         isEdit = (columnEdit || this.config.edit.all);
+                    } else if (line) {
+                        isEdit = line.edit && this.config.edit.all;
                     } else {
                         isEdit = (this.config.edit.columnMode && this.config.edit.start);
                     }
@@ -1774,6 +1777,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 } else {
                     return (this.config[configParam].active && this.config[configParam].showButton);
                 }
+            },
+
+            isShowLineEditButton: function() {
+                return this.config.edit.active && this.config.edit.showLineButton;
             },
 
             setShowButton: function(configParam, value) {
@@ -3868,7 +3875,8 @@ run(['$templateCache', function($templateCache) {
    +                        '</th>'
    +                    '</tr>'
    +                    '<tr>'
-   +                        '<th id="{{column.id}}" ng-repeat="column in udtTable.getColumnsConfig()" ng-model="column" ng-if="!udtTable.isHide(column.id)" ng-class="udtTableFunctions.getThClass(column, this)">'
+   +						'<th ng-if="udtTable.isShowLineEditButton()" ng-class="udtTableFunctions.getThClass(column, this)"><!-- Edit button column --></th>'
+   +						'<th id="{{column.id}}" ng-repeat="column in udtTable.getColumnsConfig()" ng-model="column" ng-if="!udtTable.isHide(column.id)" ng-class="udtTableFunctions.getThClass(column, this)">'
    +                            '<span ng-model="udtTable" ng-bind="udtTableFunctions.messages.Messages(column.header)"/>'
    +                            '<div class="btn-group pull-right">'
    +                                '<button class="btn btn-xs" ng-click="udtTableFunctions.setEdit(column)"        ng-if="udtTable.isShowButton(\'edit\', column)"  ng-disabled="!udtTable.canEdit()" data-toggle="tooltip" title="{{udtTableFunctions.messages.Messages(\'datatable.button.edit\')}}"><i class="fa fa-edit"></i></button>'
@@ -3891,6 +3899,10 @@ run(['$templateCache', function($templateCache) {
    +                        '</td>'
    +                    '</tr>'
    +                    '<tr ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.data, value.line)" ng-mouseover="udtTableFunctions.mouseover(value.data, value.line)" ng-mouseleave="udtTableFunctions.mouseleave(value.data, value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
+   +                        '<td ng-if="udtTable.isShowLineEditButton()">'
+   +                            '<button class="btn btn-default ng-scope" ng-click="udtTable.setEdit()" ng-show="!udtTable.isEdit(null, value.line)" ng-disabled="!udtTable.canEdit()" data-toggle="tooltip" title="Edit"><i class="fa fa-edit"></i></button>'
+   +                            '<button class="btn btn-default ng-scope" ng-click="udtTable.save()" ng-show="udtTable.isEdit(null, value.line)" ng-disabled="!udtTable.canSave()" data-toggle="tooltip" title="Save"><i class="fa fa-save"></i></button>'
+   +                        '</td>'
    +                        '<td ng-repeat="col in udtTable.config.columns" ng-if="udtTableFunctions.isShowCell(col, $parent.$index, $index)" ng-class="udtTableFunctions.getTdClass(value.data, col, this)" rowspan="{{udtTableFunctions.getRowSpanValue($parent.$parent.$index, $parent.$index)}}">'
    +                            '<div udt-cell/>'
    +                        '</td>'
