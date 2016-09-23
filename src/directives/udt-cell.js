@@ -33,7 +33,46 @@ directive("udtCell", function(){
 	    					editElement = '<input class="form-control"' +defaultValueDirective+'type="checkbox" class="input-small" ng-model="'+this.getEditProperty(col, header, filter)+ngChange+'/>';	    					
 	    				}else if (col.type === "textarea") {
                             editElement = '<textarea class="form-control"' + defaultValueDirective + userDirectives + 'ng-model="' + this.getEditProperty(col, header, filter) + ngChange + '></textarea>';
-                        }else if(!col.choiceInList){
+                        }else if(col.type === "img"){
+	    					
+	    					var value=this.getEditProperty(col, header, filter);
+	    					editElement=
+                            '<input ng-if="'+this.getEditProperty(col, header, filter)+' === undefined" type="file" base64-img="'+this.getEditProperty(col, header, filter)+'" />'
+    						+'<div  ng-click="setImage('+this.getEditProperty(col, header, filter)+'.value,'
+                        	+this.getEditProperty(col, header, filter)+'.fullname,'
+                        	+this.getEditProperty(col, header, filter)+'.width,'
+                        	+this.getEditProperty(col, header, filter)+'.height)" '
+                        	+'  class="thumbnail" ng-if="'+this.getEditProperty(col, header, filter)+' !== undefined" >'
+                            +'  <div data-target="#modalImage" role="button" data-toggle="modal" >'
+                            +'     <a href="#">'
+                            +'    <img  ng-src="data:image/{{'+this.getEditProperty(col, header, filter)+'.extension}};base64,{{'+this.getEditProperty(col, header, filter)+'.value}}" width="{{'+this.getEditProperty(col, header, filter)+'.width*0.1}}" height="{{'+this.getEditProperty(col, header, filter)+'.height*0.1}}" />'
+                            +'     </a>'
+                            +' </div>'
+                            +' </div>'
+                            +' <button  class="btn btn-default btn-xs"  ng-show="'+this.getEditProperty(col, header, filter)+' !== undefined"'
+                            +' ng-click="'+this.getEditProperty(col, header, filter)+' = undefined" ><i class="fa fa-trash-o"></i>'
+                            +'</button> ';
+
+	    					if(header){
+	    						editElement = '';
+	    					}
+	    				}
+	    				else if(col.type === "file"){
+	    					editElement=
+	    						'<input ng-if="'+this.getEditProperty(col, header, filter)+' === undefined" type="file" base64-file="'+this.getEditProperty(col, header, filter)+'" />'
+	    						+'<div ng-if="'+this.getEditProperty(col, header, filter)+' !== undefined" >'
+                                +'<a target="_blank" ng-href="data:application/{{'+this.getEditProperty(col, header, filter)+'.extension}};base64,{{'+this.getEditProperty(col, header, filter)+'.value}}">'
+                                +'{{'+this.getEditProperty(col, header, filter)+'.fullname}}'
+                                +'</a>'
+                                +' </div>'
+                                +' <button  class="btn btn-default btn-xs"  ng-show="'+this.getEditProperty(col, header, filter)+' !== undefined"'
+                                +' ng-click="'+this.getEditProperty(col, header, filter)+' = undefined" ><i class="fa fa-trash-o"></i>'
+                                +'</button> ';
+	    					if(header){
+	    						editElement = '';
+	    					}
+	    					
+	    				}else if(!col.choiceInList){
 							//TODO: type='text' because html5 autoformat return a string before that we can format the number ourself
 	    					editElement = '<input class="form-control" '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+this.getDateTimestamp(col.type)+'/>';
 	    				}else if(col.choiceInList){
@@ -177,12 +216,15 @@ directive("udtCell", function(){
 	    				}else{
 	    					if(col.type === "boolean"){
 	    						return '<div ng-switch on="cellValue"><i ng-switch-when="true" class="fa fa-check-square-o"></i><i ng-switch-default class="fa fa-square-o"></i></div>';
-	    					}else if(col.type === "img" || col.type === "image"){
-	    						if(!col.format)console.log("missing format for img !!");
-	    						return '<img ng-src="data:image/'+col.format+';base64,{{cellValue}}" style="max-width:{{col.width}}"/>';
+	    					}else if(col.type==="img"){	    						
+	    						return '<div  ng-click="setImage(cellValue.value,cellValue.fullname,cellValue.width,cellValue.height)"  class="thumbnail" ng-if="cellValue !== undefined" > <div data-target="#modalImage" role="button" data-toggle="modal" ><a href="#"><img ng-src="data:image/{{cellValue.extension}};base64,{{cellValue.value}}" width="{{cellValue.width*0.1}}" height="{{cellValue.height*0.1}}"/></a></div></div>';		    					    
+	    					}else if(col.type==="file"){
+	    						return  '<a target="_blank" ng-href="data:application/{{cellValue.extension}};base64,{{cellValue.value}}">'
+                                +'{{cellValue.fullname}}'
+                                +'</a>';
 	    					} else{
-	    						return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
-								//return '<span ng-bind="cellValue"></span>'
+	    						//return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
+								return '<span ng-bind="cellValue"></span>'
 	    					}
 	    				}
 	    			};
