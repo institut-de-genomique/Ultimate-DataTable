@@ -67,10 +67,10 @@ run(['$templateCache', function($templateCache) {
    +'</div>');
 }])
 .run(['$templateCache', function($templateCache) {
-  $templateCache.put('udt-cell.html',
-    '<div>'
-   +    '<div ng-if="col.edit" udt-editable-cell></div>'
-   +    '<div ng-if="!col.edit" udt-cell-read></div>'
+ $templateCache.put('udt-cell.html',
+    '<div ng-switch on="col.edit">'
+   +    '<div ng-switch-when="true" udt-editable-cell></div>'
+   +    '<div ng-switch-default udt-cell-read></div>'
    +'</div>');
 }])
 .run(['$templateCache', function($templateCache) {
