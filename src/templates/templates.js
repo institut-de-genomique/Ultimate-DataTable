@@ -64,6 +64,22 @@ run(['$templateCache', function($templateCache) {
    +            '</table>'
    +        '</form>'
    +    '</div>'
+   +'<div id="udtModalImage" class="modal fade"  tabindex="-1" role="dialog"'
+   +'	aria-labelledby="modalImageLabel" aria-hidden="true">'
+   +'	<div class="modal-dialog" style="margin-left:{{udtModalImage.modalLeft}}px">'
+   +'		<div class="modal-content" style="width:{{udtModalImage.modalWidth+2}}px">'
+   +'			<div class="modal-header">'
+   +'				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'
+   +'				<h3 class="modal-title">{{udtModalImage.modalTitle}}</h3>	'
+   +'			</div>'
+   +'			<div class="modal-body" style="padding:0px">'
+   +'				<img src="data:image/png;base64,{{udtModalImage.modalImage}}" style="width:{{udtModalImage.modalWidth}}px; height:{{udtModalImage.modalHeight}}px;" />'
+   +'			</div>'
+   +'			<div class="modal-footer">'
+   +'			</div>'
+   +'		</div>'
+   +'		</div>'	
+   +'</div>'
    +'</div>');
 }])
 .run(['$templateCache', function($templateCache) {

@@ -7,6 +7,24 @@ directive('udtTable', function(){
   		    	link: function(scope, element, attr) {
   		    		if(!scope.udtTableFunctions){scope.udtTableFunctions = {};}
   		    		
+					if(scope.udtTable && scope["datatableForm"]){
+  		    			scope.udtTable.formController = scope["datatableForm"];
+  		    		}
+  		    		scope.udtTableFunctions.setImage = function(imageData, imageName, imageFullSizeWidth, imageFullSizeHeight) {
+  		    			scope.udtModalImage = {};
+  		    			scope.udtModalImage.modalImage = imageData;
+  		    			scope.udtModalImage.modalTitle = imageName;
+
+  		    			var margin = 25;		
+  		    			var zoom = Math.min((document.body.clientWidth - margin) / imageFullSizeWidth, 1);
+
+  		    			scope.udtModalImage.modalWidth = imageFullSizeWidth * zoom;
+  		    			scope.udtModalImage.modalHeight = imageFullSizeHeight * zoom; // in order to
+  		    			scope.udtModalImage.modalLeft = (document.body.clientWidth - scope.udtModalImage.modalWidth)/2;
+  		    			scope.udtModalImage.modalTop = (window.innerHeight - scope.udtModalImage.modalHeight)/2;
+  		    			scope.udtModalImage.modalTop = scope.udtModalImage.modalTop - 50; // height of header and footer
+  		    		};
+					
   		    		scope.udtTableFunctions.getTrClass = function(data, line, currentScope){
   		    			var udtTable = scope.udtTable;
 	    				if(line.trClass){

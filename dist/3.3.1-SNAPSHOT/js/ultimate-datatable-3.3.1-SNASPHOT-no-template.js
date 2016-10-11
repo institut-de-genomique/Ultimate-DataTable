@@ -2448,7 +2448,159 @@ directive('udtAutoselect',['$parse', function($parse) {
 					}
     			}
     		};
-    	}]);;angular.module('ultimateDataTableServices').
+    	}]);;
+angular.module('ultimateDataTableServices')
+.directive('udtBase64Img', [function () {
+	return {
+		 restrict: 'A',
+		 require: 'ngModel',
+		 link: function (scope, elem, attrs, ngModel) {
+    		  var nbFiles = 0, counter = 0, files;
+			 
+    		  var onload =  function (e) {
+        		if(e.target.result!= undefined && e.target.result != ""){
+    				  var udtBase64Img = {};
+    				  udtBase64Img._type = "img";
+    				  udtBase64Img.fullname = e.target.file.name;
+    				  //console.log("udtBase64Img.fullname "+udtBase64Img.fullname);
+    				  //Get the extension
+    				  var matchExtension = e.target.file.type.match(/^image\/(.*)/);
+        			  if(matchExtension && matchExtension.length > 1){
+        				  udtBase64Img.extension = matchExtension[1];
+        				  
+        				  //Get the base64 without the extension feature
+        				  var matchBase64 = e.target.result.match(/^.*,(.*)/);
+        				  udtBase64Img.value = matchBase64[1];
+        				  //Load image from the base64 to get the width and height
+        				  var img = new Image();
+        				  img.src =  e.target.result;
+
+        				  img.onload = function(){
+        					  counter++;
+        					  udtBase64Img.width = img.width;
+        					  udtBase64Img.height = img.height;
+        					  files.push(udtBase64Img);
+        					  onloadend();
+        					  
+        				  };		        				  
+        				  		        				  
+    				  }else{
+    					 counter++;
+    					 alert("This is not an image..."+udtBase64Img.fullname);
+    					 elem[0].value = null;
+    				  }
+        			  
+				  }
+    		  };
+    		  
+    		  var onloadend = function(){
+    			  if(nbFiles === counter){
+    				  if(attrs.multiple){
+    					  scope.$apply(function(scope){ngModel.$setViewValue(files);});
+    				  }else{
+    					  scope.$apply(function(scope){ngModel.$setViewValue(files[0]);});
+    				  }
+    				  
+    			  }
+    		  };
+    		  
+		      elem.on('change', function() {
+		    	  nbFiles = 0, counter = 0;
+		    	  files = [];
+		    	  if(attrs.multiple){
+		    		 nbFiles = elem[0].files.length
+		    		  angular.forEach(elem[0].files, function(inputFile){
+		    			  var reader = new FileReader();
+		    			  reader.file = inputFile;
+		    			  reader.onload = onload;	
+		    			  //reader.onloadend = onloadend;
+		    			  reader.readAsDataURL(inputFile);				    			  		        						    			  
+		    		  });
+		    	  }else{
+		    		  var reader = new FileReader();
+		    		  nbFiles = elem[0].files.length
+		    		  reader.file = elem[0].files[0];
+		    		  reader.onload = onload;
+		    		  //reader.onloadend = onloadend;
+	    			  reader.readAsDataURL(elem[0].files[0]);				    			  		    	 
+		    	  }				    	  
+		      });
+		 }
+		};
+		}]).directive('udtBase64File', [function () {
+	return {
+		 restrict: 'A',
+		 require: 'ngModel',
+		
+		 link: function (scope, elem, attrs, ngModel) {
+			 var nbFiles = 0, counter = 0, files;
+    		 
+    		  var onload = onload = function (e) {
+    			 if(e.target.result!= undefined && e.target.result != ""){
+					 
+					  var udtBase64File = {};
+					  udtBase64File.fullname = e.target.file.name;
+    				  
+    				  //Get the extension
+    				  //console.log("File type "+e.target.file.type);
+    				  var matchExtension = e.target.file.type.match(/^application\/(.*)/);
+    				  var matchExtensionText = e.target.file.type.match(/^text\/(.*)/);
+    				  if(matchExtension && matchExtension.length > 1){
+    					  udtBase64File.extension = matchExtension[1];
+    				  }else if(matchExtensionText && matchExtensionText.length > 1){
+    					  udtBase64File.extension = matchExtensionText[1];
+    				  }
+    				  if(udtBase64File.extension != undefined){
+    					  udtBase64File._type = "file";
+        				  
+        				  //Get the base64 without the extension feature
+        				  var matchBase64 = e.target.result.match(/^.*,(.*)/);
+        				  udtBase64File.value = matchBase64[1];
+        				  files.push(udtBase64File);
+    				  }else{
+    					 alert("This is not an authorized file : "+udtBase64File.fullname);		        					 
+    				  }
+    				  counter++;
+				  }
+    			 
+    		  }
+    		  var onloadend = function(e){
+    			  if(nbFiles === counter){
+    				  if(attrs.multiple){
+    					  scope.$apply(function(scope){ngModel.$setViewValue(files);});
+    				  }else{
+    					  scope.$apply(function(scope){ngModel.$setViewValue(files[0]);});
+    				  }
+    				  
+    			  }
+    		  };
+    		  
+    		  elem.on('change', function() {
+		    	  nbFiles = 0, counter = 0;
+		    	  files = [];
+		    	  if(attrs.multiple){
+		    		  nbFiles = elem[0].files.length
+		    		  angular.forEach(elem[0].files, function(inputFile){
+		    			  var reader = new FileReader();
+		    			  reader.file = inputFile;
+		    			  reader.onload = onload;	
+		    			  reader.onloadend = onloadend;
+		    			  reader.readAsDataURL(inputFile);				    			  		        						    			  
+		    		  });
+		    	  }else{
+		    		  var reader = new FileReader();
+		    		  nbFiles = elem[0].files.length
+		    		  reader.file = elem[0].files[0];
+		    		  reader.onload = onload;
+		    		  reader.onloadend = onloadend;
+	    			  reader.readAsDataURL(elem[0].files[0]);				    			  		    	 
+		    	  }				    	  
+		      });
+		      
+		      
+		 }
+		};
+}]);;angular.module('ultimateDataTableServices').
 directive('udtBtselect',  ['$parse', '$document', '$window', '$filter', function($parse,$document, $window, $filter)  {
 			//0000111110000000000022220000000000000000000000333300000000000000444444444444444000000000555555555555555000000066666666666666600000000000000007777000000000000000000088888
     		var BT_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*))\s+in\s+([\s\S]+?)$/;                        
@@ -2697,24 +2849,22 @@ directive("udtCell", function(){
 	    				}else if (col.type === "textarea") {
                             editElement = '<textarea class="form-control"' + defaultValueDirective + userDirectives + 'ng-model="' + this.getEditProperty(col, header, filter) + ngChange + '></textarea>';
                         }else if(col.type === "img"){
-	    					
-	    					var value=this.getEditProperty(col, header, filter);
 	    					editElement=
-                            '<input ng-if="'+this.getEditProperty(col, header, filter)+' === undefined" type="file" base64-img="'+this.getEditProperty(col, header, filter)+'" />'
-    						+'<div  ng-click="setImage('+this.getEditProperty(col, header, filter)+'.value,'
-                        	+this.getEditProperty(col, header, filter)+'.fullname,'
-                        	+this.getEditProperty(col, header, filter)+'.width,'
-                        	+this.getEditProperty(col, header, filter)+'.height)" '
-                        	+'  class="thumbnail" ng-if="'+this.getEditProperty(col, header, filter)+' !== undefined" >'
-                            +'  <div data-target="#modalImage" role="button" data-toggle="modal" >'
-                            +'     <a href="#">'
-                            +'    <img  ng-src="data:image/{{'+this.getEditProperty(col, header, filter)+'.extension}};base64,{{'+this.getEditProperty(col, header, filter)+'.value}}" width="{{'+this.getEditProperty(col, header, filter)+'.width*0.1}}" height="{{'+this.getEditProperty(col, header, filter)+'.height*0.1}}" />'
-                            +'     </a>'
-                            +' </div>'
-                            +' </div>'
-                            +' <button  class="btn btn-default btn-xs"  ng-show="'+this.getEditProperty(col, header, filter)+' !== undefined"'
-                            +' ng-click="'+this.getEditProperty(col, header, filter)+' = undefined" ><i class="fa fa-trash-o"></i>'
-                            +'</button> ';
+	    						'<input type="file" class="form-control" udt-base64-img ng-model="'+this.getEditProperty(col, header, filter)+'" id="{{\''+col.id+'_\'+value.line.id}}" ng-if="'+this.getEditProperty(col, header, filter)+' === undefined" />'
+	    						+'<div  ng-click="udtTableFunctions.setImage('+this.getEditProperty(col, header, filter)+'.value,'
+	                        	+this.getEditProperty(col, header, filter)+'.fullname,'
+	                        	+this.getEditProperty(col, header, filter)+'.width,'
+	                        	+this.getEditProperty(col, header, filter)+'.height)" '
+	                        	+'  class="thumbnail" ng-if="'+this.getEditProperty(col, header, filter)+' !== undefined" >'
+	                            +'  <div data-target="#udtModalImage" role="button" data-toggle="modal" >'
+	                            +'     <a href="#">'
+	                            +'    <img  ng-src="data:image/{{'+this.getEditProperty(col, header, filter)+'.extension}};base64,{{'+this.getEditProperty(col, header, filter)+'.value}}" width="{{'+this.getEditProperty(col, header, filter)+'.width*0.1}}" height="{{'+this.getEditProperty(col, header, filter)+'.height*0.1}}" />'
+	                            +'     </a>'
+	                            +' </div>'
+	                            +' </div>'
+	    						+' <button ng-if="'+this.getEditProperty(col, header, filter)+' !== undefined" class="btn btn-default btn-xs" ng-click="'+this.getEditProperty(col, header, filter)+' = undefined" >'
+	    						+' <i class="fa fa-trash-o"></i>'
+                                +' </button>';
 
 	    					if(header){
 	    						editElement = '';
@@ -2722,19 +2872,18 @@ directive("udtCell", function(){
 	    				}
 	    				else if(col.type === "file"){
 	    					editElement=
-	    						'<input ng-if="'+this.getEditProperty(col, header, filter)+' === undefined" type="file" base64-file="'+this.getEditProperty(col, header, filter)+'" />'
+	    						'<input ng-if="'+this.getEditProperty(col, header, filter)+' === undefined"  type="file" class="form-control" udt-base64-file ng-model="'+this.getEditProperty(col, header, filter)+'" id="{{\''+col.id+'_\'+value.line.id}} />'
 	    						+'<div ng-if="'+this.getEditProperty(col, header, filter)+' !== undefined" >'
                                 +'<a target="_blank" ng-href="data:application/{{'+this.getEditProperty(col, header, filter)+'.extension}};base64,{{'+this.getEditProperty(col, header, filter)+'.value}}">'
                                 +'{{'+this.getEditProperty(col, header, filter)+'.fullname}}'
                                 +'</a>'
                                 +' </div>'
-                                +' <button  class="btn btn-default btn-xs"  ng-show="'+this.getEditProperty(col, header, filter)+' !== undefined"'
-                                +' ng-click="'+this.getEditProperty(col, header, filter)+' = undefined" ><i class="fa fa-trash-o"></i>'
-                                +'</button> ';
+	    						
+	    						+' <button ng-if="'+this.getEditProperty(col, header, filter)+' !== undefined" class="btn btn-default btn-xs" ng-click="'+this.getEditProperty(col, header, filter)+' = undefined" ><i class="fa fa-trash-o"></i>'
+                                +' </button>';
 	    					if(header){
 	    						editElement = '';
 	    					}
-	    					
 	    				}else if(!col.choiceInList){
 							//TODO: type='text' because html5 autoformat return a string before that we can format the number ourself
 	    					editElement = '<input class="form-control" '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+this.getDateTimestamp(col.type)+'/>';
@@ -2880,9 +3029,10 @@ directive("udtCell", function(){
 	    					if(col.type === "boolean"){
 	    						return '<div ng-switch on="cellValue"><i ng-switch-when="true" class="fa fa-check-square-o"></i><i ng-switch-default class="fa fa-square-o"></i></div>';
 	    					}else if(col.type==="img"){	    						
-	    						return '<div  ng-click="setImage(cellValue.value,cellValue.fullname,cellValue.width,cellValue.height)"  class="thumbnail" ng-if="cellValue !== undefined" > <div data-target="#modalImage" role="button" data-toggle="modal" ><a href="#"><img ng-src="data:image/{{cellValue.extension}};base64,{{cellValue.value}}" width="{{cellValue.width*0.1}}" height="{{cellValue.height*0.1}}"/></a></div></div>';		    					    
+	    						return '<div  ng-click="udtTableFunctions.setImage(cellValue.value,cellValue.fullname,cellValue.width,cellValue.height)" class="thumbnail" ng-if="cellValue !== undefined" >' 
+	    						+'<div data-target="#udtModalImage" role="button" data-toggle="modal" ><a href="#"><img ng-src="data:image/{{cellValue.extension}};base64,{{cellValue.value}}" width="{{cellValue.width*0.1}}" height="{{cellValue.height*0.1}}"/></a></div></div>';		    					    
 	    					}else if(col.type==="file"){
-	    						return  '<a target="_blank" ng-href="data:application/{{cellValue.extension}};base64,{{cellValue.value}}">'
+	    						return  '<a ng-href="data:application/{{cellValue.extension}};base64,{{cellValue.value}}" download="{{cellValue.fullname}}">'
                                 +'{{cellValue.fullname}}'
                                 +'</a>';
 	    					} else{
@@ -3245,6 +3395,24 @@ directive('udtTable', function(){
   		    	link: function(scope, element, attr) {
   		    		if(!scope.udtTableFunctions){scope.udtTableFunctions = {};}
   		    		
+					if(scope.udtTable && scope["datatableForm"]){
+  		    			scope.udtTable.formController = scope["datatableForm"];
+  		    		}
+  		    		scope.udtTableFunctions.setImage = function(imageData, imageName, imageFullSizeWidth, imageFullSizeHeight) {
+  		    			scope.udtModalImage = {};
+  		    			scope.udtModalImage.modalImage = imageData;
+  		    			scope.udtModalImage.modalTitle = imageName;
+
+  		    			var margin = 25;		
+  		    			var zoom = Math.min((document.body.clientWidth - margin) / imageFullSizeWidth, 1);
+
+  		    			scope.udtModalImage.modalWidth = imageFullSizeWidth * zoom;
+  		    			scope.udtModalImage.modalHeight = imageFullSizeHeight * zoom; // in order to
+  		    			scope.udtModalImage.modalLeft = (document.body.clientWidth - scope.udtModalImage.modalWidth)/2;
+  		    			scope.udtModalImage.modalTop = (window.innerHeight - scope.udtModalImage.modalHeight)/2;
+  		    			scope.udtModalImage.modalTop = scope.udtModalImage.modalTop - 50; // height of header and footer
+  		    		};
+					
   		    		scope.udtTableFunctions.getTrClass = function(data, line, currentScope){
   		    			var udtTable = scope.udtTable;
 	    				if(line.trClass){
