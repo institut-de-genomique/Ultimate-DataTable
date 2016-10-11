@@ -409,7 +409,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     var newData = this.config.add.init(this);
                     var line = {
                         "edit": true,
-                        "selected": true,
+                        "selected": false,
                         "trClass": undefined,
                         "group": false,
                         "new": true
@@ -427,6 +427,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         });
                     }
                     this.config.edit.all = true;
+					this.config.edit.start = true;
                 }
             },
             /**
