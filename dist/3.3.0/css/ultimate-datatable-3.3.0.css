@@ -1,0 +1,102 @@
+/*! ultimate-datatable version 3.3.0 2016-10-11 
+ Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
+*/
+.datatable .btn-toolbar .btn,.datatable div[name="udt-toolbar-results"],
+.datatable div[name="udt-toolbar-pagination"],
+.datatable div[name="udt-toolbar-filter"] .input-compact,
+.datatable div[name="udt-toolbar-filter"] .btn {
+	font-size:12px;
+	line-height: 1.33333333;
+	height:30px;
+}
+
+.datatable .filter {
+	background-color: #f1f1f1;
+}
+
+.row_selected {
+	background-color: #f1f1f1;
+}
+
+.control-group-datatable{
+	margin-bottom: 0px;
+}
+
+.table-hover tbody tr:hover td,
+.table-hover tbody tr:hover th {
+  background-color: #f1f1f1;
+}
+
+.datatable .btn-toolbar{
+	margin-top: 0px;
+}
+
+.datatable .pagination{
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+.datatable .well{
+	margin-bottom: 10px;
+}
+
+.datatable form .form-group {
+	margin-bottom: 7px;
+}
+
+.datatable .table>tbody>tr>td,
+.datatable .table>thead>tr>th{
+	overflow-wrap: break-word;
+}
+
+.datatable .table .form-group input.form-control:not([type="checkbox"]) {
+	padding: 3px 3px 3px 3px;
+}
+
+.datatable form .form-group:last-child {
+	margin-bottom: 0px;
+}
+
+.datatable .xheader {
+	text-align: center;
+}
+.datatable .form-group input.form-control:not([type="checkbox"]) {
+	width: 100%;
+	margin:0px;
+}
+
+.datatable .form-group input.form-control {
+	margin:0px;
+}
+
+.datatable .margin-bottom-3 {
+	margin-bottom:3px;
+}
+
+.datatable .inProgress {
+	padding-left:40%;
+    background-color: #428BCA;
+    bottom: 0;
+    /*height: 100%;*/
+    left: 0;
+    opacity: 0.5;
+    position: absolute;
+    right: 0;
+    top: 0;
+    /*width: 100%;*/
+    z-index: 1040;
+}
+
+.datatable .udt-highlight {
+	background-color:	rgba(89,186,238,0.4);
+	font-weight:		bold;
+
+
+.editParent {
+	/*background-color: #9d8ba7;*/
+	background-color: #d1d7b3;
+}
+
+.datatable .thumbnail {
+	margin-bottom:0px;
+}

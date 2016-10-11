@@ -3,8 +3,8 @@
 > This [AngularJS](http://www.angularjs.org) directive generate a HTML table with build-in fonctionnality like save, edit, remove, pagination etc...
 
 ##Versions
-> **Current stable version** : 3.2.1<br>
-**Latest version** : 3.2.1
+> **Current stable version** : 3.3.0<br>
+**Latest version** : 3.3.0
 
 ##Demo
 
@@ -34,7 +34,7 @@
  <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/bootstrap/js/bootstrap-3.3.4.min.js" type="text/javascript" charset="utf-8"></script>
  <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/angular-js/angular-1.3.16.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/momentjs.js" type="text/javascript" charset="utf-8"></script>
- <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/ultimate-datatable-3.2.1.js" type="text/javascript" charset="utf-8"></script>
+ <script src="http://institut-de-genomique.github.io/Ultimate-DataTable/js/ultimate-datatable-3.3.0.js" type="text/javascript" charset="utf-8"></script>
 ```
 
 ### HTML
