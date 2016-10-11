@@ -170,6 +170,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 },
                 otherButtons: {
                     active: false,
+					complex : false, //used to inject several buttons in toolbars.
                     template: undefined
                 },
                 messages: {
@@ -4075,7 +4076,8 @@ run(['$templateCache', function($templateCache) {
    +                    '</li>'
    +                '</ul>'
    +            '</div>'
-   +            '<div class="btn-group" ng-if="udtTable.isShowOtherButtons()" udt-compile="udtTable.config.otherButtons.template"></div>'
+   +            '<div class="btn-group" ng-if="udtTable.isShowOtherButtons() && !udtTable.config.otherButtons.complex" udt-compile="udtTable.config.otherButtons.template"></div>'
+   +			'<div style="display:inline-block; margin-left:5px" ng-if="udtTable.isShowOtherButtons() && udtTable.config.otherButtons.complex" udt-compile="udtTable.config.otherButtons.template"></div>'        
    +        '</div>'
    +        '<div class="col-xs-2 .col-sm-3 col-md-3 col-lg-3" name="udt-toolbar-filter" ng-if="udtTable.config.filter.active === true">'
    +            '<div class="col-xs-12 .col-sm-6 col-md-7 col-lg-8 input-group" ng-if="udtTable.isCompactMode()">'

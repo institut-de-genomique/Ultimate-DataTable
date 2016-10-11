@@ -170,6 +170,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 },
                 otherButtons: {
                     active: false,
+					complex : false, //used to inject several buttons in toolbars.
                     template: undefined
                 },
                 messages: {

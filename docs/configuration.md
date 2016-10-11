@@ -241,7 +241,8 @@ compact:boolean/boolean
 ```json
 "otherButtons":{
 	"active":boolean,//Active or not
-	"template":string//Html element
+	"complex":boolean // true if you want manage btn-group in your template
+	"template":string //Html element to insert one button a the end of toolbar
 }
 ```
 ## Messages
