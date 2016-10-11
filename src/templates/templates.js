@@ -168,7 +168,7 @@ run(['$templateCache', function($templateCache) {
    +                    '<span ng-if="!udtTable.isCompactMode()"> {{udtTableFunctions.messages.Messages(\'datatable.button.exportCSV\')}}</span>'
    +                    '<span class="caret"/>'
    +                '</button>'
-   +                '<ul class="dropdown-menu">'
+   +                '<ul class="dropdown-menu" ng-switch-when="true">'
    +                    '<li>'
    +                        '<a href="" ng-click="udtTableFunctions.exportCSV(\'all\')">'
    +                            '<i class="fa fa-file-text-o"></i> {{udtTableFunctions.messages.Messages(\'datatable.button.basicExportCSV\')}}'
