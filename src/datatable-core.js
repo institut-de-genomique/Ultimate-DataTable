@@ -1634,7 +1634,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
              * value = true or false
              */
             selectAll: function(value) {
-                if (this.config.select.active) {
+                if (this.config.select.active && this.displayResult) {
                     this.config.select.isSelectAll = value;
                     for (var i = 0; i < this.displayResult.length; i++) {
                         if (value) {

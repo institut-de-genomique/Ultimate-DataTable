@@ -3,7 +3,7 @@
 angular.module('ultimateDataTableServices').
 run(['$templateCache', function($templateCache) {
   $templateCache.put('ultimate-datatable.html',
-    '<div name="datatable" class="datatable">'
+    '<div name="datatable" class="datatable" ng-if="udtTable">'
    +    '<div ng-transclude/>'
    +    '<div udt-toolbar ng-if="udtTable.isShowToolbar()"/>'
    +    '<div udt-messages ng-if="udtTable.config.messages.active"/>'
