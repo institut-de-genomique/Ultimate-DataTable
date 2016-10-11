@@ -70,7 +70,7 @@
 ##Type
 > The column input type
 ```json
-"type" : "text"/"number"/"month"/"week"/"time"/"datetime"/"range"/"color"/"mail"/"tel"/"date"
+"type" : "text"/"textarea"/"number"/"month"/"week"/"time"/"datetime"/"range"/"color"/"mail"/"tel"/"date"
 ```
 ##Choice in list
 > When the column is in edit mode, the edition is a list of choices or not
