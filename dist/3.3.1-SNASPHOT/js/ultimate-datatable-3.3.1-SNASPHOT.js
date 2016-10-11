@@ -2921,18 +2921,18 @@ directive("udtCell", function(){
   		    	}
     		};
     	});;angular.module('ultimateDataTableServices').
-directive('udtChange', ['$interval', function($interval) {
+directive('udtChange', function() {
 	return {
-		require: 'ngModel',
+	  require: 'ngModel',
 		link: function(scope, element, attr, ngModel) {
-			scope.$watch(attr.ngModel, function(newValue, oldValue){
+		   scope.$watch(attr.ngModel, function(newValue, oldValue){
 				if(newValue !== oldValue){
-					scope.$eval(attr.udtChange);
+					scope.$evalAsync(attr.udtChange);						
 				}
 			}); 
-		}
+	  }
 	};	    	
-}]);;angular.module('ultimateDataTableServices').
+});;angular.module('ultimateDataTableServices').
 directive('udtCompile', ['$compile', function($compile) {
 			// directive factory creates a link function
 			return {
