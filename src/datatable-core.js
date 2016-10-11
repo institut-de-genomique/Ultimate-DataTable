@@ -1733,10 +1733,16 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             },
 
             isShowToolbarButtons: function() {
-                return (this.isShowCRUDButtons() || this.isShowHideButtons() || (this.config.show.active && this.config.show.showButton) || this.isShowExportCSVButton() || this.isShowOtherButtons());
+                return (this.isShowCRUDButtons() || this.isShowHideButtons() || this.isShowAddButtons() || this.isShowShowButtons() || this.isShowExportCSVButton() || this.isShowOtherButtons());
             },
             isShowCRUDButtons: function() {
                 return ((this.config.edit.active && this.config.edit.showButton) || (this.config.save.active && this.config.save.showButton) || (this.config.remove.active && this.config.remove.showButton));
+            },
+            isShowAddButtons: function() {
+                return (this.config.add.active && this.config.add.showButton);
+            },
+            isShowShowButtons: function() {
+                return  (this.config.show.active && this.config.show.showButton);
             },
             isShowHideButtons: function() {
                 return (this.config.hide.active && this.config.hide.showButton && this.getHideColumns().length > 0);
@@ -1933,6 +1939,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 
                         if(null === columns[i].showFilter || undefined === columns[i].showFilter){
                             columns[i].showFilter = false;
+                        }
+						
+						if(null === columns[i].edit || undefined === columns[i].edit){
+                            columns[i].edit = false;
                         }
                     }
 
@@ -2213,6 +2223,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                 var header = column.header;
                                 if (angular.isFunction(header)) {
                                     header = header();
+                                }else{
+                                	header = that.config.messages.transformKey(header);
                                 }
 
                                 if (that.isGroupActive()) {
