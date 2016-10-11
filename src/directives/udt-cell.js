@@ -27,15 +27,23 @@ directive("udtCell", function(){
 								userDirectives = userDirectives();
 							}
 						}
+						var requiredDirective = "";
+						if(col.required != undefined && !header && (angular.isFunction(col.required) && col.required()) 
+	    						|| (!angular.isFunction(col.required) && col.required)){
+							requiredDirective = "name='"+col.id+"' ng-required=true";
+						}else{
+							requiredDirective = "name='"+col.id+"' ";
+						}
+						
 						if(col.editTemplate){
-							editElement = col.editTemplate.replace("#ng-model", 'ng-model="'+this.getEditProperty(col, header, filter)+ngChange);														
+							editElement = col.editTemplate.replace("#ng-model", 'ng-model="'+this.getEditProperty(col, header, filter)+ngChange+' '+requiredDirective);														
 						}else if(col.type === "boolean"){
 	    					editElement = '<input class="form-control"' +defaultValueDirective+'type="checkbox" class="input-small" ng-model="'+this.getEditProperty(col, header, filter)+ngChange+'/>';	    					
 	    				}else if (col.type === "textarea") {
                             editElement = '<textarea class="form-control"' + defaultValueDirective + userDirectives + 'ng-model="' + this.getEditProperty(col, header, filter) + ngChange + '></textarea>';
-                        }else if(col.type === "img"){
+	    				}else if(col.type === "img"){
 	    					editElement=
-	    						'<input type="file" class="form-control" udt-base64-img ng-model="'+this.getEditProperty(col, header, filter)+'" id="{{\''+col.id+'_\'+value.line.id}}" ng-if="'+this.getEditProperty(col, header, filter)+' === undefined" />'
+	    						'<input type="file" class="form-control" udt-base64-img ng-model="'+this.getEditProperty(col, header, filter)+'" id="{{\''+col.id+'_\'+value.line.id}}" '+requiredDirective+' ng-if="'+this.getEditProperty(col, header, filter)+' === undefined" />'
 	    						+'<div  ng-click="udtTableFunctions.setImage('+this.getEditProperty(col, header, filter)+'.value,'
 	                        	+this.getEditProperty(col, header, filter)+'.fullname,'
 	                        	+this.getEditProperty(col, header, filter)+'.width,'
@@ -57,7 +65,7 @@ directive("udtCell", function(){
 	    				}
 	    				else if(col.type === "file"){
 	    					editElement=
-	    						'<input ng-if="'+this.getEditProperty(col, header, filter)+' === undefined"  type="file" class="form-control" udt-base64-file ng-model="'+this.getEditProperty(col, header, filter)+'" id="{{\''+col.id+'_\'+value.line.id}} />'
+	    						'<input ng-if="'+this.getEditProperty(col, header, filter)+' === undefined"  type="file" class="form-control" udt-base64-file ng-model="'+this.getEditProperty(col, header, filter)+'" id="{{\''+col.id+'_\'+value.line.id}} '+requiredDirective+' />'
 	    						+'<div ng-if="'+this.getEditProperty(col, header, filter)+' !== undefined" >'
                                 +'<a target="_blank" ng-href="data:application/{{'+this.getEditProperty(col, header, filter)+'.extension}};base64,{{'+this.getEditProperty(col, header, filter)+'.value}}">'
                                 +'{{'+this.getEditProperty(col, header, filter)+'.fullname}}'
@@ -71,7 +79,7 @@ directive("udtCell", function(){
 	    					}
 	    				}else if(!col.choiceInList){
 							//TODO: type='text' because html5 autoformat return a string before that we can format the number ourself
-	    					editElement = '<input class="form-control" '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+this.getDateTimestamp(col.type)+'/>';
+	    					editElement = '<input class="form-control" '+requiredDirective+' '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+this.getDateTimestamp(col.type)+'/>';
 	    				}else if(col.choiceInList){
 	    					switch (col.listStyle) {
 	    						case "radio":
@@ -80,19 +88,19 @@ directive("udtCell", function(){
 	    										   +'</label>';
 									break;
 	    						case "multiselect":
-	    							editElement = '<select class="form-control" multiple="true" '+defaultValueDirective+' ng-options="opt.code '+this.getFormatter(col)+' as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></select>';
+	    							editElement = '<select class="form-control" multiple="true" '+requiredDirective+' '+defaultValueDirective+' ng-options="opt.code '+this.getFormatter(col)+' as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+'></select>';
 		    						break;
 	    						case "bt-select":
-	    							editElement = '<div udt-html-filter="{{col.type}}" class="form-control" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
+	    							editElement = '<div udt-html-filter="{{col.type}}" class="form-control" udt-btselect '+requiredDirective+' '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+'></div>';
 	    							break;
 								case "bt-select-filter":
-	    							editElement = '<div udt-html-filter="{{col.type}}" class="form-control" filter="true" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
+	    							editElement = '<div udt-html-filter="{{col.type}}" class="form-control" filter="true" udt-btselect '+requiredDirective+' '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+'></div>';
 	    							break;
 	    						case "bt-select-multiple":
-	    							editElement = '<div class="form-control" '+defaultValueDirective+' udt-btselect multiple="true" bt-dropdown-class="dropdown-menu-right" placeholder="" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
+	    							editElement = '<div class="form-control" '+requiredDirective+' '+defaultValueDirective+' udt-btselect multiple="true" bt-dropdown-class="dropdown-menu-right" placeholder="" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+'></div>';
 	    							break;
 	    						default:
-	    							editElement = '<select udt-html-filter="{{col.type}}" class="form-control" '+defaultValueDirective+' ng-options="opt.code '+this.getFormatter(col)+' as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'>'
+	    							editElement = '<select udt-html-filter="{{col.type}}" class="form-control" '+requiredDirective+' '+defaultValueDirective+' ng-options="opt.code '+this.getFormatter(col)+' as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+'>'
 	    										  + '<option></option>'
 	    										  + '</select>';
 		    						break;
@@ -100,7 +108,9 @@ directive("udtCell", function(){
 	    				}else{
 	    					editElement = "Edit Not Defined for col.type !";
 	    				}
-	    				return '<div class="form-group"  ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
+	    				//return '<div class="form-group"  ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
+	    				return '<div class="form-group"  ng-class="udtTableFunctions.getValidationClass(\'subForm\'+value.line.id, col)">'+editElement+'</div>';
+		    			
 	    			};
 
 
@@ -157,6 +167,19 @@ directive("udtCell", function(){
 	    				}
 
 	    				return '';
+	    			};
+					
+					scope.udtTableFunctions.getValidationClass = function(formName, col){
+	    				
+	    				if(scope.udtTable.config.save.enableValidation
+	    					&& scope.datatableForm[formName] 
+	    					&& scope.datatableForm[formName][col.id] 
+	    					&& scope.datatableForm[formName][col.id].$invalid){
+	    					return 'has-error';
+	    				}else{
+	    					return undefined;
+	    				}
+	    				    				
 	    			};
   		    	}
     		};

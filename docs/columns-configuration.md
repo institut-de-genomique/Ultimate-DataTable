@@ -134,3 +134,13 @@
 ```json
 "url" : "theUrlToGetTheData"
 ```
+##mergeCells
+> if you want to merge cell with same value, experimently features
+```json
+"mergeCells" : boolean
+```
+##required
+> if a cell is required during edition
+```json
+"required" : boolean or function that return boolean
+```

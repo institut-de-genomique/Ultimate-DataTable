@@ -90,9 +90,9 @@
 .datatable .udt-highlight {
 	background-color:	rgba(89,186,238,0.4);
 	font-weight:		bold;
+}
 
-
-.editParent {
+.datatable .editParent {
 	/*background-color: #9d8ba7;*/
 	background-color: #d1d7b3;
 }
@@ -100,3 +100,10 @@
 .datatable .thumbnail {
 	margin-bottom:0px;
 }
+
+
+.datatable .required .header:after {
+  content:" *";
+  color:red;
+}
+

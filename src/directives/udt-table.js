@@ -43,21 +43,22 @@ directive('udtTable', function(){
 	    				if(angular.isFunction(col.tdClass)){
 	    					return col.tdClass(data);
 	    				} else if(angular.isString(col.tdClass)){
-	    					//we try to evaluation the string against the scope
 	    					return currentScope.$eval(col.tdClass) || col.tdClass;
 	    				}else{
 	    					return '';
 	    				}
 	    			};
 					scope.udtTableFunctions.getThClass = function(col, currentScope){
+	    				var clazz = '';
 	    				if(angular.isFunction(col.thClass)){
-	    					return col.thClass(col);
+	    					clazz = col.thClass(col);
 	    				} else if(angular.isString(col.thClass)){
 	    					//we try to evaluation the string against the scope
-	    					return currentScope.$eval(col.thClass) || col.thClass;
-	    				}else{
-	    					return '';
+	    					clazz =  currentScope.$eval(col.thClass) || col.thClass;
 	    				}
+	    				if(col.required)clazz = clazz +' required';
+	    				
+	    				return clazz;	    				
 	    			};
 	    			/**
 					 * Select all the table line or just one

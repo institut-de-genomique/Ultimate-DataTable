@@ -45,6 +45,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                      "defaultValues":"" //If the value of the column is undefined or "" when the user edit, this value show up
                      "url"://to lazy data
                      "mergeCells":false //to enable merge cell on this column
+					 "required":true/false //to add * on column header if required                     
                      "
                    }*/
                 columnsUrl: undefined, //Load columns config
@@ -128,7 +129,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     start: false, //if save started
                     number: 0, //number of element in progress
                     error: 0,
-                    newData: []
+                    newData: [],
+                    enableValidation:false
                 },
                 remove: {
                     active: false,
@@ -296,7 +298,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     };
 
                     this.totalNumberRecords = _allResult.length;
-                    this.sortAllResult();
+                    //this.sortAllResult();
                     this.computePaginationList();
                     this.computeDisplayResult();
                     var that = this;
@@ -792,13 +794,15 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 							_displayResult = $.extend(true,[],that._getAllResult());
 						}
                         var displayResultTmp = [];
+						var id = 0;
                         angular.forEach(_displayResult, function(value, key) {
                             var line = {
                                 "edit": (that.config.edit.start)?true:undefined,
                                 "selected": undefined,
                                 "trClass": undefined,
                                 "group": false,
-                                "new": false
+                                "new": false,
+                                "id":id++
                             };
                             this.push({
                                 data: value,
@@ -1275,44 +1279,48 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
              * Save the selected table line
              */
             save: function() {
-                if (this.config.save.active) {
-                    this.config.save.number = 0;
-                    this.config.save.error = 0;
-                    this.config.save.start = true;
-                    this.setSpinner(true);
-                    this.config.messages.text = undefined;
-                    this.config.messages.clazz = undefined;
-                    var data = [];
+                if (this.config.save.active && this.displayResult) {
+                	if(this.formController.$invalid){
+                		this.config.save.enableValidation = true;            		
+            		}else{
+						this.config.save.number = 0;
+						this.config.save.error = 0;
+						this.config.save.start = true;
+						this.setSpinner(true);
+						this.config.messages.text = undefined;
+						this.config.messages.clazz = undefined;
+						var data = [];
 
-                    var valueFunction = this.getValueFunction(this.config.save.value);
-                    for (var i = 0; i < this.displayResult.length; i++) {
-                        if (this.displayResult[i].line.edit || this.config.save.withoutEdit) {
-                            //remove datatable properties to avoid this data are retrieve in the json
-                            this.config.save.number++;
-                            this.displayResult[i].line.trClass = undefined;
-                            this.displayResult[i].line.selected = undefined;
-                            this.resetErrors(i);
-                            if (this.isRemoteMode(this.config.save.mode) && !this.config.save.batch) {
-                                //add the url in table to used $q
-                                data.push(this.getSaveRemoteRequest(this.displayResult[i].data, i));
-                            } else if (this.isRemoteMode(this.config.save.mode) && this.config.save.batch) {
-                                //add the data in table to send in once all the result
-                                data.push({
-                                    index: i,
-                                    data: valueFunction(this.displayResult[i].data)
-                                });
-                            } else {
-                                this.saveLocal(valueFunction(this.displayResult[i].data), i);
-                            }
-                        }
-                    }
-                    if (!this.isRemoteMode(this.config.save.mode) || data.length === 0) {
-                        this.saveFinish();
-                    } else if (this.isRemoteMode(this.config.save.mode) && !this.config.save.batch) {
-                        this.saveRemote(data);
-                    } else if (this.isRemoteMode(this.config.save.mode) && this.config.save.batch) {
-                        this.saveBatchRemote(data);
-                    }
+						var valueFunction = this.getValueFunction(this.config.save.value);
+						for (var i = 0; i < this.displayResult.length; i++) {
+							if (this.displayResult[i].line.edit || this.config.save.withoutEdit) {
+								//remove datatable properties to avoid this data are retrieve in the json
+								this.config.save.number++;
+								this.displayResult[i].line.trClass = undefined;
+								this.displayResult[i].line.selected = undefined;
+								this.resetErrors(i);
+								if (this.isRemoteMode(this.config.save.mode) && !this.config.save.batch) {
+									//add the url in table to used $q
+									data.push(this.getSaveRemoteRequest(this.displayResult[i].data, i));
+								} else if (this.isRemoteMode(this.config.save.mode) && this.config.save.batch) {
+									//add the data in table to send in once all the result
+									data.push({
+										index: i,
+										data: valueFunction(this.displayResult[i].data)
+									});
+								} else {
+									this.saveLocal(valueFunction(this.displayResult[i].data), i);
+								}
+							}
+						}
+						if (!this.isRemoteMode(this.config.save.mode) || data.length === 0) {
+							this.saveFinish();
+						} else if (this.isRemoteMode(this.config.save.mode) && !this.config.save.batch) {
+							this.saveRemote(data);
+						} else if (this.isRemoteMode(this.config.save.mode) && this.config.save.batch) {
+							this.saveBatchRemote(data);
+						}
+					}
                 } else {
                     //console.log("save is not active !");
                 }
@@ -1457,6 +1465,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         this.addData(this.config.save.newData);
                     }
                     this.config.save.newData = [];
+					this.config.save.enableValidation = false;                    
                     this.setSpinner(false);
                 }
 
@@ -2842,15 +2851,23 @@ directive("udtCell", function(){
 								userDirectives = userDirectives();
 							}
 						}
+						var requiredDirective = "";
+						if(col.required != undefined && !header && (angular.isFunction(col.required) && col.required()) 
+	    						|| (!angular.isFunction(col.required) && col.required)){
+							requiredDirective = "name='"+col.id+"' ng-required=true";
+						}else{
+							requiredDirective = "name='"+col.id+"' ";
+						}
+						
 						if(col.editTemplate){
-							editElement = col.editTemplate.replace("#ng-model", 'ng-model="'+this.getEditProperty(col, header, filter)+ngChange);														
+							editElement = col.editTemplate.replace("#ng-model", 'ng-model="'+this.getEditProperty(col, header, filter)+ngChange+' '+requiredDirective);														
 						}else if(col.type === "boolean"){
 	    					editElement = '<input class="form-control"' +defaultValueDirective+'type="checkbox" class="input-small" ng-model="'+this.getEditProperty(col, header, filter)+ngChange+'/>';	    					
 	    				}else if (col.type === "textarea") {
                             editElement = '<textarea class="form-control"' + defaultValueDirective + userDirectives + 'ng-model="' + this.getEditProperty(col, header, filter) + ngChange + '></textarea>';
-                        }else if(col.type === "img"){
+	    				}else if(col.type === "img"){
 	    					editElement=
-	    						'<input type="file" class="form-control" udt-base64-img ng-model="'+this.getEditProperty(col, header, filter)+'" id="{{\''+col.id+'_\'+value.line.id}}" ng-if="'+this.getEditProperty(col, header, filter)+' === undefined" />'
+	    						'<input type="file" class="form-control" udt-base64-img ng-model="'+this.getEditProperty(col, header, filter)+'" id="{{\''+col.id+'_\'+value.line.id}}" '+requiredDirective+' ng-if="'+this.getEditProperty(col, header, filter)+' === undefined" />'
 	    						+'<div  ng-click="udtTableFunctions.setImage('+this.getEditProperty(col, header, filter)+'.value,'
 	                        	+this.getEditProperty(col, header, filter)+'.fullname,'
 	                        	+this.getEditProperty(col, header, filter)+'.width,'
@@ -2872,7 +2889,7 @@ directive("udtCell", function(){
 	    				}
 	    				else if(col.type === "file"){
 	    					editElement=
-	    						'<input ng-if="'+this.getEditProperty(col, header, filter)+' === undefined"  type="file" class="form-control" udt-base64-file ng-model="'+this.getEditProperty(col, header, filter)+'" id="{{\''+col.id+'_\'+value.line.id}} />'
+	    						'<input ng-if="'+this.getEditProperty(col, header, filter)+' === undefined"  type="file" class="form-control" udt-base64-file ng-model="'+this.getEditProperty(col, header, filter)+'" id="{{\''+col.id+'_\'+value.line.id}} '+requiredDirective+' />'
 	    						+'<div ng-if="'+this.getEditProperty(col, header, filter)+' !== undefined" >'
                                 +'<a target="_blank" ng-href="data:application/{{'+this.getEditProperty(col, header, filter)+'.extension}};base64,{{'+this.getEditProperty(col, header, filter)+'.value}}">'
                                 +'{{'+this.getEditProperty(col, header, filter)+'.fullname}}'
@@ -2886,7 +2903,7 @@ directive("udtCell", function(){
 	    					}
 	    				}else if(!col.choiceInList){
 							//TODO: type='text' because html5 autoformat return a string before that we can format the number ourself
-	    					editElement = '<input class="form-control" '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+this.getDateTimestamp(col.type)+'/>';
+	    					editElement = '<input class="form-control" '+requiredDirective+' '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+this.getDateTimestamp(col.type)+'/>';
 	    				}else if(col.choiceInList){
 	    					switch (col.listStyle) {
 	    						case "radio":
@@ -2895,19 +2912,19 @@ directive("udtCell", function(){
 	    										   +'</label>';
 									break;
 	    						case "multiselect":
-	    							editElement = '<select class="form-control" multiple="true" '+defaultValueDirective+' ng-options="opt.code '+this.getFormatter(col)+' as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></select>';
+	    							editElement = '<select class="form-control" multiple="true" '+requiredDirective+' '+defaultValueDirective+' ng-options="opt.code '+this.getFormatter(col)+' as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+'></select>';
 		    						break;
 	    						case "bt-select":
-	    							editElement = '<div udt-html-filter="{{col.type}}" class="form-control" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
+	    							editElement = '<div udt-html-filter="{{col.type}}" class="form-control" udt-btselect '+requiredDirective+' '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+'></div>';
 	    							break;
 								case "bt-select-filter":
-	    							editElement = '<div udt-html-filter="{{col.type}}" class="form-control" filter="true" udt-btselect '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
+	    							editElement = '<div udt-html-filter="{{col.type}}" class="form-control" filter="true" udt-btselect '+requiredDirective+' '+defaultValueDirective+' placeholder="" bt-dropdown-class="dropdown-menu-right" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+'></div>';
 	    							break;
 	    						case "bt-select-multiple":
-	    							editElement = '<div class="form-control" '+defaultValueDirective+' udt-btselect multiple="true" bt-dropdown-class="dropdown-menu-right" placeholder="" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'></div>';
+	    							editElement = '<div class="form-control" '+requiredDirective+' '+defaultValueDirective+' udt-btselect multiple="true" bt-dropdown-class="dropdown-menu-right" placeholder="" bt-options="opt.code as opt.name  '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+'></div>';
 	    							break;
 	    						default:
-	    							editElement = '<select udt-html-filter="{{col.type}}" class="form-control" '+defaultValueDirective+' ng-options="opt.code '+this.getFormatter(col)+' as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+userDirectives+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+'>'
+	    							editElement = '<select udt-html-filter="{{col.type}}" class="form-control" '+requiredDirective+' '+defaultValueDirective+' ng-options="opt.code '+this.getFormatter(col)+' as opt.name '+this.getGroupBy(col)+' for opt in '+this.getOptions(col)+'" '+' ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+'>'
 	    										  + '<option></option>'
 	    										  + '</select>';
 		    						break;
@@ -2915,7 +2932,9 @@ directive("udtCell", function(){
 	    				}else{
 	    					editElement = "Edit Not Defined for col.type !";
 	    				}
-	    				return '<div class="form-group"  ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
+	    				//return '<div class="form-group"  ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
+	    				return '<div class="form-group"  ng-class="udtTableFunctions.getValidationClass(\'subForm\'+value.line.id, col)">'+editElement+'</div>';
+		    			
 	    			};
 
 
@@ -2972,6 +2991,19 @@ directive("udtCell", function(){
 	    				}
 
 	    				return '';
+	    			};
+					
+					scope.udtTableFunctions.getValidationClass = function(formName, col){
+	    				
+	    				if(scope.udtTable.config.save.enableValidation
+	    					&& scope.datatableForm[formName] 
+	    					&& scope.datatableForm[formName][col.id] 
+	    					&& scope.datatableForm[formName][col.id].$invalid){
+	    					return 'has-error';
+	    				}else{
+	    					return undefined;
+	    				}
+	    				    				
 	    			};
   		    	}
     		};
@@ -3431,21 +3463,22 @@ directive('udtTable', function(){
 	    				if(angular.isFunction(col.tdClass)){
 	    					return col.tdClass(data);
 	    				} else if(angular.isString(col.tdClass)){
-	    					//we try to evaluation the string against the scope
 	    					return currentScope.$eval(col.tdClass) || col.tdClass;
 	    				}else{
 	    					return '';
 	    				}
 	    			};
 					scope.udtTableFunctions.getThClass = function(col, currentScope){
+	    				var clazz = '';
 	    				if(angular.isFunction(col.thClass)){
-	    					return col.thClass(col);
+	    					clazz = col.thClass(col);
 	    				} else if(angular.isString(col.thClass)){
 	    					//we try to evaluation the string against the scope
-	    					return currentScope.$eval(col.thClass) || col.thClass;
-	    				}else{
-	    					return '';
+	    					clazz =  currentScope.$eval(col.thClass) || col.thClass;
 	    				}
+	    				if(col.required)clazz = clazz +' required';
+	    				
+	    				return clazz;	    				
 	    			};
 	    			/**
 					 * Select all the table line or just one
@@ -4070,7 +4103,7 @@ run(['$templateCache', function($templateCache) {
    +                '<i class="fa fa-spinner fa-spin fa-5x"></i>'
    +            '</button>'
    +        '</div>'
-   +        '<form class="form-inline">'
+   +        '<form name="datatableForm" class="form-inline">'
    +            '<table class="table table-condensed table-hover table-bordered">'
    +                '<thead>'
    +                    '<tr ng-repeat="(key,headers) in udtTable.getExtraHeaderConfig()">'
@@ -4081,7 +4114,7 @@ run(['$templateCache', function($templateCache) {
    +                    '<tr>'
    +						'<th ng-if="udtTable.isShowLineEditButton()" ng-class="udtTableFunctions.getThClass(column, this)"><!-- Edit button column --></th>'
    +						'<th id="{{column.id}}" ng-repeat="column in udtTable.getColumnsConfig()" ng-model="column" ng-if="!udtTable.isHide(column.id)" ng-class="udtTableFunctions.getThClass(column, this)">'
-   +                            '<span ng-model="udtTable" ng-bind="udtTableFunctions.messages.Messages(column.header)"/>'
+   +                            '<span class="header" ng-model="udtTable" ng-bind="udtTableFunctions.messages.Messages(column.header)"/>'
    +                            '<div class="btn-group pull-right">'
    +                                '<button class="btn btn-xs" ng-click="udtTableFunctions.setEdit(column)"        ng-if="udtTable.isShowButton(\'edit\', column)"  ng-disabled="!udtTable.canEdit()" data-toggle="tooltip" title="{{udtTableFunctions.messages.Messages(\'datatable.button.edit\')}}"><i class="fa fa-edit"></i></button>'
    +                                '<button class="btn btn-xs" ng-click="udtTableFunctions.setOrderColumn(column)" ng-if="udtTable.isShowButton(\'order\', column)" ng-disabled="!udtTable.canOrder()" data-toggle="tooltip" title="{{udtTableFunctions.messages.Messages(\'datatable.button.sort\')}}"><i ng-class="udtTable.getOrderColumnClass(column.id)"></i></button>'
@@ -4102,7 +4135,7 @@ run(['$templateCache', function($templateCache) {
    +                            '<div udt-cell-header/>'
    +                        '</td>'
    +                    '</tr>'
-   +                    '<tr ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.data, value.line)" ng-mouseover="udtTableFunctions.mouseover(value.data, value.line)" ng-mouseleave="udtTableFunctions.mouseleave(value.data, value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
+   +                    '<tr ng-form name="subForm{{value.line.id}}" ng-repeat="value in udtTable.displayResult" ng-click="udtTableFunctions.select(value.data, value.line)" ng-mouseover="udtTableFunctions.mouseover(value.data, value.line)" ng-mouseleave="udtTableFunctions.mouseleave(value.data, value.line)" ng-class="udtTableFunctions.getTrClass(value.data, value.line, this)">'
    +                        '<td ng-if="udtTable.isShowLineEditButton()">'
    +                            '<button class="btn btn-default ng-scope" ng-click="udtTable.setEdit()" ng-show="!udtTable.isEdit(null, value.line)" ng-disabled="!udtTable.canEdit()" data-toggle="tooltip" title="Edit"><i class="fa fa-edit"></i></button>'
    +                            '<button class="btn btn-default ng-scope" ng-click="udtTable.save()" ng-show="udtTable.isEdit(null, value.line)" ng-disabled="!udtTable.canSave()" data-toggle="tooltip" title="Save"><i class="fa fa-save"></i></button>'

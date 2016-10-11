@@ -42,6 +42,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                      "defaultValues":"" //If the value of the column is undefined or "" when the user edit, this value show up
                      "url"://to lazy data
                      "mergeCells":false //to enable merge cell on this column
+					 "required":true/false //to add * on column header if required                     
                      "
                    }*/
                 columnsUrl: undefined, //Load columns config
@@ -125,7 +126,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     start: false, //if save started
                     number: 0, //number of element in progress
                     error: 0,
-                    newData: []
+                    newData: [],
+                    enableValidation:false
                 },
                 remove: {
                     active: false,
@@ -293,7 +295,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     };
 
                     this.totalNumberRecords = _allResult.length;
-                    this.sortAllResult();
+                    //this.sortAllResult();
                     this.computePaginationList();
                     this.computeDisplayResult();
                     var that = this;
@@ -789,13 +791,15 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 							_displayResult = $.extend(true,[],that._getAllResult());
 						}
                         var displayResultTmp = [];
+						var id = 0;
                         angular.forEach(_displayResult, function(value, key) {
                             var line = {
                                 "edit": (that.config.edit.start)?true:undefined,
                                 "selected": undefined,
                                 "trClass": undefined,
                                 "group": false,
-                                "new": false
+                                "new": false,
+                                "id":id++
                             };
                             this.push({
                                 data: value,
@@ -1272,44 +1276,48 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
              * Save the selected table line
              */
             save: function() {
-                if (this.config.save.active) {
-                    this.config.save.number = 0;
-                    this.config.save.error = 0;
-                    this.config.save.start = true;
-                    this.setSpinner(true);
-                    this.config.messages.text = undefined;
-                    this.config.messages.clazz = undefined;
-                    var data = [];
+                if (this.config.save.active && this.displayResult) {
+                	if(this.formController.$invalid){
+                		this.config.save.enableValidation = true;            		
+            		}else{
+						this.config.save.number = 0;
+						this.config.save.error = 0;
+						this.config.save.start = true;
+						this.setSpinner(true);
+						this.config.messages.text = undefined;
+						this.config.messages.clazz = undefined;
+						var data = [];
 
-                    var valueFunction = this.getValueFunction(this.config.save.value);
-                    for (var i = 0; i < this.displayResult.length; i++) {
-                        if (this.displayResult[i].line.edit || this.config.save.withoutEdit) {
-                            //remove datatable properties to avoid this data are retrieve in the json
-                            this.config.save.number++;
-                            this.displayResult[i].line.trClass = undefined;
-                            this.displayResult[i].line.selected = undefined;
-                            this.resetErrors(i);
-                            if (this.isRemoteMode(this.config.save.mode) && !this.config.save.batch) {
-                                //add the url in table to used $q
-                                data.push(this.getSaveRemoteRequest(this.displayResult[i].data, i));
-                            } else if (this.isRemoteMode(this.config.save.mode) && this.config.save.batch) {
-                                //add the data in table to send in once all the result
-                                data.push({
-                                    index: i,
-                                    data: valueFunction(this.displayResult[i].data)
-                                });
-                            } else {
-                                this.saveLocal(valueFunction(this.displayResult[i].data), i);
-                            }
-                        }
-                    }
-                    if (!this.isRemoteMode(this.config.save.mode) || data.length === 0) {
-                        this.saveFinish();
-                    } else if (this.isRemoteMode(this.config.save.mode) && !this.config.save.batch) {
-                        this.saveRemote(data);
-                    } else if (this.isRemoteMode(this.config.save.mode) && this.config.save.batch) {
-                        this.saveBatchRemote(data);
-                    }
+						var valueFunction = this.getValueFunction(this.config.save.value);
+						for (var i = 0; i < this.displayResult.length; i++) {
+							if (this.displayResult[i].line.edit || this.config.save.withoutEdit) {
+								//remove datatable properties to avoid this data are retrieve in the json
+								this.config.save.number++;
+								this.displayResult[i].line.trClass = undefined;
+								this.displayResult[i].line.selected = undefined;
+								this.resetErrors(i);
+								if (this.isRemoteMode(this.config.save.mode) && !this.config.save.batch) {
+									//add the url in table to used $q
+									data.push(this.getSaveRemoteRequest(this.displayResult[i].data, i));
+								} else if (this.isRemoteMode(this.config.save.mode) && this.config.save.batch) {
+									//add the data in table to send in once all the result
+									data.push({
+										index: i,
+										data: valueFunction(this.displayResult[i].data)
+									});
+								} else {
+									this.saveLocal(valueFunction(this.displayResult[i].data), i);
+								}
+							}
+						}
+						if (!this.isRemoteMode(this.config.save.mode) || data.length === 0) {
+							this.saveFinish();
+						} else if (this.isRemoteMode(this.config.save.mode) && !this.config.save.batch) {
+							this.saveRemote(data);
+						} else if (this.isRemoteMode(this.config.save.mode) && this.config.save.batch) {
+							this.saveBatchRemote(data);
+						}
+					}
                 } else {
                     //console.log("save is not active !");
                 }
@@ -1454,6 +1462,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         this.addData(this.config.save.newData);
                     }
                     this.config.save.newData = [];
+					this.config.save.enableValidation = false;                    
                     this.setSpinner(false);
                 }
 
