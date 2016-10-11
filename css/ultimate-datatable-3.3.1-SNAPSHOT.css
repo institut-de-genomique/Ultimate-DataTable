@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.2.1 2015-08-03 
+/*! ultimate-datatable version 3.3.1-SNAPSHOT 2016-10-11 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 .datatable .btn-toolbar .btn,.datatable div[name="udt-toolbar-results"],
@@ -44,11 +44,22 @@
 	margin-bottom: 7px;
 }
 
+.datatable .table>tbody>tr>td,
+.datatable .table>thead>tr>th{
+	overflow-wrap: break-word;
+}
+
+.datatable .table .form-group input.form-control:not([type="checkbox"]) {
+	padding: 3px 3px 3px 3px;
+}
+
 .datatable form .form-group:last-child {
 	margin-bottom: 0px;
 }
 
-
+.datatable .xheader {
+	text-align: center;
+}
 .datatable .form-group input.form-control:not([type="checkbox"]) {
 	width: 100%;
 	margin:0px;
@@ -80,3 +91,19 @@
 	background-color:	rgba(89,186,238,0.4);
 	font-weight:		bold;
 }
+
+.datatable .editParent {
+	/*background-color: #9d8ba7;*/
+	background-color: #d1d7b3;
+}
+
+.datatable .thumbnail {
+	margin-bottom:0px;
+}
+
+
+.datatable .required .header:after {
+  content:" *";
+  color:red;
+}
+
