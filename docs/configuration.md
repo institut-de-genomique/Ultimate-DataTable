@@ -172,6 +172,7 @@ compact:boolean/boolean
 ```json
 "hide":{
 	"active":boolean,//Active or not
+	"byDefault":undefined, //set default column in hide mode
 	"showButton":boolean//Show the hide button in the toolbar
 }
 ```
