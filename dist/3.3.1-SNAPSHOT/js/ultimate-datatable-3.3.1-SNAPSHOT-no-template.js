@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.3.1-SNAPSHOT 2016-10-11 
+/*! ultimate-datatable version 3.3.1-SNAPSHOT 2016-10-12 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -267,7 +267,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 }
             },
             /**
-             * External search réinit pageNumber to 0
+             * External search reinit pageNumber to 0
              */
             search: function(params) {
                 this.config.edit = angular.copy(this.configMaster.edit);
@@ -3476,8 +3476,10 @@ directive('udtTable', function(){
 	    					//we try to evaluation the string against the scope
 	    					clazz =  currentScope.$eval(col.thClass) || col.thClass;
 	    				}
-	    				if(col.required)clazz = clazz +' required';
-	    				
+	    				if(col.required != undefined && (angular.isFunction(col.required) && col.required()) 
+	    						|| (!angular.isFunction(col.required) && col.required)){
+	    					clazz = clazz +' required';
+	    				}
 	    				return clazz;	    				
 	    			};
 	    			/**
@@ -3882,9 +3884,9 @@ factory('udtConvertValueServices', [function() {
 					},
 					//Get the multiplier to convert the value
 					getConversion : function(inputUnit, outputUnit){
-						if((inputUnit === '�g' && outputUnit === 'ng') || (inputUnit === 'ml' && outputUnit === '�l') || (inputUnit === 'pM' && outputUnit === 'nM')){
+						if((inputUnit === '\u00B5g' && outputUnit === 'ng') || (inputUnit === 'ml' && outputUnit === '\u00B5l') || (inputUnit === 'pM' && outputUnit === 'nM')){
 							return (1/1000);
-						}else if((inputUnit === 'ng' && outputUnit === '�g') || (inputUnit === '�l' && outputUnit === 'ml') || (inputUnit === 'nM' && outputUnit === 'pM')){
+						}else if((inputUnit === 'ng' && outputUnit === '\u00B5g') || (inputUnit === '\u00B5l' && outputUnit === 'ml') || (inputUnit === 'nM' && outputUnit === 'pM')){
 							return 1000;
 						}else if ((inputUnit === 'mM' && outputUnit === 'nM')){
 							return 1000000;
@@ -3955,14 +3957,14 @@ factory('udtI18n', [function() {
           },
 				  translateTable : {
 						"fr": {
-							"result":"Résultats",
+							"result":"R\u00e9sultats",
 							"date.format":"dd/MM/yyyy",
 							"datetime.format":"dd/MM/yyyy HH:mm:ss",
-							"datatable.button.selectall":"Tout Sélectionner",
-							"datatable.button.unselectall" :"Tout Délectionner",
+							"datatable.button.selectall":"Tout S\u00e9lectionner",
+							"datatable.button.unselectall" :"Tout D\u00e9lectionner",
 							"datatable.button.cancel":"Annuler",
 							"datatable.button.hide":"Cacher",
-							"datatable.button.show":"Afficher Détails",
+							"datatable.button.show":"Afficher D\u00e9tails",
 							"datatable.button.edit":"Editer",
 							"datatable.button.sort":"Trier",
 							"datatable.button.save":"Sauvegarder",
@@ -3971,11 +3973,11 @@ factory('udtI18n', [function() {
 							"datatable.button.searchLocal":"Rechercher",
 							"datatable.button.resetSearchLocal":"Annuler",
 							"datatable.button.length" : "Taille ({0})",
-							"datatable.totalNumberRecords" : "{0} Résultat(s)",
+							"datatable.totalNumberRecords" : "{0} R\u00e9sultat(s)",
 							"datatable.button.exportCSV" : "Export CSV",
-							"datatable.msg.success.save" : "Toutes les sauvegardes ont réussi.",
+							"datatable.msg.success.save" : "Toutes les sauvegardes ont r\u00e9ussi.",
 							"datatable.msg.error.save" : "Il y a {0} sauvegarde(s) en erreur.",
-							"datatable.msg.success.remove" : "Toutes les suppressions ont réussi.",
+							"datatable.msg.success.remove" : "Toutes les suppressions ont r\u00e9ussi.",
 							"datatable.msg.error.remove":" Il y a {0} suppression(s) en erreur.",
 							"datatable.remove.confirm" : "Pouvez-vous confirmer la suppression ?",
 							"datatable.export.sum" : "(Somme)",
@@ -3984,10 +3986,10 @@ factory('udtI18n', [function() {
 							"datatable.export.countDistinct" :"(Nb. distinct d'occurence)",
 							"datatable.export.yes" : "Oui",
 							"datatable.export.no" : "Non",
-							"datatable.button.group" : "Grouper / Dégrouper",
-							"datatable.button.generalGroup" : "Grouper toute la sélection",
+							"datatable.button.group" : "Grouper / D\u00e9grouper",
+							"datatable.button.generalGroup" : "Grouper toute la s\u00e9lection",
 							"datatable.button.basicExportCSV" : "Exporter toutes les lignes",
-							"datatable.button.groupedExportCSV" : "Exporter les lignes groupées",
+							"datatable.button.groupedExportCSV" : "Exporter les lignes group\u00e9es",
 							"datatable.button.showOnlyGroups" : "Voir uniquement les groupes"
 						},
 						"en": {

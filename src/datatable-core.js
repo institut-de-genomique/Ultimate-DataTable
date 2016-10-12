@@ -264,7 +264,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 }
             },
             /**
-             * External search réinit pageNumber to 0
+             * External search reinit pageNumber to 0
              */
             search: function(params) {
                 this.config.edit = angular.copy(this.configMaster.edit);
