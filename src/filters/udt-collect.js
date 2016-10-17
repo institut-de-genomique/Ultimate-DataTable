@@ -14,7 +14,7 @@ filter('udtCollect', ['$parse',function($parse) {
     	    			if(undefined !== currentValue && null !== currentValue){
     	    				//Array.prototype.push.apply take only arrays
     	    				if(angular.isArray(currentValue)){
-    	    					Array.prototype.push.apply(possibleValues, currentValue);
+    	    					possibleValues = possibleValues.concat(currentValue);
     	    				}else{
     	    					possibleValues.push(currentValue);
     	    				}
