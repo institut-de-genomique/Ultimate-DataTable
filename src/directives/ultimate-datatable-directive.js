@@ -12,8 +12,8 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
   		    		if(!attr.ultimateDatatable) return;
   		    		
   		    		scope.$watch(attr.ultimateDatatable, function(newValue, oldValue) {
-  		    			if(newValue && (newValue !== oldValue || !scope.udtTable)){
-  		    				scope.udtTable = $parse(attr.ultimateDatatable)(scope);
+  		    			if(newValue && newValue !== oldValue){
+  		    				scope.udtTable = newValue;
   		    			}
 		            });
   		    		

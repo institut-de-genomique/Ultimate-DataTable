@@ -10,6 +10,13 @@ directive('udtTable', function(){
 					if(scope.udtTable && scope["datatableForm"]){
   		    			scope.udtTable.formController = scope["datatableForm"];
   		    		}
+					
+					scope.$watch("udtTable", function(newValue, oldValue) {
+  		    			if(newValue && newValue !== oldValue && scope["datatableForm"]){
+  		    				scope.udtTable.formController = scope["datatableForm"];
+  		    			}
+		            });
+					
   		    		scope.udtTableFunctions.setImage = function(imageData, imageName, imageFullSizeWidth, imageFullSizeHeight) {
   		    			scope.udtModalImage = {};
   		    			scope.udtModalImage.modalImage = imageData;

@@ -28,8 +28,8 @@ directive("udtCell", function(){
 							}
 						}
 						var requiredDirective = "";
-						if(col.required != undefined && !header && (angular.isFunction(col.required) && col.required()) 
-	    						|| (!angular.isFunction(col.required) && col.required)){
+						if(col.required != undefined && !header && ((angular.isFunction(col.required) && col.required()) 
+	    						|| (!angular.isFunction(col.required) && col.required))){
 							requiredDirective = "name='"+col.id+"' ng-required=true";
 						}else{
 							requiredDirective = "name='"+col.id+"' ";
@@ -109,7 +109,7 @@ directive("udtCell", function(){
 	    					editElement = "Edit Not Defined for col.type !";
 	    				}
 	    				//return '<div class="form-group"  ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
-	    				return '<div class="form-group"  ng-class="udtTableFunctions.getValidationClass(\'subForm\'+value.line.id, col)">'+editElement+'</div>';
+	    				return '<div class="form-group"  ng-class="udtTableFunctions.getValidationClass(\'subForm\'+value.line.id, col)">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
 		    			
 	    			};
 
