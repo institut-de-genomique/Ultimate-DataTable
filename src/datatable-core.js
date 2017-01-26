@@ -436,10 +436,16 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (this.config.group.active && this.config.group.by) {
                     var propertyGroupGetter = this.config.group.by.property;
                     propertyGroupGetter += this.getFilter(this.config.group.by);
-                    var groupGetter = $parse(propertyGroupGetter);
+                    if(this.config.group.by=="all"){
+                    	propertyGroupGetter="all";
+                    }					
+					var groupGetter = $parse(propertyGroupGetter);
                    
                     var groupValues = this.allResult.reduce(function(array, value) {
-                        var groupValue = groupGetter(value).toString();
+                        var groupValue = "all";
+                    	if(propertyGroupGetter !== "all"){
+                    		groupValue = groupGetter(value).toString();
+                    	}
                         if (!array[groupValue]) {
                             array[groupValue] = [];
                         }
@@ -605,12 +611,16 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 var displayResult = [];
                 var propertyGroupGetter = this.config.group.by.property;
                 propertyGroupGetter += this.getFilter(this.config.group.by);
+				if(this.config.group.by=="all"){
+                	propertyGroupGetter = "all";
+                }
                 var groupGetter = $parse(propertyGroupGetter);
                 var groupConfig = this.config.group;
                 displayResultTmp.forEach(function(element, index, array) {
                     /* previous mode */
-                    if (!groupConfig.after && (index === 0 || groupGetter(element.data).toString() !== groupGetter(array[index - 1].data).toString())) {
-                        var line = {
+                    if (!groupConfig.after && (index === 0 || 
+                    		(propertyGroupGetter!=="all" && groupGetter(element.data).toString() !== groupGetter(array[index - 1].data).toString()))) {
+                         var line = {
                             edit: undefined,
                             selected: undefined,
                             trClass: undefined,
@@ -618,14 +628,15 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             "new": false
                         };
                         this.push({
-                            data: groupConfig.data[groupGetter(element.data).toString()],
+                            data: propertyGroupGetter!=="all" ? groupConfig.data[groupGetter(element.data).toString()]:groupConfig.data["all"],
                             line: line
                         });
                     }
                     this.push(element);
 
                     /* after mode */
-                    if (groupConfig.after && (index === (array.length - 1) || groupGetter(element.data).toString() !== groupGetter(array[index + 1].data).toString())) {
+                    if (groupConfig.after && (index === (array.length - 1) || 
+                    		(propertyGroupGetter!=="all" && groupGetter(element.data).toString() !== groupGetter(array[index + 1].data).toString()))) {
                         var line = {
                             "edit": undefined,
                             "selected": undefined,
@@ -634,7 +645,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             "new": false
                         };
                         this.push({
-                            data: groupConfig.data[groupGetter(element.data).toString()],
+                            data: propertyGroupGetter!=="all" ? groupConfig.data[groupGetter(element.data).toString()]:groupConfig.data["all"],
                             line: line
                         });
                     };
