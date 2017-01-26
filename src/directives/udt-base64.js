@@ -75,6 +75,9 @@ angular.module('ultimateDataTableServices')
 	    			  reader.readAsDataURL(elem[0].files[0]);				    			  		    	 
 		    	  }				    	  
 		      });
+			  elem.on('click', function() {
+    			  elem[0].value=null;
+    		  });
 		 }
 		};
 		}]).directive('udtBase64File', [function () {
@@ -146,7 +149,9 @@ angular.module('ultimateDataTableServices')
 	    			  reader.readAsDataURL(elem[0].files[0]);				    			  		    	 
 		    	  }				    	  
 		      });
-		      
+		      elem.on('click', function() {
+    			  elem[0].value=null;
+    		  });
 		      
 		 }
 		};
