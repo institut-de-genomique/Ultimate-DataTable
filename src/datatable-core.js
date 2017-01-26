@@ -1277,7 +1277,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
              * @param updateColumnName : column name
              */
             updateColumn: function(columnPropertyName, columnId) {
-                if (this.config.edit.active) {
+                if (this.config.edit.active && this.config.edit.columns[columnId].value !== undefined) {
                     var getter = $parse(columnPropertyName);
                     for (var i = 0; i < this.displayResult.length; i++) {
                         if (this.displayResult[i].line.edit) {
