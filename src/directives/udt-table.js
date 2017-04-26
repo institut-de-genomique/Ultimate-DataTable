@@ -57,9 +57,9 @@ directive('udtTable', function(){
 	    			};
 					scope.udtTableFunctions.getThClass = function(col, currentScope){
 	    				var clazz = '';
-	    				if(angular.isFunction(col.thClass)){
+	    				if(col && angular.isFunction(col.thClass)){
 	    					clazz = col.thClass(col);
-	    				} else if(angular.isString(col.thClass)){
+	    				} else if(col && angular.isString(col.thClass)){
 	    					//we try to evaluation the string against the scope
 	    					clazz =  currentScope.$eval(col.thClass) || col.thClass;
 	    				}
