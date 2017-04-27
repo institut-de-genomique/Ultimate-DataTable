@@ -321,8 +321,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         $http.get(url(), {
                             params: this.getParams(params),
                             datatable: this
-                        }).success(function(data, status, headers, config) {
-                            config.datatable._setData(data.data, data.recordsNumber);
+                        }).then(function(resp) {
+                            resp.config.datatable._setData(resp.data.data, resp.data.recordsNumber);
                             that.computeDisplayResultTimeOut.then(function() {
                                 that.setSpinner(false);
                             });
@@ -1404,11 +1404,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         var valueFunction = this.getValueFunction(this.config.save.value);
                         httpConfig.index = i;
                         return $http[method](urlFunction(value), valueFunction(value), httpConfig).
-                        success(function(data, status, headers, config) {
-                            config.datatable.saveRemoteOneElement(status, data, config.index);
-                        }).
-                        error(function(data, status, headers, config) {
-                            config.datatable.saveRemoteOneElement(status, data, config.index);
+                        then(function(resp) {
+                            resp.config.datatable.saveRemoteOneElement(resp.status, resp.data, resp.config.index);
+                            return resp;
+                        }, function(resp) {
+                            resp.config.datatable.saveRemoteOneElement(resp.status, resp.data, resp.config.index);
+                            return resp;
                         });
 
                     }
@@ -1564,16 +1565,17 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             index: i,
                             value: value
                         })
-                        .success(function(data, status, headers, config) {
-                            config.datatable.config.remove.ids.success.push(config.index);
-                            config.datatable.config.remove.number--;
-                            config.datatable.removeFinish();
-                        })
-                        .error(function(data, status, headers, config) {
-                            config.datatable.config.remove.ids.errors.push(config.value);
-                            config.datatable.config.remove.error++;
-                            config.datatable.config.remove.number--;
-                            config.datatable.removeFinish();
+                        .then(function(resp) {
+                            resp.config.datatable.config.remove.ids.success.push(resp.config.index);
+                            resp.config.datatable.config.remove.number--;
+                            resp.config.datatable.removeFinish();
+                            return resp;
+                        }, function(resp) {
+                            resp.config.datatable.config.remove.ids.errors.push(resp.config.value);
+                            resp.config.datatable.config.remove.error++;
+                            resp.config.datatable.config.remove.number--;
+                            resp.config.datatable.removeFinish();
+                            return resp;
                         });
                 } else {
                     throw 'no url define for save !';
@@ -1992,8 +1994,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             setColumnsConfigWithUrl: function() {
                 $http.get(this.config.columnsUrl, {
                     datatable: this
-                }).success(function(data, status, headers, config) {
-                    config.datatable.setColumnsConfig(data);
+                }).then(function(resp) {
+                    resp.config.datatable.setColumnsConfig(resp.data);
+                    return resp;
                 });
             },
             getColumnsConfig: function() {
