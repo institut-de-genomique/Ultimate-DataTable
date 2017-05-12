@@ -36,7 +36,7 @@ directive("udtCell", function(){
 						}
 						
 						if(col.editTemplate){
-							editElement = col.editTemplate.replace("#ng-model", 'ng-model="'+this.getEditProperty(col, header, filter)+ngChange+' '+requiredDirective);														
+							editElement = col.editTemplate.replace(/#ng-model/g, 'ng-model="'+this.getEditProperty(col, header, filter)+ngChange+' '+requiredDirective);														
 						}else if(col.type === "boolean"){
 	    					editElement = '<input class="form-control"' +defaultValueDirective+'type="checkbox" class="input-small" ng-model="'+this.getEditProperty(col, header, filter)+ngChange+'/>';	    					
 	    				}else if (col.type === "textarea") {
