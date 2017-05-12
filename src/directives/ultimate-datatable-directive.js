@@ -12,7 +12,7 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
   		    		if(!attr.ultimateDatatable) return;
   		    		
   		    		scope.$watch(attr.ultimateDatatable, function(newValue, oldValue) {
-  		    			if(newValue && newValue !== oldValue){
+  		    			if(newValue && (newValue !== oldValue || !scope.udtTable)){
   		    				scope.udtTable = newValue;
   		    			}
 		            });
@@ -36,8 +36,8 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 			    	
 			    	scope.udtTableFunctions.cancel = function(){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.cancel()}).then(function(){
-		    				scope.udtTable.computeDisplayResultTimeOut.then(function(){
+		    			$timeout(function(){scope.udtTable.cancel()}).finally(function(){
+		    				scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 								scope.udtTable.setSpinner(false); 
 							});	   		    				
 		    			});
@@ -47,9 +47,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 			    	
 		    		scope.udtTableFunctions.setNumberRecordsPerPage = function(elt){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setNumberRecordsPerPage(elt)}).then(function(){
+		    			$timeout(function(){scope.udtTable.setNumberRecordsPerPage(elt)}).finally(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.pagination.mode)){
-		    					scope.udtTable.computeDisplayResultTimeOut.then(function(){
+		    					scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 									scope.udtTable.setSpinner(false); 
 								});	    				
 		    				}
@@ -60,9 +60,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		
 		    		scope.udtTableFunctions.setPageNumber = function(page){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setPageNumber(page)}).then(function(){
+		    			$timeout(function(){scope.udtTable.setPageNumber(page)}).finally(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.pagination.mode)){
-								scope.udtTable.computeDisplayResultTimeOut.then(function(){
+								scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 									scope.udtTable.setSpinner(false); 
 								});									
 		    				}	    				
@@ -71,16 +71,16 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		
 		    		scope.udtTableFunctions.setEdit = function(column){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setEdit(column)}).then(function(){
+		    			$timeout(function(){scope.udtTable.setEdit(column)}).finally(function(){
 		    				scope.udtTable.setSpinner(false);  		    				
 		    			});		    			
 		    		};
 		    		
 		    		scope.udtTableFunctions.setOrderColumn = function(column){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setOrderColumn(column)}).then(function(){
+		    			$timeout(function(){scope.udtTable.setOrderColumn(column)}).finally(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.order.mode)){
-								scope.udtTable.computeDisplayResultTimeOut.then(function(){
+								scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 									scope.udtTable.setSpinner(false);  		    			
 								});								
 		    				} 		    				
@@ -90,15 +90,15 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		
 		    		scope.udtTableFunctions.setHideColumn = function(column){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setHideColumn(column)}).then(function(){
+		    			$timeout(function(){scope.udtTable.setHideColumn(column)}).finally(function(){
 		    				scope.udtTable.setSpinner(false);  		    				
 		    			});
 		    		};
 		    		
 		    		scope.udtTableFunctions.setGroupColumn = function(column){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setGroupColumn(column)}).then(function(){
-							scope.udtTable.computeDisplayResultTimeOut.then(function(){
+		    			$timeout(function(){scope.udtTable.setGroupColumn(column)}).finally(function(){
+							scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 								scope.udtTable.setSpinner(false);
 							});  		    				
 		    			});
@@ -107,15 +107,15 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		
 		    		scope.udtTableFunctions.exportCSV = function(exportType){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.exportCSV(exportType)}).then(function(){
+		    			$timeout(function(){scope.udtTable.exportCSV(exportType)}).finally(function(){
 		    				scope.udtTable.setSpinner(false);  		    				
 		    			});
 		    		};
 		    		
 		    		scope.udtTableFunctions.updateShowOnlyGroups = function(){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.updateShowOnlyGroups()}).then(function(){
-							scope.udtTable.computeDisplayResultTimeOut.then(function(){
+		    			$timeout(function(){scope.udtTable.updateShowOnlyGroups()}).finally(function(){
+							scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 								scope.udtTable.setSpinner(false); 
 							});									
 		    			});
