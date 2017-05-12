@@ -1,7 +1,8 @@
 "use strict";
 
 angular.module('ultimateDataTableServices', []).
-factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', '$timeout', function($http, $filter, $parse, $window, $q, udtI18n, $timeout) { //service to manage datatable
+factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', '$timeout', '$anchorScroll', '$location',
+		function($http, $filter, $parse, $window, $q, udtI18n, $timeout, $anchorScroll, $location) { //service to manage datatable
     var constructor = function(iConfig) {
         var datatable = {
             configDefault: {
@@ -67,7 +68,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     numberPageListMax: 3,
                     pageList: [],
                     numberRecordsPerPage: 10,
-                    numberRecordsPerPageList: undefined
+                    numberRecordsPerPageList: undefined,
+                    bottom:true,
+                    numberRecordsPerPageForBottomdisplay:50
                 },
                 order: {
                     active: true,
@@ -235,7 +238,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     active: false
                 }
             },
-            messages: udtI18n(navigator.language || navigator.userLanguage), //i18n intern service instance
+            messages: udtI18n(navigator.languages || navigator.language || navigator.userLanguage), //i18n intern service instance
             //errors functions
             /**
              * Reset all the errors for a line
@@ -1760,10 +1763,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             isShowToolbar: function() {
                 return (this.isShowToolbarButtons() || this.isShowToolbarPagination() || this.isShowToolbarResults());
             },
-
+			isShowToolbarBottom: function() {
+                return (this.isShowToolbarPagination() && this.config.pagination.bottom && this.config.pagination.numberRecordsPerPage >= this.config.pagination.numberRecordsPerPageForBottomdisplay);
+            },
             isShowToolbarButtons: function() {
                 return (this.isShowCRUDButtons() || this.isShowHideButtons() || this.isShowAddButtons() || this.isShowShowButtons() || this.isShowExportCSVButton() || this.isShowOtherButtons());
-            },
+            },			
             isShowCRUDButtons: function() {
                 return ((this.config.edit.active && this.config.edit.showButton) || (this.config.save.active && this.config.save.showButton) || (this.config.remove.active && this.config.remove.showButton));
             },
@@ -1796,7 +1801,19 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             isEmpty: function() {
                 return (this.allResult === undefined || this.allResult === null || this.allResult.length === 0);
             },
-
+			
+			goToAnchor : function(hash){
+            	$anchorScroll.yOffset = 50;
+            	if ($location.hash() !== hash) {
+                    // set the $location.hash to `newHash` and
+                    // $anchorScroll will automatically scroll to it
+                    $location.hash(hash);
+                  } else {
+                    // call $anchorScroll() explicitly,
+                    // since $location.hash hasn't changed
+                    $anchorScroll();
+                  }
+            },
             /**
              * Function to show (or not) the "CSV Export" button
              */

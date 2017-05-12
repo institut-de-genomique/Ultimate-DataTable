@@ -5,9 +5,11 @@ run(['$templateCache', function($templateCache) {
   $templateCache.put('ultimate-datatable.html',
     '<div name="datatable" class="datatable" ng-if="udtTable">'
    +    '<div ng-transclude/>'
+   +	'<div id="udt-top-{{udtTable.config.name}}"/>'
    +    '<div udt-toolbar ng-if="udtTable.isShowToolbar()"/>'
    +    '<div udt-messages ng-if="udtTable.config.messages.active"/>'
    +    '<div udt-table/>'
+   +    '<div udt-toolbar-bottom ng-show="udtTable.isShowToolbarBottom()"/>'
    +'</div>');
 }])
 .run(['$templateCache', function($templateCache) {
@@ -297,4 +299,23 @@ run(['$templateCache', function($templateCache) {
    +        '</div>'
    +    '</div>'
    +'</div>');
+}]).run(['$templateCache', function($templateCache) {
+	  $templateCache.put('udt-toolbar-bottom.html',
+			    '<div name="udt-toolbar-bottom" class="row margin-bottom-3">'
+			   +    '<div class="col-md-12 col-lg-12">'
+			   +        '<div class="btn-toolbar pull-right" name="udt-toolbar-pagination" ng-if="udtTable.isShowToolbarPagination()">'
+			   +            '<div class="btn-group" ng-if="udtTable.isShowPagination()">'
+			   +                '<ul class="pagination">'
+			   +                    '<li ng-repeat="page in udtTable.config.pagination.pageList" ng-class="page.clazz">'
+			   +                        '<a href="" ng-click="udtTableFunctions.setPageNumber(page);" ng-bind="page.label"></a>'
+			   +                    '</li>'
+			   +                '</ul>'
+			   +            '</div>'
+			   +			'<button class="btn btn-default" ng-click="udtTable.goToAnchor(\'udt-top-\'+udtTable.config.name)" title="{{udtTableFunctions.messages.Messages(\'datatable.button.top\')}}">'
+			   +                        '<i class="fa fa-chevron-up"></i>'
+			   +                        '<span ng-if="!udtTable.isCompactMode()"> {{udtTableFunctions.messages.Messages(\'datatable.button.show\')}} </span>'
+			   +             '</button>'
+			   +        '</div>'
+			   +    '</div>'
+			   +'</div>');
 }]);

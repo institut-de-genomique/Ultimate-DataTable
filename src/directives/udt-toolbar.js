@@ -8,4 +8,14 @@ directive('udtToolbar', function(){
   		    	link: function(scope, element, attr) {
   		    	}
     		};
-    	});
+    	})
+.directive('udtToolbarBottom', function(){ 
+    		return {
+    			restrict: 'A',
+  		    	replace:true,
+  		    	templateUrl:'udt-toolbar-bottom.html'		    		
+  		    		,
+  		    	link: function(scope, element, attr) {
+  		    	}
+    		};
+		});

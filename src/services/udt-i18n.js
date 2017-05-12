@@ -78,7 +78,8 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup" : "Grouper toute la s\u00e9lection",
 							"datatable.button.basicExportCSV" : "Exporter toutes les lignes",
 							"datatable.button.groupedExportCSV" : "Exporter les lignes group\u00e9es",
-							"datatable.button.showOnlyGroups" : "Voir uniquement les groupes"
+							"datatable.button.showOnlyGroups" : "Voir uniquement les groupes",
+							"datatable.button.top" : "Aller au d\u00e9but du tableau"
 						},
 						"en": {
 							"result":"Results",
@@ -114,7 +115,8 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup" : "Group All selected lines",
 							"datatable.button.basicExportCSV" : "Export all lines",
 							"datatable.button.groupedExportCSV" : "Export only grouped lines",
-							"datatable.button.showOnlyGroups" : "See only group"
+							"datatable.button.showOnlyGroups" : "See only group",
+							"datatable.button.top" : "Go to the top"
 						},
 						"nl": {
 							"result": "Resultaten",
@@ -150,7 +152,8 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup": "Groepeer alle geselecteerde regels",
 							"datatable.button.basicExportCSV": "Exporteer alle regels",
 							"datatable.button.groupedExportCSV": "Exporteer alleen de gegroepeerde regels",
-							"datatable.button.showOnlyGroups": "Toon alleen de groep"
+							"datatable.button.showOnlyGroups": "Toon alleen de groep",
+							"datatable.button.top" : "Ga naar de top"
 						}
 					},
 
