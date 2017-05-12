@@ -1264,7 +1264,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     } else if (line) {
                         isEdit = line.edit && this.config.edit.all;
                     } else {
-                        isEdit = (this.config.edit.columnMode && this.config.edit.start);
+                    	var nbEditableColumns = $filter('filter')(this.config.columns, {"edit":true}).length;                     	
+                        isEdit = (this.config.edit.columnMode && this.config.edit.start && nbEditableColumns > 0);
                     }
                 }
                 return isEdit;
