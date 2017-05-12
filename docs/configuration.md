@@ -139,7 +139,9 @@ The server have to respond with data in JSON:
 	"numberPageListMax":3,
 	"numberRecordsPerPage":10,//Number of item in a page
 	//The list of the possible option given to the user
-	"numberRecordsPerPageList": [{number:10, clazz:''},{number:25, clazz:''},...]
+	"numberRecordsPerPageList": [{number:10, clazz:''},{number:25, clazz:''},...],
+    "bottom":true, //Display pagination toolbar on udt bottom
+    "numberRecordsPerPageForBottomdisplay":50 //Number of elements that bottom toolbar is displaying
 }
 ```
 ## Order
