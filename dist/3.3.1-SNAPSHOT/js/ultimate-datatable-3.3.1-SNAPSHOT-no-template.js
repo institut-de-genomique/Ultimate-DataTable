@@ -1,10 +1,11 @@
-/*! ultimate-datatable version 3.3.1-SNAPSHOT 2016-10-17 
+/*! ultimate-datatable version 3.3.1-SNAPSHOT 2017-05-12 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
 
 angular.module('ultimateDataTableServices', []).
-factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', '$timeout', function($http, $filter, $parse, $window, $q, udtI18n, $timeout) { //service to manage datatable
+factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', '$timeout', '$anchorScroll', '$location',
+		function($http, $filter, $parse, $window, $q, udtI18n, $timeout, $anchorScroll, $location) { //service to manage datatable
     var constructor = function(iConfig) {
         var datatable = {
             configDefault: {
@@ -70,7 +71,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     numberPageListMax: 3,
                     pageList: [],
                     numberRecordsPerPage: 10,
-                    numberRecordsPerPageList: undefined
+                    numberRecordsPerPageList: undefined,
+                    bottom:true,
+                    numberRecordsPerPageForBottomdisplay:50
                 },
                 order: {
                     active: true,
@@ -238,7 +241,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     active: false
                 }
             },
-            messages: udtI18n(navigator.language || navigator.userLanguage), //i18n intern service instance
+            messages: udtI18n(navigator.languages || navigator.language || navigator.userLanguage), //i18n intern service instance
             //errors functions
             /**
              * Reset all the errors for a line
@@ -324,8 +327,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         $http.get(url(), {
                             params: this.getParams(params),
                             datatable: this
-                        }).success(function(data, status, headers, config) {
-                            config.datatable._setData(data.data, data.recordsNumber);
+                        }).then(function(resp) {
+                            resp.config.datatable._setData(resp.data.data, resp.data.recordsNumber);
                             that.computeDisplayResultTimeOut.then(function() {
                                 that.setSpinner(false);
                             });
@@ -439,10 +442,16 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (this.config.group.active && this.config.group.by) {
                     var propertyGroupGetter = this.config.group.by.property;
                     propertyGroupGetter += this.getFilter(this.config.group.by);
-                    var groupGetter = $parse(propertyGroupGetter);
+                    if(this.config.group.by=="all"){
+                    	propertyGroupGetter="all";
+                    }					
+					var groupGetter = $parse(propertyGroupGetter);
                    
                     var groupValues = this.allResult.reduce(function(array, value) {
-                        var groupValue = groupGetter(value).toString();
+                        var groupValue = "all";
+                    	if(propertyGroupGetter !== "all"){
+                    		groupValue = groupGetter(value).toString();
+                    	}
                         if (!array[groupValue]) {
                             array[groupValue] = [];
                         }
@@ -608,12 +617,16 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 var displayResult = [];
                 var propertyGroupGetter = this.config.group.by.property;
                 propertyGroupGetter += this.getFilter(this.config.group.by);
+				if(this.config.group.by=="all"){
+                	propertyGroupGetter = "all";
+                }
                 var groupGetter = $parse(propertyGroupGetter);
                 var groupConfig = this.config.group;
                 displayResultTmp.forEach(function(element, index, array) {
                     /* previous mode */
-                    if (!groupConfig.after && (index === 0 || groupGetter(element.data).toString() !== groupGetter(array[index - 1].data).toString())) {
-                        var line = {
+                    if (!groupConfig.after && (index === 0 || 
+                    		(propertyGroupGetter!=="all" && groupGetter(element.data).toString() !== groupGetter(array[index - 1].data).toString()))) {
+                         var line = {
                             edit: undefined,
                             selected: undefined,
                             trClass: undefined,
@@ -621,14 +634,15 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             "new": false
                         };
                         this.push({
-                            data: groupConfig.data[groupGetter(element.data).toString()],
+                            data: propertyGroupGetter!=="all" ? groupConfig.data[groupGetter(element.data).toString()]:groupConfig.data["all"],
                             line: line
                         });
                     }
                     this.push(element);
 
                     /* after mode */
-                    if (groupConfig.after && (index === (array.length - 1) || groupGetter(element.data).toString() !== groupGetter(array[index + 1].data).toString())) {
+                    if (groupConfig.after && (index === (array.length - 1) || 
+                    		(propertyGroupGetter!=="all" && groupGetter(element.data).toString() !== groupGetter(array[index + 1].data).toString()))) {
                         var line = {
                             "edit": undefined,
                             "selected": undefined,
@@ -637,7 +651,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             "new": false
                         };
                         this.push({
-                            data: groupConfig.data[groupGetter(element.data).toString()],
+                            data: propertyGroupGetter!=="all" ? groupConfig.data[groupGetter(element.data).toString()]:groupConfig.data["all"],
                             line: line
                         });
                     };
@@ -1253,7 +1267,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     } else if (line) {
                         isEdit = line.edit && this.config.edit.all;
                     } else {
-                        isEdit = (this.config.edit.columnMode && this.config.edit.start);
+                    	var nbEditableColumns = $filter('filter')(this.config.columns, {"edit":true}).length;                     	
+                        isEdit = (this.config.edit.columnMode && this.config.edit.start && nbEditableColumns > 0);
                     }
                 }
                 return isEdit;
@@ -1269,7 +1284,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
              * @param updateColumnName : column name
              */
             updateColumn: function(columnPropertyName, columnId) {
-                if (this.config.edit.active) {
+                if (this.config.edit.active && this.config.edit.columns[columnId].value !== undefined) {
                     var getter = $parse(columnPropertyName);
                     for (var i = 0; i < this.displayResult.length; i++) {
                         if (this.displayResult[i].line.edit) {
@@ -1396,11 +1411,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         var valueFunction = this.getValueFunction(this.config.save.value);
                         httpConfig.index = i;
                         return $http[method](urlFunction(value), valueFunction(value), httpConfig).
-                        success(function(data, status, headers, config) {
-                            config.datatable.saveRemoteOneElement(status, data, config.index);
-                        }).
-                        error(function(data, status, headers, config) {
-                            config.datatable.saveRemoteOneElement(status, data, config.index);
+                        then(function(resp) {
+                            resp.config.datatable.saveRemoteOneElement(resp.status, resp.data, resp.config.index);
+                            return resp;
+                        }, function(resp) {
+                            resp.config.datatable.saveRemoteOneElement(resp.status, resp.data, resp.config.index);
+                            return resp;
                         });
 
                     }
@@ -1556,16 +1572,17 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             index: i,
                             value: value
                         })
-                        .success(function(data, status, headers, config) {
-                            config.datatable.config.remove.ids.success.push(config.index);
-                            config.datatable.config.remove.number--;
-                            config.datatable.removeFinish();
-                        })
-                        .error(function(data, status, headers, config) {
-                            config.datatable.config.remove.ids.errors.push(config.value);
-                            config.datatable.config.remove.error++;
-                            config.datatable.config.remove.number--;
-                            config.datatable.removeFinish();
+                        .then(function(resp) {
+                            resp.config.datatable.config.remove.ids.success.push(resp.config.index);
+                            resp.config.datatable.config.remove.number--;
+                            resp.config.datatable.removeFinish();
+                            return resp;
+                        }, function(resp) {
+                            resp.config.datatable.config.remove.ids.errors.push(resp.config.value);
+                            resp.config.datatable.config.remove.error++;
+                            resp.config.datatable.config.remove.number--;
+                            resp.config.datatable.removeFinish();
+                            return resp;
                         });
                 } else {
                     throw 'no url define for save !';
@@ -1750,10 +1767,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             isShowToolbar: function() {
                 return (this.isShowToolbarButtons() || this.isShowToolbarPagination() || this.isShowToolbarResults());
             },
-
+			isShowToolbarBottom: function() {
+                return (this.isShowToolbarPagination() && this.config.pagination.bottom && this.config.pagination.numberRecordsPerPage >= this.config.pagination.numberRecordsPerPageForBottomdisplay);
+            },
             isShowToolbarButtons: function() {
                 return (this.isShowCRUDButtons() || this.isShowHideButtons() || this.isShowAddButtons() || this.isShowShowButtons() || this.isShowExportCSVButton() || this.isShowOtherButtons());
-            },
+            },			
             isShowCRUDButtons: function() {
                 return ((this.config.edit.active && this.config.edit.showButton) || (this.config.save.active && this.config.save.showButton) || (this.config.remove.active && this.config.remove.showButton));
             },
@@ -1786,7 +1805,19 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             isEmpty: function() {
                 return (this.allResult === undefined || this.allResult === null || this.allResult.length === 0);
             },
-
+			
+			goToAnchor : function(hash){
+            	$anchorScroll.yOffset = 50;
+            	if ($location.hash() !== hash) {
+                    // set the $location.hash to `newHash` and
+                    // $anchorScroll will automatically scroll to it
+                    $location.hash(hash);
+                  } else {
+                    // call $anchorScroll() explicitly,
+                    // since $location.hash hasn't changed
+                    $anchorScroll();
+                  }
+            },
             /**
              * Function to show (or not) the "CSV Export" button
              */
@@ -1984,8 +2015,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             setColumnsConfigWithUrl: function() {
                 $http.get(this.config.columnsUrl, {
                     datatable: this
-                }).success(function(data, status, headers, config) {
-                    config.datatable.setColumnsConfig(data);
+                }).then(function(resp) {
+                    resp.config.datatable.setColumnsConfig(resp.data);
+                    return resp;
                 });
             },
             getColumnsConfig: function() {
@@ -2305,7 +2337,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                         	}else if(!Array.isArray(colValue) && colValue.search
                                         			&& colValue.search(new RegExp("\r|\n|"+delimiter)) !== -1){
                                         		colValue = '"'+colValue+'"';
-                                        	}                                        	
+                                        	} else if(!Array.isArray(colValue) || (Array.isArray(colValue) && colValue.length === 1)){
+                                        		colValue = '"'+colValue+'"';
+                                        	}                                          	
                                         }
 										
 										
@@ -2543,6 +2577,9 @@ angular.module('ultimateDataTableServices')
 	    			  reader.readAsDataURL(elem[0].files[0]);				    			  		    	 
 		    	  }				    	  
 		      });
+			  elem.on('click', function() {
+    			  elem[0].value=null;
+    		  });
 		 }
 		};
 		}]).directive('udtBase64File', [function () {
@@ -2614,7 +2651,9 @@ angular.module('ultimateDataTableServices')
 	    			  reader.readAsDataURL(elem[0].files[0]);				    			  		    	 
 		    	  }				    	  
 		      });
-		      
+		      elem.on('click', function() {
+    			  elem[0].value=null;
+    		  });
 		      
 		 }
 		};
@@ -2861,15 +2900,15 @@ directive("udtCell", function(){
 							}
 						}
 						var requiredDirective = "";
-						if(col.required != undefined && !header && (angular.isFunction(col.required) && col.required()) 
-	    						|| (!angular.isFunction(col.required) && col.required)){
+						if(col.required != undefined && !header && ((angular.isFunction(col.required) && col.required()) 
+	    						|| (!angular.isFunction(col.required) && col.required))){
 							requiredDirective = "name='"+col.id+"' ng-required=true";
 						}else{
 							requiredDirective = "name='"+col.id+"' ";
 						}
 						
 						if(col.editTemplate){
-							editElement = col.editTemplate.replace("#ng-model", 'ng-model="'+this.getEditProperty(col, header, filter)+ngChange+' '+requiredDirective);														
+							editElement = col.editTemplate.replace(/#ng-model/g, 'ng-model="'+this.getEditProperty(col, header, filter)+ngChange+' '+requiredDirective);														
 						}else if(col.type === "boolean"){
 	    					editElement = '<input class="form-control"' +defaultValueDirective+'type="checkbox" class="input-small" ng-model="'+this.getEditProperty(col, header, filter)+ngChange+'/>';	    					
 	    				}else if (col.type === "textarea") {
@@ -2942,7 +2981,7 @@ directive("udtCell", function(){
 	    					editElement = "Edit Not Defined for col.type !";
 	    				}
 	    				//return '<div class="form-group"  ng-class="{\'has-error\': value.line.errors[\''+col.property+'\'] !== undefined}">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
-	    				return '<div class="form-group"  ng-class="udtTableFunctions.getValidationClass(\'subForm\'+value.line.id, col)">'+editElement+'</div>';
+	    				return '<div class="form-group"  ng-class="udtTableFunctions.getValidationClass(\'subForm\'+value.line.id, col)">'+editElement+'<span class="help-block" ng-if="value.line.errors[\''+col.property+'\'] !== undefined">{{value.line.errors["'+col.property+'"]}}<br></span></div>';
 		    			
 	    			};
 
@@ -3439,6 +3478,13 @@ directive('udtTable', function(){
 					if(scope.udtTable && scope["datatableForm"]){
   		    			scope.udtTable.formController = scope["datatableForm"];
   		    		}
+					
+					scope.$watch("udtTable", function(newValue, oldValue) {
+  		    			if(newValue && newValue !== oldValue && scope["datatableForm"]){
+  		    				scope.udtTable.formController = scope["datatableForm"];
+  		    			}
+		            });
+					
   		    		scope.udtTableFunctions.setImage = function(imageData, imageName, imageFullSizeWidth, imageFullSizeHeight) {
   		    			scope.udtModalImage = {};
   		    			scope.udtModalImage.modalImage = imageData;
@@ -3479,14 +3525,14 @@ directive('udtTable', function(){
 	    			};
 					scope.udtTableFunctions.getThClass = function(col, currentScope){
 	    				var clazz = '';
-	    				if(angular.isFunction(col.thClass)){
+	    				if(col && angular.isFunction(col.thClass)){
 	    					clazz = col.thClass(col);
-	    				} else if(angular.isString(col.thClass)){
+	    				} else if(col && angular.isString(col.thClass)){
 	    					//we try to evaluation the string against the scope
 	    					clazz =  currentScope.$eval(col.thClass) || col.thClass;
 	    				}
-	    				if(col.required != undefined && (angular.isFunction(col.required) && col.required()) 
-	    						|| (!angular.isFunction(col.required) && col.required)){
+	    				if((col && col.required != undefined && (angular.isFunction(col.required) && col.required()))
+	    						|| (col && !angular.isFunction(col.required) && col.required)){
 	    					clazz = clazz +' required';
 	    				}
 	    				return clazz;	    				
@@ -3603,7 +3649,17 @@ directive('udtToolbar', function(){
   		    	link: function(scope, element, attr) {
   		    	}
     		};
-    	});;"use strict";
+    	})
+.directive('udtToolbarBottom', function(){ 
+    		return {
+    			restrict: 'A',
+  		    	replace:true,
+  		    	templateUrl:'udt-toolbar-bottom.html'		    		
+  		    		,
+  		    	link: function(scope, element, attr) {
+  		    	}
+    		};
+		});;"use strict";
 
 angular.module('ultimateDataTableServices').
 directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', function($parse, $q, $timeout, $templateCache){
@@ -3618,7 +3674,7 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
   		    		
   		    		scope.$watch(attr.ultimateDatatable, function(newValue, oldValue) {
   		    			if(newValue && (newValue !== oldValue || !scope.udtTable)){
-  		    				scope.udtTable = $parse(attr.ultimateDatatable)(scope);
+  		    				scope.udtTable = newValue;
   		    			}
 		            });
   		    		
@@ -3641,8 +3697,8 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 			    	
 			    	scope.udtTableFunctions.cancel = function(){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.cancel()}).then(function(){
-		    				scope.udtTable.computeDisplayResultTimeOut.then(function(){
+		    			$timeout(function(){scope.udtTable.cancel()}).finally(function(){
+		    				scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 								scope.udtTable.setSpinner(false); 
 							});	   		    				
 		    			});
@@ -3652,9 +3708,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 			    	
 		    		scope.udtTableFunctions.setNumberRecordsPerPage = function(elt){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setNumberRecordsPerPage(elt)}).then(function(){
+		    			$timeout(function(){scope.udtTable.setNumberRecordsPerPage(elt)}).finally(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.pagination.mode)){
-		    					scope.udtTable.computeDisplayResultTimeOut.then(function(){
+		    					scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 									scope.udtTable.setSpinner(false); 
 								});	    				
 		    				}
@@ -3665,9 +3721,9 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		
 		    		scope.udtTableFunctions.setPageNumber = function(page){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setPageNumber(page)}).then(function(){
+		    			$timeout(function(){scope.udtTable.setPageNumber(page)}).finally(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.pagination.mode)){
-								scope.udtTable.computeDisplayResultTimeOut.then(function(){
+								scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 									scope.udtTable.setSpinner(false); 
 								});									
 		    				}	    				
@@ -3676,16 +3732,16 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		
 		    		scope.udtTableFunctions.setEdit = function(column){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setEdit(column)}).then(function(){
+		    			$timeout(function(){scope.udtTable.setEdit(column)}).finally(function(){
 		    				scope.udtTable.setSpinner(false);  		    				
 		    			});		    			
 		    		};
 		    		
 		    		scope.udtTableFunctions.setOrderColumn = function(column){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setOrderColumn(column)}).then(function(){
+		    			$timeout(function(){scope.udtTable.setOrderColumn(column)}).finally(function(){
 		    				if(!scope.udtTable.isRemoteMode(scope.udtTable.config.order.mode)){
-								scope.udtTable.computeDisplayResultTimeOut.then(function(){
+								scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 									scope.udtTable.setSpinner(false);  		    			
 								});								
 		    				} 		    				
@@ -3695,15 +3751,15 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		
 		    		scope.udtTableFunctions.setHideColumn = function(column){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setHideColumn(column)}).then(function(){
+		    			$timeout(function(){scope.udtTable.setHideColumn(column)}).finally(function(){
 		    				scope.udtTable.setSpinner(false);  		    				
 		    			});
 		    		};
 		    		
 		    		scope.udtTableFunctions.setGroupColumn = function(column){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.setGroupColumn(column)}).then(function(){
-							scope.udtTable.computeDisplayResultTimeOut.then(function(){
+		    			$timeout(function(){scope.udtTable.setGroupColumn(column)}).finally(function(){
+							scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 								scope.udtTable.setSpinner(false);
 							});  		    				
 		    			});
@@ -3712,15 +3768,15 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
 		    		
 		    		scope.udtTableFunctions.exportCSV = function(exportType){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.exportCSV(exportType)}).then(function(){
+		    			$timeout(function(){scope.udtTable.exportCSV(exportType)}).finally(function(){
 		    				scope.udtTable.setSpinner(false);  		    				
 		    			});
 		    		};
 		    		
 		    		scope.udtTableFunctions.updateShowOnlyGroups = function(){
 		    			scope.udtTable.setSpinner(true);
-		    			$timeout(function(){scope.udtTable.updateShowOnlyGroups()}).then(function(){
-							scope.udtTable.computeDisplayResultTimeOut.then(function(){
+		    			$timeout(function(){scope.udtTable.updateShowOnlyGroups()}).finally(function(){
+							scope.udtTable.computeDisplayResultTimeOut.finally(function(){
 								scope.udtTable.setSpinner(false); 
 							});									
 		    			});
@@ -3999,7 +4055,8 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup" : "Grouper toute la s\u00e9lection",
 							"datatable.button.basicExportCSV" : "Exporter toutes les lignes",
 							"datatable.button.groupedExportCSV" : "Exporter les lignes group\u00e9es",
-							"datatable.button.showOnlyGroups" : "Voir uniquement les groupes"
+							"datatable.button.showOnlyGroups" : "Voir uniquement les groupes",
+							"datatable.button.top" : "Aller au d\u00e9but du tableau"
 						},
 						"en": {
 							"result":"Results",
@@ -4035,7 +4092,8 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup" : "Group All selected lines",
 							"datatable.button.basicExportCSV" : "Export all lines",
 							"datatable.button.groupedExportCSV" : "Export only grouped lines",
-							"datatable.button.showOnlyGroups" : "See only group"
+							"datatable.button.showOnlyGroups" : "See only group",
+							"datatable.button.top" : "Go to the top"
 						},
 						"nl": {
 							"result": "Resultaten",
@@ -4071,7 +4129,8 @@ factory('udtI18n', [function() {
 							"datatable.button.generalGroup": "Groepeer alle geselecteerde regels",
 							"datatable.button.basicExportCSV": "Exporteer alle regels",
 							"datatable.button.groupedExportCSV": "Exporteer alleen de gegroepeerde regels",
-							"datatable.button.showOnlyGroups": "Toon alleen de groep"
+							"datatable.button.showOnlyGroups": "Toon alleen de groep",
+							"datatable.button.top" : "Ga naar de top"
 						}
 					},
 
