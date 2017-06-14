@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.3.1-SNAPSHOT 2017-05-12 
+/*! ultimate-datatable version 3.3.1-SNAPSHOT 2017-06-14 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -19,6 +19,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 /*ex :
                        {
                        "header":"Code Container", //the title //used by default Messages
+					   "headerTpl":"", //html template to custom render                       
                        "property":"code", //the property to bind or function used to extract the value
                        "filter":"", angular filter to filter the value only used in read mode
                        "render" : function() //render the column used to add style around value
@@ -442,6 +443,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (this.config.group.active && this.config.group.by) {
                     var propertyGroupGetter = this.config.group.by.property;
                     propertyGroupGetter += this.getFilter(this.config.group.by);
+                    propertyGroupGetter += this.getFormatter(this.config.group.by);
                     if(this.config.group.by=="all"){
                     	propertyGroupGetter="all";
                     }					
@@ -450,7 +452,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     var groupValues = this.allResult.reduce(function(array, value) {
                         var groupValue = "all";
                     	if(propertyGroupGetter !== "all"){
-                    		groupValue = groupGetter(value).toString();
+                    		groupValue = groupGetter(value);
+                    		if(groupValue !== null && groupValue !== undefined){
+                    			groupValue = groupValue.toString();
+                    		}else{
+                    			groupValue = "";
+                    		}
                     	}
                         if (!array[groupValue]) {
                             array[groupValue] = [];
@@ -473,6 +480,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 							if(column.id != that.config.group.by.id){ 
 								var propertyGetter = column.property;
 								propertyGetter += that.getFilter(column);
+								if ('sum' !== column.groupMethod && 'average' !== column.groupMethod) {
+	                            	propertyGetter += that.getFormatter(column);
+	                            }
 								var columnGetter = $parse(propertyGetter);
 								var columnSetter = $parse("group." + column.id);
 
@@ -493,22 +503,32 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 										console.log("computeGroup Error : " + e);
 									}
 								} else if ('unique' === column.groupMethod) {
-									var result = $filter('udtUnique')(groupData, column.property);
-									if (result.length > 1) {
-										result = '#MULTI';
-									} else if (result.length === 1) {
-										result = columnGetter(result[0]);
-									} else {
-										result = undefined;
-									}
+									var result = $filter('udtUnique')(groupData, propertyGetter);
+	                                if (!angular.isArray(result)) {
+	                                    result = columnGetter(result);
+	                                } else if (angular.isArray(result) && result.length > 1) {
+	                                    result = '#MULTI';
+	                                } else if (angular.isArray(result) && result.length === 1) {
+	                                    result = columnGetter(result[0]);
+	                                } else {
+	                                    result = undefined;
+	                                }
 									columnSetter.assign(group, result);
 								} else if ('countDistinct' === column.groupMethod) {
-									var result = $filter('udtCountdistinct')(groupData, propertyGetter);
+									var result = $filter('udtCount')(groupData, propertyGetter,true);	                                
 									columnSetter.assign(group, result);
-								} else if ('collect' === column.groupMethod) {
-									var result = $filter('udtCollect')(groupData, propertyGetter);
-									columnSetter.assign(group, result);
-								} else {
+								} else if (column.groupMethod.startsWith('count')) {
+	                            	var params = column.groupMethod.split(":");
+	                            	var distinct = (params.length === 2 && params[1] === 'true')?true:false;
+	                            	var result = $filter('udtCount')(groupData, propertyGetter,distinct);
+	                                columnSetter.assign(group, result);
+	                            } else if (column.groupMethod.startsWith('collect')) {
+	                            	var params = column.groupMethod.split(":");
+	                            	var unique = (params.length === 2 && params[1] === 'true')?true:false;
+	                            	
+	                                var result = $filter('udtCollect')(groupData, propertyGetter,unique);
+	                                columnSetter.assign(group, result);
+	                            } else {
 									console.error("groupMethod is not managed " + column.groupMethod);
 								}
 							}
@@ -549,7 +569,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (this.config.group.active) {
                     var columnId;
                     column === 'all' ? columnId = 'all' : columnId = column.id;
- 		    		if(this.config.group.by === undefined || this.config.group.by.property !== column.property){
+ 		    		if(this.config.group.by === undefined || this.config.group.by.id !== column.id){					
 						this.config.group.start = true;
                         if (columnId === "all") {
                             this.config.group.by = columnId;
@@ -1994,6 +2014,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 						if(null === columns[i].edit || undefined === columns[i].edit){
                             columns[i].edit = false;
                         }
+						
+						if(null === columns[i].headerTpl || undefined === columns[i].headerTpl){
+                        	columns[i].headerTpl = '<span class="header" ng-model="udtTable" ng-bind="udtTableFunctions.messages.Messages(column.header)"/>';
+                        }
                     }
 
 
@@ -2339,6 +2363,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                         		colValue = '"'+colValue+'"';
                                         	} else if(!Array.isArray(colValue) || (Array.isArray(colValue) && colValue.length === 1)){
                                         		colValue = '"'+colValue+'"';
+                                        	} else if(Array.isArray(colValue)){
+                                        		colValue = '"'+colValue.join()+'"';
                                         	}                                          	
                                         }
 										
@@ -3155,9 +3181,9 @@ directive("udtCell", function(){
 			    				//if error in group function
 			    				if(angular.isDefined(v) && angular.isString(v) &&v.charAt(0) === "#"){
 			    					return v;
-			    				}else if(angular.isDefined(v) ){
-			    					//not filtered properties because used during the compute
-			    					return currentScope.$eval("group."+column.id+currentScope.udtTableFunctions.getFormatter(column), value.data);
+			    				}else if(angular.isDefined(v)){
+			    					//no filtered and no formatter properties because used during the compute
+			    					return currentScope.$eval("group."+column.id, value.data);
 			    				}else{
 			    					return undefined;
 			    				}
@@ -3796,8 +3822,8 @@ directive('ultimateDatatable', ['$parse', '$q', '$timeout','$templateCache', fun
        		    } 		    		
     		};
 }]);;angular.module('ultimateDataTableServices').
-filter('udtCollect', ['$parse',function($parse) {
-    	    return function(array, key) {
+filter('udtCollect', ['$parse','$filter',function($parse,$filter) {
+    	    return function(array, key, unique) {
     	    	if (!array || array.length === 0)return undefined;
     	    	if (!angular.isArray(array) && (angular.isObject(array) || angular.isNumber(array) || angular.isString(array) || angular.isDate(array))) array = [array];
     	    	else if(!angular.isArray(array)) throw "input is not an array, object, number or string !";
@@ -3821,8 +3847,11 @@ filter('udtCollect', ['$parse',function($parse) {
     	    		}else if (!params.key && angular.isObject(value)){
     	    			throw "missing key !";
     	    		}
-    	    		
+						
     	    	});
+    	    	if(unique){
+					possibleValues = $filter('udtUnique')(possibleValues);
+				}
     	    	return possibleValues;    	    	
     	    };
     	}]);;angular.module('ultimateDataTableServices').
@@ -3835,8 +3864,8 @@ filter('udtConvert', ['udtConvertValueServices', function(udtConvertValueService
     			return input;
     		}
 }]);;angular.module('ultimateDataTableServices').
-filter('udtCountdistinct', ['$parse',function($parse) {
-    	    return function(array, key) {
+filter('udtCount', ['$parse',function($parse) {
+    	    return function(array, key, distinct) {
     	    	if (!array || array.length === 0)return undefined;
     	    	if (!angular.isArray(array) && (angular.isObject(array) || angular.isNumber(array) || angular.isString(array) || angular.isDate(array))) array = [array];
     	    	else if(!angular.isArray(array)) throw "input is not an array, object, number or string !";
@@ -3847,11 +3876,11 @@ filter('udtCountdistinct', ['$parse',function($parse) {
     	    	angular.forEach(array, function(element){
     	    		if (angular.isObject(element)) {
     	    			var currentValue = $parse(key)(element);
-    	    			if(undefined !== currentValue && null !== currentValue && possibleValues.indexOf(currentValue) === -1){
+    	    			if(distinct && undefined !== currentValue && null !== currentValue && possibleValues.indexOf(currentValue) === -1){
        	    				possibleValues.push(currentValue);
-    	    			}
-    	    			
-    	    			
+    	    			}else if(!distinct && undefined !== currentValue && null !== currentValue){
+    	    				possibleValues.push(currentValue);
+    	    			}     	    			
     	    		}else if (!params.key && angular.isObject(value)){
     	    			throw "missing key !";
     	    		}
