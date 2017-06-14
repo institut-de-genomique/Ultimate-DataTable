@@ -2360,6 +2360,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                         		colValue = '"'+colValue+'"';
                                         	} else if(!Array.isArray(colValue) || (Array.isArray(colValue) && colValue.length === 1)){
                                         		colValue = '"'+colValue+'"';
+                                        	} else if(Array.isArray(colValue)){
+                                        		colValue = '"'+colValue.join()+'"';
                                         	}                                          	
                                         }
 										
