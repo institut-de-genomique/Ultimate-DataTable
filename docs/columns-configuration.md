@@ -93,6 +93,12 @@
 "format" : "number"/"date"/"datetime"
 ```
 #Advanced features
+##Custom template header
+> To put an html template on header to add some functions or design
+```json
+"headerTpl" : "<html>"
+```
+
 ##Render
 > To change the template of the cells in the column (override the property)
 ```json

@@ -16,6 +16,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 /*ex :
                        {
                        "header":"Code Container", //the title //used by default Messages
+					   "headerTpl":"", //html template to custom render                       
                        "property":"code", //the property to bind or function used to extract the value
                        "filter":"", angular filter to filter the value only used in read mode
                        "render" : function() //render the column used to add style around value
@@ -2009,6 +2010,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 						
 						if(null === columns[i].edit || undefined === columns[i].edit){
                             columns[i].edit = false;
+                        }
+						
+						if(null === columns[i].headerTpl || undefined === columns[i].headerTpl){
+                        	columns[i].headerTpl = '<span class="header" ng-model="udtTable" ng-bind="udtTableFunctions.messages.Messages(column.header)"/>';
                         }
                     }
 
