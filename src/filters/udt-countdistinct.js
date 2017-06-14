@@ -1,6 +1,6 @@
 angular.module('ultimateDataTableServices').
-filter('udtCountdistinct', ['$parse',function($parse) {
-    	    return function(array, key) {
+filter('udtCount', ['$parse',function($parse) {
+    	    return function(array, key, distinct) {
     	    	if (!array || array.length === 0)return undefined;
     	    	if (!angular.isArray(array) && (angular.isObject(array) || angular.isNumber(array) || angular.isString(array) || angular.isDate(array))) array = [array];
     	    	else if(!angular.isArray(array)) throw "input is not an array, object, number or string !";
@@ -11,11 +11,11 @@ filter('udtCountdistinct', ['$parse',function($parse) {
     	    	angular.forEach(array, function(element){
     	    		if (angular.isObject(element)) {
     	    			var currentValue = $parse(key)(element);
-    	    			if(undefined !== currentValue && null !== currentValue && possibleValues.indexOf(currentValue) === -1){
+    	    			if(distinct && undefined !== currentValue && null !== currentValue && possibleValues.indexOf(currentValue) === -1){
        	    				possibleValues.push(currentValue);
-    	    			}
-    	    			
-    	    			
+    	    			}else if(!distinct && undefined !== currentValue && null !== currentValue){
+    	    				possibleValues.push(currentValue);
+    	    			}     	    			
     	    		}else if (!params.key && angular.isObject(value)){
     	    			throw "missing key !";
     	    		}

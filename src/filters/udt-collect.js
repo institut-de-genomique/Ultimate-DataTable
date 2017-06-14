@@ -1,6 +1,6 @@
 angular.module('ultimateDataTableServices').
-filter('udtCollect', ['$parse',function($parse) {
-    	    return function(array, key) {
+filter('udtCollect', ['$parse','$filter',function($parse,$filter) {
+    	    return function(array, key, unique) {
     	    	if (!array || array.length === 0)return undefined;
     	    	if (!angular.isArray(array) && (angular.isObject(array) || angular.isNumber(array) || angular.isString(array) || angular.isDate(array))) array = [array];
     	    	else if(!angular.isArray(array)) throw "input is not an array, object, number or string !";
@@ -24,8 +24,11 @@ filter('udtCollect', ['$parse',function($parse) {
     	    		}else if (!params.key && angular.isObject(value)){
     	    			throw "missing key !";
     	    		}
-    	    		
+						
     	    	});
+    	    	if(unique){
+					possibleValues = $filter('udtUnique')(possibleValues);
+				}
     	    	return possibleValues;    	    	
     	    };
     	}]);

@@ -439,6 +439,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (this.config.group.active && this.config.group.by) {
                     var propertyGroupGetter = this.config.group.by.property;
                     propertyGroupGetter += this.getFilter(this.config.group.by);
+                    propertyGroupGetter += this.getFormatter(this.config.group.by);
                     if(this.config.group.by=="all"){
                     	propertyGroupGetter="all";
                     }					
@@ -447,7 +448,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     var groupValues = this.allResult.reduce(function(array, value) {
                         var groupValue = "all";
                     	if(propertyGroupGetter !== "all"){
-                    		groupValue = groupGetter(value).toString();
+                    		groupValue = groupGetter(value);
+                    		if(groupValue !== null && groupValue !== undefined){
+                    			groupValue = groupValue.toString();
+                    		}else{
+                    			groupValue = "";
+                    		}
                     	}
                         if (!array[groupValue]) {
                             array[groupValue] = [];
@@ -470,6 +476,9 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 							if(column.id != that.config.group.by.id){ 
 								var propertyGetter = column.property;
 								propertyGetter += that.getFilter(column);
+								if ('sum' !== column.groupMethod && 'average' !== column.groupMethod) {
+	                            	propertyGetter += that.getFormatter(column);
+	                            }
 								var columnGetter = $parse(propertyGetter);
 								var columnSetter = $parse("group." + column.id);
 
@@ -490,22 +499,32 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 										console.log("computeGroup Error : " + e);
 									}
 								} else if ('unique' === column.groupMethod) {
-									var result = $filter('udtUnique')(groupData, column.property);
-									if (result.length > 1) {
-										result = '#MULTI';
-									} else if (result.length === 1) {
-										result = columnGetter(result[0]);
-									} else {
-										result = undefined;
-									}
+									var result = $filter('udtUnique')(groupData, propertyGetter);
+	                                if (!angular.isArray(result)) {
+	                                    result = columnGetter(result);
+	                                } else if (angular.isArray(result) && result.length > 1) {
+	                                    result = '#MULTI';
+	                                } else if (angular.isArray(result) && result.length === 1) {
+	                                    result = columnGetter(result[0]);
+	                                } else {
+	                                    result = undefined;
+	                                }
 									columnSetter.assign(group, result);
 								} else if ('countDistinct' === column.groupMethod) {
-									var result = $filter('udtCountdistinct')(groupData, propertyGetter);
+									var result = $filter('udtCount')(groupData, propertyGetter,true);	                                
 									columnSetter.assign(group, result);
-								} else if ('collect' === column.groupMethod) {
-									var result = $filter('udtCollect')(groupData, propertyGetter);
-									columnSetter.assign(group, result);
-								} else {
+								} else if (column.groupMethod.startsWith('count')) {
+	                            	var params = column.groupMethod.split(":");
+	                            	var distinct = (params.length === 2 && params[1] === 'true')?true:false;
+	                            	var result = $filter('udtCount')(groupData, propertyGetter,distinct);
+	                                columnSetter.assign(group, result);
+	                            } else if (column.groupMethod.startsWith('collect')) {
+	                            	var params = column.groupMethod.split(":");
+	                            	var unique = (params.length === 2 && params[1] === 'true')?true:false;
+	                            	
+	                                var result = $filter('udtCollect')(groupData, propertyGetter,unique);
+	                                columnSetter.assign(group, result);
+	                            } else {
 									console.error("groupMethod is not managed " + column.groupMethod);
 								}
 							}
@@ -546,7 +565,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (this.config.group.active) {
                     var columnId;
                     column === 'all' ? columnId = 'all' : columnId = column.id;
- 		    		if(this.config.group.by === undefined || this.config.group.by.property !== column.property){
+ 		    		if(this.config.group.by === undefined || this.config.group.by.id !== column.id){					
 						this.config.group.start = true;
                         if (columnId === "all") {
                             this.config.group.by = columnId;

@@ -283,9 +283,9 @@ directive("udtCell", function(){
 			    				//if error in group function
 			    				if(angular.isDefined(v) && angular.isString(v) &&v.charAt(0) === "#"){
 			    					return v;
-			    				}else if(angular.isDefined(v) ){
-			    					//not filtered properties because used during the compute
-			    					return currentScope.$eval("group."+column.id+currentScope.udtTableFunctions.getFormatter(column), value.data);
+			    				}else if(angular.isDefined(v)){
+			    					//no filtered and no formatter properties because used during the compute
+			    					return currentScope.$eval("group."+column.id, value.data);
 			    				}else{
 			    					return undefined;
 			    				}

@@ -120,10 +120,17 @@
 "group" : boolean
 ```
 ##Group method
-> mandatory if group:true, set the group method on that column
+> used with the group attribute to execute an aggregate fonction on the column during group
 ```json
-"groupMethod" : "sum"/"average"/"countDistinct"/"collect"
+"groupMethod" : "sum"/"average"/"countDistinct"/"count:true|false"/"collect:true|false"
 ```
+* sum : used to sum number column
+* average : used to compute an average on number column
+* countDistinct : used to count distinct element
+* count:true|false : used to count element. with true option as same as countDistinct, false count all element; default : false.
+* collect:true|false : used to put in list each element. with true collect only once each element otherwise collect all elements; default false.
+* unique : used to display only one valeur if the same on all lines otherwise display #MULTI. 
+
 ##Default value
 > If the value of the column is undefined or "" when the user edit, this value show up
 ```json
