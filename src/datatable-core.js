@@ -2277,7 +2277,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     //calcule results ( code extracted from method computeDisplayResult() )
                     var displayResultTmp = [];
 					if (this.isGroupActive()) {
-                    	this.allResult = $filter('orderBy')(this.allResult, this.config.group.by.property);
+                    	var orderProperty = this.config.group.by.property;
+                        orderProperty += (this.config.group.by.filter) ? '|' + this.config.group.by.filter : '';
+                        var orderSense = (this.config.order.reverse) ? '-' : '+';
+                        this.allResult = $filter('orderBy')(this.allResult, orderSense + orderProperty);
                     }
                     angular.forEach(this.allResult, function(value, key) {
                         var line = {
