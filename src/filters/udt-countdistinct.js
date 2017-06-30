@@ -11,6 +11,7 @@ filter('udtCount', ['$parse',function($parse) {
     	    	angular.forEach(array, function(element){
     	    		if (angular.isObject(element)) {
     	    			var currentValue = $parse(key)(element);
+						if(angular.isArray(currentValue) && currentValue.length === 1)currentValue = currentValue[0];
     	    			if(distinct && undefined !== currentValue && null !== currentValue && possibleValues.indexOf(currentValue) === -1){
        	    				possibleValues.push(currentValue);
     	    			}else if(!distinct && undefined !== currentValue && null !== currentValue){
