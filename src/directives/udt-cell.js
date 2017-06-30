@@ -266,7 +266,7 @@ directive("udtCell", function(){
 							if(column.watch === true){
                                 scope.$watch("value.data."+column.property, function(newValue, oldValue) {
                                     if ( newValue !== oldValue ) {
-                                        scope.cellValue = getDisplayFunction(column, false);
+                                        scope.cellValue = newValue;
                                      }
                                 });
                             }
@@ -274,9 +274,9 @@ directive("udtCell", function(){
 			    		}else{
 			    			if(!value.line.group && (column.url === undefined || column.url === null)){
 			    				if(column.watch === true){
-                                    scope.$watch("value.data."+column.property, function(newValue, oldValue) {
+                                    scope.$watch("value.data."+column.property+currentScope.udtTableFunctions.getFilter(column)+currentScope.udtTableFunctions.getFormatter(column), function(newValue, oldValue) {
                                         if ( newValue !== oldValue ) {
-                                            scope.cellValue = getDisplayFunction(column, false);
+                                            scope.cellValue = newValue;
                                          }
                                     });
                                 }
