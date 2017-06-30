@@ -485,14 +485,19 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 
 								if ('sum' === column.groupMethod || 'average' === column.groupMethod) {
 									var result = groupData.reduce(function(value, element) {
-										return value += columnGetter(element);
+										element.col = column; //add in experimental feature
+	                                	value += columnGetter(element);
+										element.col = undefined;
+										return value;
 									}, 0);
 
 									if ('average' === column.groupMethod) result = result / groupData.length;
 
 									if (isNaN(result)) {
 										result = "#ERROR";
-									}
+									}else{
+	                                	result = $parse(result.toString()+that.getFormatter(column))(result);
+	                                }
 
 									try {
 										columnSetter.assign(group, result);
@@ -632,13 +637,16 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             },
             addGroup: function(displayResultTmp) {
                 var displayResult = [];
+                
                 var propertyGroupGetter = this.config.group.by.property;
                 propertyGroupGetter += this.getFilter(this.config.group.by);
-				if(this.config.group.by=="all"){
-                	propertyGroupGetter = "all";
+                propertyGroupGetter += this.getFormatter(this.config.group.by);
+                if(this.config.group.by=="all"){
+                	propertyGroupGetter="all";
                 }
                 var groupGetter = $parse(propertyGroupGetter);
-                var groupConfig = this.config.group;
+                
+				var groupConfig = this.config.group;
                 displayResultTmp.forEach(function(element, index, array) {
                     /* previous mode */
                     if (!groupConfig.after && (index === 0 || 
