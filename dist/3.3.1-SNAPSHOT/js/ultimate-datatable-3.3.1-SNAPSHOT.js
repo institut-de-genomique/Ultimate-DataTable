@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.3.1-SNAPSHOT 2017-06-14 
+/*! ultimate-datatable version 3.3.1-SNAPSHOT 2017-06-30 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -488,14 +488,19 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 
 								if ('sum' === column.groupMethod || 'average' === column.groupMethod) {
 									var result = groupData.reduce(function(value, element) {
-										return value += columnGetter(element);
+										element.col = column; //add in experimental feature
+	                                	value += columnGetter(element);
+										element.col = undefined;
+										return value;
 									}, 0);
 
 									if ('average' === column.groupMethod) result = result / groupData.length;
 
 									if (isNaN(result)) {
 										result = "#ERROR";
-									}
+									}else{
+	                                	result = $parse(result.toString()+that.getFormatter(column))(result);
+	                                }
 
 									try {
 										columnSetter.assign(group, result);
@@ -635,13 +640,16 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             },
             addGroup: function(displayResultTmp) {
                 var displayResult = [];
+                
                 var propertyGroupGetter = this.config.group.by.property;
                 propertyGroupGetter += this.getFilter(this.config.group.by);
-				if(this.config.group.by=="all"){
-                	propertyGroupGetter = "all";
+                propertyGroupGetter += this.getFormatter(this.config.group.by);
+                if(this.config.group.by=="all"){
+                	propertyGroupGetter="all";
                 }
                 var groupGetter = $parse(propertyGroupGetter);
-                var groupConfig = this.config.group;
+                
+				var groupConfig = this.config.group;
                 displayResultTmp.forEach(function(element, index, array) {
                     /* previous mode */
                     if (!groupConfig.after && (index === 0 || 
@@ -2272,7 +2280,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     //calcule results ( code extracted from method computeDisplayResult() )
                     var displayResultTmp = [];
 					if (this.isGroupActive()) {
-                    	this.allResult = $filter('orderBy')(this.allResult, this.config.group.by.property);
+                    	var orderProperty = this.config.group.by.property;
+                        orderProperty += (this.config.group.by.filter) ? '|' + this.config.group.by.filter : '';
+                        var orderSense = (this.config.order.reverse) ? '-' : '+';
+                        this.allResult = $filter('orderBy')(this.allResult, orderSense + orderProperty);
                     }
                     angular.forEach(this.allResult, function(value, key) {
                         var line = {
@@ -2926,9 +2937,12 @@ directive("udtCell", function(){
 							}
 						}
 						var requiredDirective = "";
-						if(col.required != undefined && !header && ((angular.isFunction(col.required) && col.required()) 
-	    						|| (!angular.isFunction(col.required) && col.required))){
-							requiredDirective = "name='"+col.id+"' ng-required=true";
+						if(col.required != undefined && col.required != null && !header){
+							if(angular.isFunction(col.required) && col.required() || col.required === true){
+								requiredDirective = 'name="'+col.id+'" ng-required=true';
+							}else if(angular.isString(col.required)){
+								requiredDirective = 'name="'+col.id+'" ng-required="'+col.required+'"';
+							}
 						}else{
 							requiredDirective = "name='"+col.id+"' ";
 						}
@@ -3161,7 +3175,7 @@ directive("udtCell", function(){
 							if(column.watch === true){
                                 scope.$watch("value.data."+column.property, function(newValue, oldValue) {
                                     if ( newValue !== oldValue ) {
-                                        scope.cellValue = getDisplayFunction(column, false);
+                                        scope.cellValue = newValue;
                                      }
                                 });
                             }
@@ -3169,9 +3183,9 @@ directive("udtCell", function(){
 			    		}else{
 			    			if(!value.line.group && (column.url === undefined || column.url === null)){
 			    				if(column.watch === true){
-                                    scope.$watch("value.data."+column.property, function(newValue, oldValue) {
+                                    scope.$watch("value.data."+column.property+currentScope.udtTableFunctions.getFilter(column)+currentScope.udtTableFunctions.getFormatter(column), function(newValue, oldValue) {
                                         if ( newValue !== oldValue ) {
-                                            scope.cellValue = getDisplayFunction(column, false);
+                                            scope.cellValue = newValue;
                                          }
                                     });
                                 }
@@ -3557,8 +3571,10 @@ directive('udtTable', function(){
 	    					//we try to evaluation the string against the scope
 	    					clazz =  currentScope.$eval(col.thClass) || col.thClass;
 	    				}
-	    				if((col && col.required != undefined && (angular.isFunction(col.required) && col.required()))
-	    						|| (col && !angular.isFunction(col.required) && col.required)){
+	    				if((col && col.required != undefined && col.required != null)
+	    						&& ((angular.isFunction(col.required) && col.required())
+	    								|| col.required === true
+	    								|| (angular.isString(col.required) && scope.$eval(col.required)))){
 	    					clazz = clazz +' required';
 	    				}
 	    				return clazz;	    				
@@ -3876,6 +3892,7 @@ filter('udtCount', ['$parse',function($parse) {
     	    	angular.forEach(array, function(element){
     	    		if (angular.isObject(element)) {
     	    			var currentValue = $parse(key)(element);
+						if(angular.isArray(currentValue) && currentValue.length === 1)currentValue = currentValue[0];
     	    			if(distinct && undefined !== currentValue && null !== currentValue && possibleValues.indexOf(currentValue) === -1){
        	    				possibleValues.push(currentValue);
     	    			}else if(!distinct && undefined !== currentValue && null !== currentValue){
