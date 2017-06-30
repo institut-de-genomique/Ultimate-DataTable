@@ -63,8 +63,10 @@ directive('udtTable', function(){
 	    					//we try to evaluation the string against the scope
 	    					clazz =  currentScope.$eval(col.thClass) || col.thClass;
 	    				}
-	    				if((col && col.required != undefined && (angular.isFunction(col.required) && col.required()))
-	    						|| (col && !angular.isFunction(col.required) && col.required)){
+	    				if((col && col.required != undefined && col.required != null)
+	    						&& ((angular.isFunction(col.required) && col.required())
+	    								|| col.required === true
+	    								|| (angular.isString(col.required) && scope.$eval(col.required)))){
 	    					clazz = clazz +' required';
 	    				}
 	    				return clazz;	    				

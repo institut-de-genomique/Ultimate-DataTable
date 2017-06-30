@@ -28,9 +28,12 @@ directive("udtCell", function(){
 							}
 						}
 						var requiredDirective = "";
-						if(col.required != undefined && !header && ((angular.isFunction(col.required) && col.required()) 
-	    						|| (!angular.isFunction(col.required) && col.required))){
-							requiredDirective = "name='"+col.id+"' ng-required=true";
+						if(col.required != undefined && col.required != null && !header){
+							if(angular.isFunction(col.required) && col.required() || col.required === true){
+								requiredDirective = 'name="'+col.id+'" ng-required=true';
+							}else if(angular.isString(col.required)){
+								requiredDirective = 'name="'+col.id+'" ng-required="'+col.required+'"';
+							}
 						}else{
 							requiredDirective = "name='"+col.id+"' ";
 						}
