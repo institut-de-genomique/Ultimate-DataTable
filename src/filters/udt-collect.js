@@ -1,6 +1,6 @@
 angular.module('ultimateDataTableServices').
 filter('udtCollect', ['$parse','$filter',function($parse,$filter) {
-    	    return function(array, key, unique) {
+    	    return function(array, key, unique, keyUnique, context) {
     	    	if (!array || array.length === 0)return undefined;
     	    	if (!angular.isArray(array) && (angular.isObject(array) || angular.isNumber(array) || angular.isString(array) || angular.isDate(array))) array = [array];
     	    	else if(!angular.isArray(array)) throw "input is not an array, object, number or string !";
@@ -10,7 +10,7 @@ filter('udtCollect', ['$parse','$filter',function($parse,$filter) {
     	    	var possibleValues = [];
     	    	angular.forEach(array, function(element){
     	    		if (angular.isObject(element)) {
-    	    			var currentValue = $parse(key)(element);
+    	    			var currentValue = $parse(key)(element, context);
     	    			if(undefined !== currentValue && null !== currentValue){
     	    				//Array.prototype.push.apply take only arrays
     	    				if(angular.isArray(currentValue)){
@@ -21,14 +21,14 @@ filter('udtCollect', ['$parse','$filter',function($parse,$filter) {
     	    			}
     	    			
     	    			
-    	    		}else if (!params.key && angular.isObject(value)){
+    	    		}else if (!key && angular.isObject(value)){
     	    			throw "missing key !";
     	    		}
-						
+    	    		
     	    	});
     	    	if(unique){
-					possibleValues = $filter('udtUnique')(possibleValues);
-				}
-    	    	return possibleValues;    	    	
+    	    		possibleValues = $filter('udtUnique')(possibleValues, keyUnique, context);
+    	    	}
+    	    	return possibleValues;   	
     	    };
     	}]);

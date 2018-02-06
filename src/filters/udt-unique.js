@@ -1,6 +1,6 @@
 angular.module('ultimateDataTableServices').
 filter('udtUnique', ['$parse', function($parse) {
-    		return function (collection, property) {
+    		return function (collection, property, context) {
     			var isDefined = angular.isDefined,
     		    isUndefined = angular.isUndefined,
     		    isFunction = angular.isFunction,
@@ -17,7 +17,7 @@ filter('udtUnique', ['$parse', function($parse) {
 					return collection;
 				}
 	
-	    		/**
+				/**
 	    		* get an object and return array of values
 	    		* @param object
 	    		* @returns {Array}
@@ -37,29 +37,29 @@ filter('udtUnique', ['$parse', function($parse) {
 
     		      if (isUndefined(property)) {
     		        return collection.filter(function (elm, pos, self) {
-    		          return self.indexOf(elm) === pos;
-    		        })
+						  return self.indexOf(elm) === pos;
+					  })
     		      }
     		      //store all unique members
     		      var uniqueItems = [],
     		          get = $parse(property);
 
     		      return collection.filter(function (elm) {
-    		        var prop = get(elm);
-    		        if(some(uniqueItems, prop)) {
-    		          return false;
-    		        }
-    		        uniqueItems.push(prop);
-    		        return true;
-    		      });
-
+					var prop = get(elm, context);
+					if(some(uniqueItems, prop)) {
+					  return false;
+					}
+					uniqueItems.push(prop);
+					return true;
+				  });
+					  
     		      //checked if the unique identifier is already exist
     		      function some(array, member) {
-					/*
-    		        if(isUndefined(member)) {
+    		        /*
+    		    	if(isUndefined(member)) {
     		          return false;
     		        }
-					*/
+    		        */
     		        return array.some(function(el) {
     		          return equals(el, member);
     		        });
