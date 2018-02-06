@@ -684,67 +684,6 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 }, displayResult);
                 return displayResult;
             },
-
-            getColumnValue: function(result, column) {
-                var colValue = undefined;
-                if (!result.line.group && (column.url === undefined || column.url === null)) {
-                    var property = column.property;
-                    var isFunction = false;
-                    if (angular.isFunction(property)) {
-                        property = property();
-                        isFunction = true;
-                    }
-                    property += this.getFilter(column);
-                    property += this.getFormatter(column);
-                    colValue = $parse(property)(result.data);
-					if(colValue === null)colValue = undefined;
-                    if (colValue === undefined && isFunction === true) { //Because the property here is not $parsable
-                        //The function have to return a $scope value
-                        colValue = property;
-                    }
-                    if (colValue !== undefined && colValue !== null && column.type === "number") {
-                        colValue = colValue.replace(/\u00a0/g, "");
-                    }
-                    if (colValue === undefined && column.type === "boolean") {
-                        colValue = this.messages.Messages('datatable.export.no');
-                    } else if (colValue !== undefined && column.type === "boolean") {
-                        if (colValue) {
-                            colValue = this.messages.Messages('datatable.export.yes');
-                        } else {
-                            colValue = this.messages.Messages('datatable.export.no');
-                        }
-                    }
-
-                } else if (result.line.group) {
-
-                    var v = $parse("group." + column.id)(result.data);
-                    //if error in group function
-                    if (angular.isDefined(v) && angular.isString(v) && v.charAt(0) === "#") {
-                        colValue = v;
-                    } else if (angular.isDefined(v)) {
-                        //not filtered properties because used during the compute
-                        colValue = $parse("group." + column.id + this.getFormatter(column))(result.data);
-                    } else {
-                        colValue = undefined;
-                    }
-					if(colValue === null)colValue = undefined;
-                    if (colValue !== undefined && column.type === "number") {
-                        colValue = colValue.replace(/\u00a0/g, "");
-                    }
-
-                } else if (!result.line.group && column.url !== undefined && column.url !== null) {
-                    var url = $parse(column.url)(result.data);
-                    colValue = $parse(column.property + this.getFilter(column) + this.getFormatter(column))(this.urlCache[url]);
-					if(colValue === null)colValue = undefined;
-                    if (colValue !== undefined && column.type === "number") {
-                        colValue = colValue.replace(/\u00a0/g, "");
-                    }
-
-                }
-                return colValue;
-            },
-
-
             /**
              * compute for each <td> the row span if user whant to merge cell
              */
@@ -766,11 +705,18 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     for (var j = 0; j < nbRowEquals.length; j++) {
                         nbRowEquals[j] = 0;
                     }
+                    var that = this;
+                    var getColumnValue = function(column, result){
+                    	var colValue = that.getFinalValue(column, result);	    			
+                		colValue = that.cleanColValue(column, colValue);
+						return colValue;	
+                    }
+                    
                     currentDisplayResult.forEach(function(result, i) {
                         currentColumns.forEach(function(column, j) {
                             if (i > 0 && column.mergeCells) {
-                                var currentColValue = this.getColumnValue(result, column);
-                                var previousColValue = this.getColumnValue(previousResult, column);
+                                var currentColValue = getColumnValue(column, result);
+                                var previousColValue = getColumnValue(column, previousResult);
                                 if (currentColValue === previousColValue) {
                                     rowspans[i][j] = 0;
                                     nbRowEquals[j]++;
@@ -2262,8 +2208,69 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     }
                 }
             },
-
-
+            getFinalValue : function(column, result){
+            	var filter = this.getFilter(column);
+            	var formatter = this.getFormatter(column);
+            	var context = {"col":column};
+            	context = Object.assign(context, this.config.objectsMustBeAddInGetFinalValue);
+            	var colValue = undefined;
+            	if (!result.line.group && (column.url === undefined || column.url === null)) {
+                	var getter = $parse(column.property+filter);
+            		var v = getter(result.data, context);
+    				if(!angular.isArray(v)){ //so work for sum, average, unique and collect if one element
+    					colValue =  $parse("this"+formatter)(v);
+					}else {
+						colValue = v.map(function(v){return $parse("this"+formatter)(v);});			    						
+					}		    				                                    	
+                } else if (result.line.group) {
+                	var v = $parse("group."+column.id)(result.data, context);
+    				//if error in group function
+    				if(angular.isDefined(v) && angular.isString(v) && v.charAt(0) === "#"){
+    					colValue = v;
+    				}else if(angular.isDefined(v)){
+    					if(!angular.isArray(v)){ //so work for sum, average, unique and collect if one element
+    						colValue = $parse("this"+formatter)(v);
+    					}else {
+    						colValue = v.map(function(v){return $parse("this"+formatter)(v);});			    						
+    					}			    					
+    				}                                    	
+                } else if (!result.line.group && column.url !== undefined && column.url !== null) {
+                    var url = $parse(column.url)(result.data, context);
+                    var v = $parse(column.property+filter)(this.urlCache[url]);
+    				if(!angular.isArray(v)){ //so work for sum, average, unique and collect if one element
+    					colValue =  $parse("this"+formatter)(v);
+					}else {
+						colValue = v.map(function(v){return $parse("this"+formatter)(v);});			    						
+					}
+                }
+            	return colValue;
+            },
+            //clean data before put in CSV
+            cleanColValue : function(column, colValue){
+            	if(colValue === null)colValue = undefined;
+					
+            	if (column.type === "number" && colValue !== undefined && !angular.isArray(colValue)) {
+				    colValue = colValue.replace(/\u00a0/g, "");
+				}else if(column.type === "number" && angular.isArray(colValue)){
+					colValue = colValue.map(function(colValue){return colValue.replace(/\u00a0/g, "");});
+				}else if(column.type === "boolean" && colValue === undefined){
+					colValue = this.messages.Messages('datatable.export.no');
+				} else if (column.type === "boolean") {
+				    if (colValue) {
+				        colValue = this.messages.Messages('datatable.export.yes');
+				    } else {
+				        colValue = this.messages.Messages('datatable.export.no');
+				    }
+				}else if((column.type === "string" || column.type === "text"  || column.type === "textarea") && colValue !== undefined){
+					if(!angular.isArray(colValue)){
+						colValue = [colValue];
+					}
+					colValue = '"'+colValue.join()+'"';					                            	
+				}else if(column.type === "img" || column.type === "image"  || column.type === "file"){
+					colValue = undefined;
+				}
+				return colValue;
+            },
             /**
              * Function to export data in a CSV file
              */
@@ -2272,11 +2279,11 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     this.config.exportCSV.start = true;
                     var delimiter = this.config.exportCSV.delimiter,
                         lineValue = "",
-                        colValue, that = this;
+                        that = this;
 
                     //calcule results ( code extracted from method computeDisplayResult() )
                     var displayResultTmp = [];
-					if (this.isGroupActive()) {
+                    if (this.isGroupActive()) {
                     	var orderProperty = this.config.group.by.property;
                         orderProperty += (this.config.group.by.filter) ? '|' + this.config.group.by.filter : '';
                         var orderSense = (this.config.order.reverse) ? '-' : '+';
@@ -2296,7 +2303,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         });
                     }, displayResultTmp);
                     if (this.isGroupActive()) {
-                        displayResultTmp = this.addGroup(displayResultTmp);
+                    	displayResultTmp = this.addGroup(displayResultTmp);
                     }
                     //manage results
                     if (displayResultTmp) {
@@ -2312,16 +2319,22 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                 }else{
                                 	header = that.config.messages.transformKey(header);
                                 }
-
-                                if (that.isGroupActive()) {
+                                
+                                if (that.isGroupActive() && column.property!=that.config.group.by.property) {
                                     if (column.groupMethod === "sum") {
                                         header = header + this.messages.Messages('datatable.export.sum');
                                     } else if (column.groupMethod === "average") {
                                         header = header + this.messages.Messages('datatable.export.average');
                                     } else if (column.groupMethod === "unique") {
                                         header = header + this.messages.Messages('datatable.export.unique');
-                                    } else if (column.groupMethod === "countDistinct") {
+                                    } else if (column.groupMethod === "countDistinct" || column.groupMethod === "count:true") {
                                         header = header + this.messages.Messages('datatable.export.countDistinct');
+                                    } else if (column.groupMethod === "count" || column.groupMethod =="count:false" ) {
+                                            header = header + this.messages.Messages('datatable.export.count');
+                                    } else if (column.groupMethod === "collect" || column.groupMethod === "collect:false") {
+                                        header = header + this.messages.Messages('datatable.export.collect');
+                                    } else if (column.groupMethod === "collect:true") {
+                                        header = header + this.messages.Messages('datatable.export.collectDistinct');
                                     }
                                 }
                                 lineValue = lineValue + header + delimiter;
@@ -2330,80 +2343,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         lineValue = lineValue.substr(0, lineValue.length - 1) + "\n";
                         //data
                         displayResultTmp.forEach(function(result) {
-
                             columnsToPrint.forEach(function(column) {
-                                if (!that.config.hide.columns[column.id]) {
-                                    //algo to set colValue (value of the column)
-                                    if (!result.line.group && (column.url === undefined || column.url === null) && exportType !== 'groupsOnly') {
-                                        var property = column.property;
-                                        var isFunction = false;
-                                        if (angular.isFunction(property)) {
-                                            property = property();
-                                            isFunction = true;
-                                        }
-                                        property += that.getFilter(column);
-                                        property += that.getFormatter(column);
-                                        colValue = $parse(property)(result.data);
-										if(colValue === null)colValue = undefined;
-                                        if (colValue === undefined && isFunction === true) { //Because the property here is not $parsable
-                                            //The function have to return a $scope value
-                                            colValue = property;
-                                        }
-                                        if (colValue !== undefined && column.type === "number") {
-                                            colValue = colValue.replace(/\u00a0/g, "");
-                                        }
-                                        if (colValue === undefined && column.type === "boolean") {
-                                            colValue = this.messages.Messages('datatable.export.no');
-                                        } else if (colValue !== undefined && column.type === "boolean") {
-                                            if (colValue) {
-                                                colValue = this.messages.Messages('datatable.export.yes');
-                                            } else {
-                                                colValue = this.messages.Messages('datatable.export.no');
-                                            }
-                                        }
-										
-										if((column.type === "string" || column.type === "text"  || column.type === "textarea") && colValue){
-                                        	if(Array.isArray(colValue) && colValue.length === 1  && colValue[0].search
-                                        			&& colValue[0].search(new RegExp("\r|\n|"+delimiter)) !== -1){
-                                        		colValue = '"'+colValue[0]+'"';
-                                        	}else if(!Array.isArray(colValue) && colValue.search
-                                        			&& colValue.search(new RegExp("\r|\n|"+delimiter)) !== -1){
-                                        		colValue = '"'+colValue+'"';
-                                        	} else if(!Array.isArray(colValue) || (Array.isArray(colValue) && colValue.length === 1)){
-                                        		colValue = '"'+colValue+'"';
-                                        	} else if(Array.isArray(colValue)){
-                                        		colValue = '"'+colValue.join()+'"';
-                                        	}                                          	
-                                        }
-										
-										
-                                        lineValue = lineValue + ((colValue !== null) && (colValue) ? colValue : "") + delimiter;
-                                    } else if (result.line.group) {
-
-                                        var v = $parse("group." + column.id)(result.data);
-                                        //if error in group function
-                                        if (angular.isDefined(v) && angular.isString(v) && v.charAt(0) === "#") {
-                                            colValue = v;
-                                        } else if (angular.isDefined(v)) {
-                                            //not filtered properties because used during the compute
-                                            colValue = $parse("group." + column.id + that.getFormatter(column))(result.data);
-                                        } else {
-                                            colValue = undefined;
-                                        }
-										if(colValue === null)colValue = undefined;
-                                        if (colValue !== undefined && column.type === "number") {
-                                            colValue = colValue.replace(/\u00a0/g, "");
-                                        }
-                                        lineValue = lineValue + ((colValue !== null) && (colValue) ? colValue : "") + delimiter;
-                                    } else if (!result.line.group && column.url !== undefined && column.url !== null && exportType !== 'groupsOnly') {
-                                        var url = $parse(column.url)(result.data);
-                                        colValue = $parse(column.property + that.getFilter(column) + that.getFormatter(column))(that.urlCache[url]);
-										if(colValue === null)colValue = undefined;
-                                        if (colValue !== undefined && column.type === "number") {
-                                            colValue = colValue.replace(/\u00a0/g, "");
-                                        }
-                                        lineValue = lineValue + ((colValue !== null) && (colValue) ? colValue : "") + delimiter;
-                                    }
+                            	if (!that.config.hide.columns[column.id] &&
+                                		(exportType !== 'groupsOnly' || (exportType === 'groupsOnly' && result.line.group))) {
+                            		var colValue = that.getFinalValue(column, result);	    			
+                            		colValue = that.cleanColValue(column, colValue);
+     								lineValue = lineValue + ((colValue) ? colValue : "") + delimiter;                                                                      
                                 }
                             }, this);
                             if ((exportType === 'all') || ((exportType === 'groupsOnly') && result.line.group)) {

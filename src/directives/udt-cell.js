@@ -220,7 +220,7 @@ directive("udtCell", function(){
   		    	}
 
     		};
-    	}).directive("udtCellRead", function(){
+    	    	}).directive("udtCellRead", ["$parse", function($parse){
     		return {
     			restrict: 'A',
   		    	replace:true,
@@ -254,57 +254,32 @@ directive("udtCell", function(){
 	    				}
 	    			};
 
-	    			var getDisplayFunction = function(col, onlyProperty){
+	    			
+			    	var getDisplayValue = function(column, value, currentScope){
+			    		var filter  = currentScope.udtTableFunctions.getFilter(column);
+		    			var formatter = currentScope.udtTableFunctions.getFormatter(column);
+	    				
+		    			if(column.watch === true && !value.line.group && (column.url === undefined || column.url === null)){
+		    				scope.$watch("value.data."+column.property+filter+formatter, function(newValue, oldValue) {
+                                    if ( newValue !== oldValue ) {
+                                    	scope.cellValue = newValue;
+                                     }
+                            	});                           
+		    			}
+		    			return currentScope.udtTable.getFinalValue(column, value);			    		
+	    			};
+	    			
+	    			var getDisplayFunction = function(col){
 	    				if(angular.isFunction(col.property)){
     			    		return col.property(scope.value.data);
     			    	}else{
-    			    		return getDisplayValue(col, scope.value, onlyProperty, scope);
+    			    		return getDisplayValue(col, scope.value, scope);
     			    	}
 			    	};
 
-			    	var getDisplayValue = function(column, value, onlyProperty, currentScope){
-			    		if(onlyProperty){
-							if(column.watch === true){
-                                scope.$watch("value.data."+column.property, function(newValue, oldValue) {
-                                    if ( newValue !== oldValue ) {
-                                        scope.cellValue = newValue;
-                                     }
-                                });
-                            }
-			    			return currentScope.$eval(column.property, value.data);
-			    		}else{
-			    			if(!value.line.group && (column.url === undefined || column.url === null)){
-			    				if(column.watch === true){
-                                    scope.$watch("value.data."+column.property+currentScope.udtTableFunctions.getFilter(column)+currentScope.udtTableFunctions.getFormatter(column), function(newValue, oldValue) {
-                                        if ( newValue !== oldValue ) {
-                                            scope.cellValue = newValue;
-                                         }
-                                    });
-                                }
-								return currentScope.$eval(column.property+currentScope.udtTableFunctions.getFilter(column)+currentScope.udtTableFunctions.getFormatter(column), value.data);
-			    			}else if(value.line.group){
-			    				var v = currentScope.$eval("group."+column.id, value.data);
-			    				//if error in group function
-			    				if(angular.isDefined(v) && angular.isString(v) &&v.charAt(0) === "#"){
-			    					return v;
-			    				}else if(angular.isDefined(v)){
-			    					//no filtered and no formatter properties because used during the compute
-			    					return currentScope.$eval("group."+column.id, value.data);
-			    				}else{
-			    					return undefined;
-			    				}
-			    			}else if(!value.line.group && column.url !== undefined && column.url !== null){
-			    				var url = currentScope.$eval(column.url, value.data);
-			    				return currentScope.$eval(column.property+currentScope.udtTableFunctions.getFilter(column)+currentScope.udtTableFunctions.getFormatter(column), scope.udtTable.urlCache[url]);
-			    			}
-			    		}
-	    			};
-
-	    			if(scope.col.type === "img" || scope.col.type === "image"){
-	    				scope.cellValue = getDisplayFunction(scope.col, true);
-	    			}else{
-	    				scope.cellValue = getDisplayFunction(scope.col, false);
-	    			}
+	    			
+	    			scope.cellValue = getDisplayFunction(scope.col);
+	    			
   		    	}
     		};
-    	});
+    	}]);
