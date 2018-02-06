@@ -82,7 +82,7 @@ directive("udtCell", function(){
 	    					}
 	    				}else if(!col.choiceInList){
 							//TODO: type='text' because html5 autoformat return a string before that we can format the number ourself
-	    					editElement = '<input class="form-control" '+requiredDirective+' '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+this.getDateTimestamp(col.type)+'/>';
+	    					editElement = '<input class="form-control" '+requiredDirective+' '+defaultValueDirective+' '+this.getConvertDirective(col, header)+' udt-html-filter="{{col.type}}" type="text" class="input-small" ng-model="'+this.getEditProperty(col,header,filter)+ngChange+userDirectives+'/>';
 	    				}else if(col.choiceInList){
 	    					switch (col.listStyle) {
 	    						case "radio":
@@ -144,7 +144,6 @@ directive("udtCell", function(){
 			    	};
 
 			    	scope.udtTableFunctions.getFormatter = scope.udtTable.getFormatter;
-
 	    			scope.udtTableFunctions.getFilter = scope.udtTable.getFilter;
 
 	    			scope.udtTableFunctions.getOptions = function(col){
@@ -237,7 +236,10 @@ directive("udtCell", function(){
     							return '<span udt-compile="udtTable.config.columns[$index].render"></span>';
     						}
 	    				}else{
-	    					if(col.type === "boolean"){
+	    					if(col.type !== "boolean" && col.type !== "img" && col.type !=="file"){
+	    						//return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
+								return '<span ng-bind="cellValue"></span>'
+	    					}else if(col.type === "boolean"){
 	    						return '<div ng-switch on="cellValue"><i ng-switch-when="true" class="fa fa-check-square-o"></i><i ng-switch-default class="fa fa-square-o"></i></div>';
 	    					}else if(col.type==="img"){	    						
 	    						return '<div  ng-click="udtTableFunctions.setImage(cellValue.value,cellValue.fullname,cellValue.width,cellValue.height)" class="thumbnail" ng-if="cellValue !== undefined" >' 
@@ -247,8 +249,7 @@ directive("udtCell", function(){
                                 +'{{cellValue.fullname}}'
                                 +'</a>';
 	    					} else{
-	    						//return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
-								return '<span ng-bind="cellValue"></span>'
+	    						return ''
 	    					}
 	    				}
 	    			};
