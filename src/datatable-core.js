@@ -215,7 +215,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     start: false
                 },
 				callbackEndDisplayResult : function(){},                
-                compact: true //mode compact pour le nom des bouttons
+                compact: true, //mode compact pour le nom des bouttons
+                objectsMustBeAddInGetFinalValue:{} //object used in $parse to apply function on extract value.
 
             },
             config: undefined,
@@ -362,7 +363,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (configPagination.active && !this.isRemoteMode(configPagination.mode)) {
                     this.config.pagination.pageNumber = 0;
                 }
-                if (recordsNumber === undefined) recordsNumber = data.length;
+                if (recordsNumber === undefined && data !== null & data !== undefined) recordsNumber = data.length;                
                 this.allResult = data;
                 this.totalNumberRecords = recordsNumber;
                 this.loadUrlColumnProperty();
@@ -1746,6 +1747,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (this.config.cancel.active) {
                     /*cancel only edit and hide mode */
                     this.config.edit = angular.copy(this.configMaster.edit);
+					this.config.edit.byDefault = false;
                     this.config.hide = angular.copy(this.configMaster.hide);
                     this.config.remove = angular.copy(this.configMaster.remove);
                     this.config.select = angular.copy(this.configMaster.select);
