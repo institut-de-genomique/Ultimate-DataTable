@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.3.1-SNAPSHOT 2018-05-31 
+/*! ultimate-datatable version 3.3.1-SNAPSHOT 2018-06-08 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -141,7 +141,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     withEdit: false, //to authorize to remove a line in edition mode
                     showButton: true,
                     mode: 'remote', //or local
-                    value: undefined,//function to access row before delete, necessary for app like electron
+                    beforeDelete: undefined,//function to access row before delete, necessary for app like electron
                     url: undefined, //function with object in parameter !!!
                     callback: undefined, //used to have a callback after remove all element. the datatable is pass to callback method and number of error
                     start: false,
@@ -1534,7 +1534,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                                 } else {
                                     this.config.remove.ids.success.push(i);
                                 }
-                                this.config.remove.value && this.config.remove.value.call(this, this.allResult[i]);  
+                                this.config.remove.beforeDelete && this.config.remove.beforeDelete.call(this, this.displayResult[i]);  
                             }
                         }
                         
