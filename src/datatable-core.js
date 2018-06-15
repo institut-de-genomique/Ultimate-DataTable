@@ -2282,12 +2282,17 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 					colValue = colValue.map(function(colValue){return colValue.replace(/\u00a0/g, "");});
 				}else if(column.type === "boolean" && colValue === undefined){
 					colValue = this.messages.Messages('datatable.export.no');
-				} else if (column.type === "boolean") {
-				    if (colValue) {
-				        colValue = this.messages.Messages('datatable.export.yes');
-				    } else {
-				        colValue = this.messages.Messages('datatable.export.no');
-				    }
+				} else if (column.type === "boolean" && colValue !== undefined) {
+					if(!angular.isArray(colValue)){
+						colValue = [colValue];
+					}
+					colValue = colValue.map(function(colValue){
+						if (colValue === true) {
+							return this.messages.Messages('datatable.export.yes');
+						} else {
+							return this.messages.Messages('datatable.export.no');
+						}},this);					
+					colValue = '"'+colValue.join()+'"';
 				}else if((column.type === "string" || column.type === "text"  || column.type === "textarea") && colValue !== undefined){
 					if(!angular.isArray(colValue)){
 						colValue = [colValue];
