@@ -34,13 +34,11 @@ factory('udtConvertValueServices', [function() {
 					},
 					parse : function(value){
 						var valueToConvert = value;
-						if(!angular.isNumber(valueToConvert)){
+						if(valueToConvert !== null && valueToConvert !== undefined && !angular.isNumber(valueToConvert)){
 							var valueConverted = value.replace(/\s+/g,"").replace(',','.');
-							valueConverted = parseFloat(valueConverted);
-							
+							valueConverted = parseFloat(valueConverted);							
 							return valueConverted;
-						}
-						
+						}						
 						return value;
 					}
 				};
