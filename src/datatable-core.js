@@ -1994,7 +1994,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
 						
 						if(null === columns[i].headerTpl || undefined === columns[i].headerTpl){
-                        	columns[i].headerTpl = '<span class="header" ng-model="udtTable" ng-bind="udtTableFunctions.messages.Messages(column.header)"/>';
+                        	columns[i].headerTpl = '<span class="header" ng-model="udtTable" ng-bind="udtHelpers.messages.Messages(column.header)"/>';
                         }
                     }
 
