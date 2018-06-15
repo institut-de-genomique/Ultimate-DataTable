@@ -3,32 +3,54 @@ angular.module('ultimateDataTableServices').
 //EXAMPLE: <input type="text" default-value="test" ng-model="x">
 directive('udtDefaultValue',['$parse', function($parse) {
 	    		return {
+	    			priority:1200,					 
 	    			require: 'ngModel',
-	    			link: function(scope, element, attrs, ngModel) {
-	    				var _col = null;
-	    				scope.$watch(attrs.udtDefaultValue, function(col){
-	    					if(col !== null && col !== undefined && col.defaultValues !== undefined && col.defaultValues !== null ){
-	    						_col = col;
-	    					}
-	    				});
-	    				//TODO GA ?? better way with formatter
-						scope.$watch(ngModel, function(value){
-				                if(_col != null && (ngModel.$modelValue === undefined || ngModel.$modelValue === "")){
-									if(_col.type === "boolean"){
-										if(_col.defaultValues === "true" || _col.defaultValues === true){
-											ngModel.$setViewValue(true);
-											ngModel.$render();
-										}else if(_col.defaultValues === "false" || _col.defaultValues === false){
-											ngModel.$setViewValue(false);
-											ngModel.$render();
-										}											
-									}else{
-										ngModel.$setViewValue(_col.defaultValues);
-										ngModel.$render();
-									}
-				                	
+	    			link: function(scope, element, attrs, ngModelController) {
+	    				
+	    				
+	    				var _col = $parse(attrs.udtDefaultValue)(scope);
+	    				
+	    				var currentValue = $parse(attrs.ngModel)(scope);
+	    				//inspire by ngModel.NgModelController.$isEmpty.
+	    				//not used directly this function because not work in case of inputCheckBox 
+	    				//see ngModel.NgModelController.$isEmpty documentation
+	    				var isEmpty = function(value) {
+	    				   return angular.isUndefined(value) || value === '' || value === null || value !== value;
+	    				};
+	    				
+	    				var setDefaultValue = function(){
+	    					if(_col != null && isEmpty(currentValue)){
+								if(_col.type === "boolean"){
+									if(_col.defaultValues === "true" || _col.defaultValues === true){
+										ngModelController.$setViewValue(true);
+										ngModelController.$render();
+									}else if(_col.defaultValues === "false" || _col.defaultValues === false){
+										ngModelController.$setViewValue(true); // hack to insert false value 
+										ngModelController.$setViewValue(false);
+										ngModelController.$render();
+									}											
+								}else if(!angular.isFunction(_col.defaultValues)){
+									ngModelController.$setViewValue(_col.defaultValues);
+									ngModelController.$render();
+								}else{
+									var defaultValue = _col.defaultValues(scope.value.data, _col);
+									ngModelController.$setViewValue(defaultValue);
+									ngModelController.$render();
 								}
-					    });
+			                	
+							}
+	    				}
+	    				
+	    				if(_col){
+	    					setDefaultValue();	    					
+	    					if(angular.isFunction(_col.defaultValues)){ //only watch when function to limit watching
+    							scope.$watch(attrs.udtDefaultValue+".defaultValues(value.data,col)", function(newValue, oldValue){
+    								if(newValue !== oldValue){
+    									setDefaultValue();
+    								}
+	    						});
+    						}    						
+	    				}	    			
 	    			}
-	    		};	    	
+	    		};
 	    	}]);
