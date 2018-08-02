@@ -15,7 +15,7 @@ directive('udtDefaultValue',['$parse', function($parse) {
 	    				//not used directly this function because not work in case of inputCheckBox 
 	    				//see ngModel.NgModelController.$isEmpty documentation
 	    				var isEmpty = function(value) {
-	    				   return angular.isUndefined(value) || value === '' || value === null || value !== value;
+	    				   return (angular.isUndefined(value) || value === '' || value === null);
 	    				};
 	    				
 	    				var setDefaultValue = function(){
