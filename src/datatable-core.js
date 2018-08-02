@@ -122,10 +122,10 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     showButton: true,
                     changeClass: true, //change class to success or error
                     mode: 'remote', //or local
-                    url: undefined,
-                    batch: false, //for batch mode one url with all data
-                    method: 'post',
-                    value: undefined, //used to transform the value send to the server
+                    url: undefined, //mode remote only url or function that takes the value
+                    batch: false, //for batch mode one url with all data. //mode remote only
+                    method: 'post', //mode remote only or funtion with value as parameter in batch mode an array
+                    value: undefined, //used to transform the value send to the server //mode remote only
                     callback: undefined, //used to have a callback after save all element. the datatable is pass to callback method and number of error
                     start: false, //if save started
                     number: 0, //number of element in progress
@@ -1748,6 +1748,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     /*cancel only edit and hide mode */
                     this.config.edit = angular.copy(this.configMaster.edit);
 					this.config.edit.byDefault = false;
+					this.config.save = angular.copy(this.configMaster.save);                    
                     this.config.hide = angular.copy(this.configMaster.hide);
                     this.config.remove = angular.copy(this.configMaster.remove);
                     this.config.select = angular.copy(this.configMaster.select);
@@ -2280,7 +2281,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 				    colValue = colValue.replace(/\u00a0/g, "");
 				}else if(column.type === "number" && angular.isArray(colValue)){
 					colValue = colValue.map(function(colValue){return colValue.replace(/\u00a0/g, "");});
-				}else if(column.type === "boolean" && colValue === undefined){
+				}else if(column.type === "boolean" && (colValue === undefined || (angular.isArray(colValue) && colValue.length === 0))){
 					colValue = this.messages.Messages('datatable.export.no');
 				} else if (column.type === "boolean" && colValue !== undefined) {
 					if(!angular.isArray(colValue)){
