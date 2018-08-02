@@ -21,11 +21,10 @@ directive('udtAutoSelect',['$parse', function($parse) {
 					if(valOption != undefined){
 						var match = valOption.match(OPTIONS_REGEXP);
 						var getModelValue = $parse(match[1].replace(match[4]+'.',''));
-						var model = $parse(match[7]);
-						scope.$watch(model, function(value){
+						scope.$watch(match[7], function(value){
 							if(value){
-								if(value.length === 1 && ngModel.$isEmpty(ngModel.$modelValue)){
-									
+								if(value.length === 1  && (ngModel.$modelValue === undefined || ngModel.$modelValue === '' || ngModel.$modelValue === null)){
+								
 									var value = (multiple)?[getModelValue(value[0])]:getModelValue(value[0]);
 									
 									ngModel.$setViewValue(value);
