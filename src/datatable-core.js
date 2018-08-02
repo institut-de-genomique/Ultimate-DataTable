@@ -127,7 +127,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     method: 'post', //mode remote only or funtion with value as parameter in batch mode an array
                     value: undefined, //used to transform the value send to the server //mode remote only
                     callback: undefined, //used to have a callback after save all element. the datatable is pass to callback method and number of error
-                    start: false, //if save started
+                    beforeSave: undefined, //function that will be return a promise that will be executed before save (remote or local). useful to chain two url.
+					start: false, //if save started
                     number: 0, //number of element in progress
                     error: 0,
                     newData: [],
@@ -256,7 +257,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     this.displayResult[index].line.errors = {};
                 }
                 this.displayResult[index].line.errors[key] = "";
-                for (var i = 0; i < data[key].length; i++) {
+                for (var i = 0; angular.isArray(data[key]) && i < data[key].length; i++) {
                     this.displayResult[index].line.errors[key] += data[key][i] + " ";
                 }
             },
@@ -1301,86 +1302,114 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 	if(this.formController.$invalid){
                 		this.config.save.enableValidation = true;            		
             		}else{
-						this.config.save.number = 0;
-						this.config.save.error = 0;
-						this.config.save.start = true;
-						this.setSpinner(true);
-						this.config.messages.text = undefined;
-						this.config.messages.clazz = undefined;
-						var data = [];
+            			 this.config.save.number = 0;
+                         this.config.save.error = 0;
+                         this.config.save.start = true;
+                         this.setSpinner(true);
+                         this.config.messages.text = undefined;
+                         this.config.messages.clazz = undefined;
+                         var data = [];
 
-						var valueFunction = this.getValueFunction(this.config.save.value);
-						for (var i = 0; i < this.displayResult.length; i++) {
-							if (this.displayResult[i].line.edit || this.config.save.withoutEdit) {
-								//remove datatable properties to avoid this data are retrieve in the json
-								this.config.save.number++;
-								this.displayResult[i].line.trClass = undefined;
-								this.displayResult[i].line.selected = undefined;
-								this.resetErrors(i);
-								if (this.isRemoteMode(this.config.save.mode) && !this.config.save.batch) {
-									//add the url in table to used $q
-									data.push(this.getSaveRemoteRequest(this.displayResult[i].data, i));
-								} else if (this.isRemoteMode(this.config.save.mode) && this.config.save.batch) {
-									//add the data in table to send in once all the result
-									data.push({
-										index: i,
-										data: valueFunction(this.displayResult[i].data)
-									});
-								} else {
-									this.saveLocal(valueFunction(this.displayResult[i].data), i);
-								}
-							}
-						}
-						if (!this.isRemoteMode(this.config.save.mode) || data.length === 0) {
-							this.saveFinish();
-						} else if (this.isRemoteMode(this.config.save.mode) && !this.config.save.batch) {
-							this.saveRemote(data);
-						} else if (this.isRemoteMode(this.config.save.mode) && this.config.save.batch) {
-							this.saveBatchRemote(data);
-						}
-					}
+                         var valueFunction = this.getValueFunction(this.config.save.value);
+                         for (var i = 0; i < this.displayResult.length; i++) {
+                             if (this.displayResult[i].line.edit || this.config.save.withoutEdit) {
+                                 //remove datatable properties to avoid this data are retrieve in the json
+                            	 this.resetErrors(i);
+                                 this.config.save.number++;
+                                 var dr = this.displayResult[i];
+                                 dr.line.trClass = undefined;
+                                 dr.line.selected = undefined;
+                                 data.push({
+                                     index: i,
+                                     data: dr.data
+                                 });
+                             }
+                         }
+                         if(data.length === 0){
+                        	 return $q.when(this.saveFinish());
+                         }else if (!this.isRemoteMode(this.config.save.mode)) {
+                             return this.saveAllLocal(data);
+                         } else if (this.isRemoteMode(this.config.save.mode) && !this.config.save.batch) {
+                        	 return this.saveAllRemote(data);
+                         } else if (this.isRemoteMode(this.config.save.mode) && this.config.save.batch) {
+                        	 return this.saveAllBatchRemote(data);
+                         }
+            		}                	
                 } else {
                     //console.log("save is not active !");
                 }
             },
-
-            saveBatchRemote: function(values) {
+            
+            getBeforeSavePromise : function(){
+            	var beforeSavePromise = function(context){
+					if(context.datatable.config.save.beforeSave === undefined || context.datatable.config.save.beforeSave === null){
+						return context.value;
+					}else{
+						return context.datatable.config.save.beforeSave(context.value);
+					}
+				 };
+				 return beforeSavePromise;
+            },
+            
+            saveAllLocal: function(values) {
+            	//do not transform the value            	
+           	 	var queries = values.map(function(value){
+           	 		//to backward compatibility with synchrone local save
+					if(this.config.save.beforeSave === undefined || this.context.datatable.config.save.beforeSave === null){
+						this.saveLocal(value.data, value.index);
+						this.saveFinish();
+						return $q.when();						
+					}else{
+						var context = {datatable:this, value:value.data, index:value.index};
+						return $q.when(context, this.getBeforeSavePromise()).then(function(resp){
+							context.datatable.saveLocal(context.value, context.index);
+							context.datatable.saveFinish();
+						},function(resp){
+							//error
+							context.datatable.saveOnError(context.value, context.index);
+							context.datatable.saveFinish();
+						});
+					}
+           	 		
+           	 		
+				},this)
+				
+                return $q.all(queries).then(function(results) {
+                	console.log("save global ok");
+                },function(results){
+                	console.log("save global error");
+                });
+           	 	
+            },
+            
+            saveAllBatchRemote: function(values) {
                 var nbElementByBatch = Math.ceil(values.length / 6); //6 because 6 request max in parrallel with firefox and chrome
                 var queries = [];
                 for (var i = 0; i < 6 && values.length > 0; i++) {
                     queries.push(this.getSaveRemoteRequest(values.splice(0, nbElementByBatch)));
                 }
-                $q.all(queries).then(function(results) {
-                    angular.forEach(results, function(result, key) {
-                        if (result.status !== 200) {
-                            console.log("Error for batch save");
-                        } else {
-                            angular.forEach(result.data, function(value, key) {
-                                this.datatable.saveRemoteOneElement(value.status, value.data, value.index);
-                            }, result.config);
-                        }
-
-                    });
+                return $q.all(queries).then(function(results) {
+                	console.log("save global ok");
+                },function(results){
+                	console.log("save global error");
                 });
             },
 
-            saveRemote: function(queries) {
-                $q.all(queries).then(function(results) {
-                    angular.forEach(results, function(value, key) {
-                        value.config.datatable.saveRemoteOneElement(value.status, value.data, value.config.index);
-                    });
-                });
+            saveAllRemote: function(values) {
+            	var queries = values.map(function(value){
+            		return this.getSaveRemoteRequest(value.data, value.index)
+            	},this);
+            	
+            	return $q.all(queries).then(function(results) {
+					console.log("save global ok");
+				},function(results){
+					console.log("save global error");
+				});
             },
 
             saveRemoteOneElement: function(status, value, index) {
                 if (status !== 200) {
-                    if (this.config.save.changeClass) {
-                        this.displayResult[index].line.trClass = "danger";
-                    }
-                    this.displayResult[index].line.edit = true;
-                    this.addErrors(index, value);
-                    this.config.save.error++;
-                    this.config.save.number--;
+                    this.saveOnError(value, index);
                     this.saveFinish();
                 } else {
                     this.resetErrors(index);
@@ -1388,9 +1417,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     this.saveFinish();
                 }
             },
-
+            /**
+             * value = one value or array in batch mode
+             */
             getSaveRemoteRequest: function(value, i) {
                 var urlFunction = this.getUrlFunction(this.config.save.url);
+                if(urlFunction === null || urlFunction === undefined)  throw 'no url define for save !';
                 var method = this.config.save.method;
                 if (angular.isFunction(method)) {
                     method = method(value);
@@ -1401,27 +1433,65 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 if (angular.isObject(this.config.save.httpConfig)) {
                     angular.merge(httpConfig, this.config.save.httpConfig);
                 }
-                if (urlFunction) {
-                    if (this.config.save.batch) {
-                        return $http[method](urlFunction(value), value, httpConfig);
-                    } else {
-                        var valueFunction = this.getValueFunction(this.config.save.value);
-                        httpConfig.index = i;
-                        return $http[method](urlFunction(value), valueFunction(value), httpConfig).
-                        then(function(resp) {
-                            resp.config.datatable.saveRemoteOneElement(resp.status, resp.data, resp.config.index);
-                            return resp;
-                        }, function(resp) {
-                            resp.config.datatable.saveRemoteOneElement(resp.status, resp.data, resp.config.index);
-                            return resp;
-                        });
-
-                    }
-                } else {
-                    throw 'no url define for save !';
-                }
+                
+				var valueFunction = this.getValueFunction(this.config.save.value);
+				if (this.config.save.batch) {
+					var context = {datatable:this, value:value};
+					return $q.when(context, this.getBeforeSavePromise())
+						.then(function(){
+							$http[method](urlFunction(value), value.map(function(v){return {index:v.index,data:valueFunction(v.data)};}), httpConfig).
+								then(function(resp) {
+						        	angular.forEach(resp.data, function(value, key) {
+						                this.datatable.saveRemoteOneElement(value.status, value.data, value.index);
+						            },resp.config);
+						        	return resp;
+						        }, function(resp) {
+						        	//resp.data must contain an array of map of errors
+						        	angular.forEach(resp.data, function(value, key) {
+						                this.datatable.saveRemoteOneElement(resp.status, value.data, value.index);
+						            },resp.config);
+						        	return resp;
+						        });
+						},function(resp){
+							angular.forEach(context.value, function(v, key) {
+								//can be improve because we don't have any error message
+								console.log("error on beforeSave");
+					    		this.saveRemoteOneElement("500", v.data, v.index);
+				            },context.datatable);
+				    	});
+				} else {
+				    httpConfig.index = i;
+				    var context = {datatable:this, value:value, index:i};
+				    return $q.when(context, this.getBeforeSavePromise())
+				    	.then(function(){
+					    	return $http[method](urlFunction(value), valueFunction(value), httpConfig).
+					    	 	then(function(resp) {
+						            resp.config.datatable.saveRemoteOneElement(resp.status, resp.data, resp.config.index);
+						            return resp;
+						        }, function(resp) {
+						            //resp.data must contain a map of errors
+						            resp.config.datatable.saveRemoteOneElement(resp.status, resp.data, resp.config.index);
+		                            return resp;
+						        });
+				    	},function(){
+				    		//can be improve because we don't have any error message
+				    		console.log("error on beforeSave");
+				    		context.datatable.saveRemoteOneElement("500", context.value, context.index);
+				    	});
+				       
+				
+				}    
+				
             },
-
+            saveOnError: function(value, index){
+            	 if (this.config.save.changeClass) {
+                     this.displayResult[index].line.trClass = "danger";
+                 }
+                 this.displayResult[index].line.edit = true;
+                 this.addErrors(index, value);
+                 this.config.save.error++;
+                 this.config.save.number--;
+            },
             /**
              * Call after save to update the records property
              */
