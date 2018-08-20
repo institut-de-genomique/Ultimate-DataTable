@@ -505,7 +505,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
 	                            if ('sum' === column.groupMethod || 'average' === column.groupMethod) {
 	                                var result = groupData.reduce(function(value, element) {
 	                                    element.col = column; //add in experimental feature
-	                                	value += columnGetterWithoutFomat(element, context);
+	                                	var num = columnGetterWithoutFomat(element, context);
+	                                	value += (num !==  undefined)?num:0;	                                	
 										element.col = undefined;
 										return value;
 	                                }, 0);
@@ -1760,8 +1761,11 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             }
                         }
                         if (angular.isFunction(this.config.select.callback)) {
+							console.warning('select.callback is deprecated. Use mouseevents.clickCallback instead.');
                         	this.config.select.callback(this.displayResult[i].line, this.displayResult[i].data);
-                        }
+                        } else if (angular.isFunction(this.config.mouseevents.clickCallback)) {
+	  		                this.config.mouseevents.clickCallback(this.displayResult[i].line, this.displayResult[i].data);
+	  				    }
                     }
                 } else {
                     //console.log("select is not active");
