@@ -56,7 +56,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     mode: 'remote',
                     url: undefined
                 },
-                filter: {
+                localSearch: {
                     active: false,
                     highlight: false,
                     columnMode: false,
@@ -283,8 +283,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             /**
              * local search
              */
-            searchLocal: function(searchTerms) {
-                if (this.config.filter.active === true) {
+            localSearch : function(searchTerms) {
+                if (this.config.localSearch.active === true) {
                     //Set the properties "" or null to undefined because we don't want to filter this
                     this.setSpinner(true);
                     for (var p in searchTerms) {
@@ -293,15 +293,16 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
                     }
 
-                    var _allResult = angular.copy(this.allResult);
-                    _allResult = $filter('filter')(this.allResult, searchTerms, false);
+					if(this.backupAllResult === undefined){
+						this.backupAllResult = angular.copy(this.allResult);
+					}else{
+						this.allResult = angular.copy(this.backupAllResult);
+					}
+					
+                    this.allResult = $filter('filter')(this.allResult, searchTerms, false);
 
-                    this._getAllResult = function() {
-                        return _allResult;
-                    };
-
-                    this.totalNumberRecords = _allResult.length;
-                    //this.sortAllResult();
+                    this.totalNumberRecords = this.allResult.length;
+                    this.sortAllResult();
                     this.computePaginationList();
                     this.computeDisplayResult();
                     var that = this;
@@ -310,6 +311,20 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     });
                 }
             },
+			resetLocalSearch : function(){
+				this.searchTerms = {};
+				if(this.backupAllResult !== undefined){
+						this.allResult = angular.copy(this.backupAllResult);
+						this.totalNumberRecords = this.allResult.length;
+						this.sortAllResult();
+						this.computePaginationList();
+						this.computeDisplayResult();
+						var that = this;
+						this.computeDisplayResultTimeOut.then(function() {
+							that.setSpinner(false);
+						});
+				}
+			},
             _getAllResult: function() {
                 return this.allResult;
             },
@@ -2060,8 +2075,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             throw "Columns config error: " + columns[i].property + " convertValue=active but convertValue.displayMeasureValue or convertValue.saveMeasureValue is missing";
                         }
 
-                        if(null === columns[i].showFilter || undefined === columns[i].showFilter){
-                            columns[i].showFilter = false;
+                        if(null === columns[i].localSearch || undefined === columns[i].localSearch){
+                            columns[i].localSearch = false;
                         }
 						
 						if(null === columns[i].edit || undefined === columns[i].edit){
@@ -2108,6 +2123,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 var settings = $.extend(true, {}, this.configDefault, config);
                 this.config = angular.copy(settings);
 
+				if(this.config.filter !== undefined){
+					this.config.localSearch = this.config.filter;
+					this.config.filter = undefined;
+					console.log("config filter is deprecated used localSearch");
+				}
+				
                 if(!this.config.pagination.numberRecordsPerPageList){
                 	this.config.pagination.numberRecordsPerPageList = [{
                         number: 10,

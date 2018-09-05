@@ -79,12 +79,11 @@ The server have to respond with data in JSON:
 "recordsNumber":numberOfRecords
 }
 ```
-## Filter
-> If active, add a input field to search locally on all data, the highlight option highlight the search term in the datatable if active, the columnMode option if active add filter for all columns
+## localSearch
+> If active, add a input field to search locally on all data, the columnMode option if active add filter for all columns
 ```json
-"filter": {
+"localSearch": {
 	active:boolean,//Active or not
-	highlight:boolean,
 	columnMode:boolean,
 	showButton:boolean //Show the filter and reset buttons if true
 }

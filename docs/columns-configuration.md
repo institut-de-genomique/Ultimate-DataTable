@@ -157,3 +157,6 @@
 ```json
 "required" : boolean or function that return boolean
 ```
+##localSearch
+> if you want active a search on the column see localSearch configuration
+"localSearch":boolean by default false.

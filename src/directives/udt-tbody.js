@@ -49,7 +49,7 @@ directive("udtTbody", function(){
     			    		//we need used udt-change when we used typehead directive
     			    		ngChange = '" udt-change="udtTable.updateColumn(col.property, col.id)"';
 						}else if(filter){
-							ngChange = '" udt-change="udtTable.searchLocal(udtTable.searchTerms)"';
+							ngChange = '" udt-change="udtTable.localSearch(udtTable.searchTerms)"';
     			    	}else if(col.defaultValues){
     			    		defaultValueDirective = 'udt-default-value="col"';
     			    	}else if(col.choiceInList){
@@ -172,7 +172,7 @@ directive("udtTbody", function(){
     						}
 	    				}else{
 	    					if(col.type !== "boolean" && col.type !== "img" && col.type !=="file"){
-	    						//return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
+	    						//return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.localSearch.highlight"></span>';
 								return '<span ng-bind="cellValue"></span>'
 	    					}else if(col.type === "boolean"){
 	    						return '<div ng-switch on="cellValue"><i ng-switch-when="true" class="fa fa-check-square-o"></i><i ng-switch-default class="fa fa-square-o"></i></div>';

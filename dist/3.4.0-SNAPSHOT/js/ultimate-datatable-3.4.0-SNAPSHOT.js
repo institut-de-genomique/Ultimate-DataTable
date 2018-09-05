@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.4.0-SNAPSHOT 2018-08-20 
+/*! ultimate-datatable version 3.4.0-SNAPSHOT 2018-09-05 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -59,7 +59,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     mode: 'remote',
                     url: undefined
                 },
-                filter: {
+                localSearch: {
                     active: false,
                     highlight: false,
                     columnMode: false,
@@ -286,8 +286,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             /**
              * local search
              */
-            searchLocal: function(searchTerms) {
-                if (this.config.filter.active === true) {
+            localSearch : function(searchTerms) {
+                if (this.config.localSearch.active === true) {
                     //Set the properties "" or null to undefined because we don't want to filter this
                     this.setSpinner(true);
                     for (var p in searchTerms) {
@@ -296,15 +296,16 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
                     }
 
-                    var _allResult = angular.copy(this.allResult);
-                    _allResult = $filter('filter')(this.allResult, searchTerms, false);
+					if(this.backupAllResult === undefined){
+						this.backupAllResult = angular.copy(this.allResult);
+					}else{
+						this.allResult = angular.copy(this.backupAllResult);
+					}
+					
+                    this.allResult = $filter('filter')(this.allResult, searchTerms, false);
 
-                    this._getAllResult = function() {
-                        return _allResult;
-                    };
-
-                    this.totalNumberRecords = _allResult.length;
-                    //this.sortAllResult();
+                    this.totalNumberRecords = this.allResult.length;
+                    this.sortAllResult();
                     this.computePaginationList();
                     this.computeDisplayResult();
                     var that = this;
@@ -313,6 +314,20 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     });
                 }
             },
+			resetLocalSearch : function(){
+				this.searchTerms = {};
+				if(this.backupAllResult !== undefined){
+						this.allResult = angular.copy(this.backupAllResult);
+						this.totalNumberRecords = this.allResult.length;
+						this.sortAllResult();
+						this.computePaginationList();
+						this.computeDisplayResult();
+						var that = this;
+						this.computeDisplayResultTimeOut.then(function() {
+							that.setSpinner(false);
+						});
+				}
+			},
             _getAllResult: function() {
                 return this.allResult;
             },
@@ -2063,8 +2078,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             throw "Columns config error: " + columns[i].property + " convertValue=active but convertValue.displayMeasureValue or convertValue.saveMeasureValue is missing";
                         }
 
-                        if(null === columns[i].showFilter || undefined === columns[i].showFilter){
-                            columns[i].showFilter = false;
+                        if(null === columns[i].localSearch || undefined === columns[i].localSearch){
+                            columns[i].localSearch = false;
                         }
 						
 						if(null === columns[i].edit || undefined === columns[i].edit){
@@ -2111,6 +2126,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 var settings = $.extend(true, {}, this.configDefault, config);
                 this.config = angular.copy(settings);
 
+				if(this.config.filter !== undefined){
+					this.config.localSearch = this.config.filter;
+					this.config.filter = undefined;
+					console.log("config filter is deprecated used localSearch");
+				}
+				
                 if(!this.config.pagination.numberRecordsPerPageList){
                 	this.config.pagination.numberRecordsPerPageList = [{
                         number: 10,
@@ -3498,7 +3519,7 @@ directive("udtTbody", function(){
     			    		//we need used udt-change when we used typehead directive
     			    		ngChange = '" udt-change="udtTable.updateColumn(col.property, col.id)"';
 						}else if(filter){
-							ngChange = '" udt-change="udtTable.searchLocal(udtTable.searchTerms)"';
+							ngChange = '" udt-change="udtTable.localSearch(udtTable.searchTerms)"';
     			    	}else if(col.defaultValues){
     			    		defaultValueDirective = 'udt-default-value="col"';
     			    	}else if(col.choiceInList){
@@ -3621,7 +3642,7 @@ directive("udtTbody", function(){
     						}
 	    				}else{
 	    					if(col.type !== "boolean" && col.type !== "img" && col.type !=="file"){
-	    						//return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
+	    						//return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.localSearch.highlight"></span>';
 								return '<span ng-bind="cellValue"></span>'
 	    					}else if(col.type === "boolean"){
 	    						return '<div ng-switch on="cellValue"><i ng-switch-when="true" class="fa fa-check-square-o"></i><i ng-switch-default class="fa fa-square-o"></i></div>';
@@ -4068,8 +4089,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save":"Sauvegarder",
 							"datatable.button.add":"Ajouter",
 							"datatable.button.remove":"Supprimer",
-							"datatable.button.searchLocal":"Rechercher",
-							"datatable.button.resetSearchLocal":"Annuler",
+							"datatable.button.localSearch":"Rechercher",
+							"datatable.button.resetLocalSearch":"Annuler",
 							"datatable.button.length" : "Taille ({0})",
 							"datatable.totalNumberRecords" : "{0} R\u00e9sultat(s)",
 							"datatable.button.exportCSV" : "Export CSV",
@@ -4108,8 +4129,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save":"Save",
 							"datatable.button.add":"Add",
 							"datatable.button.remove":"Remove",
-							"datatable.button.searchLocal":"Search",
-							"datatable.button.resetSearchLocal":"Cancel",
+							"datatable.button.localSearch":"Search",
+							"datatable.button.resetLocalSearch":"Cancel",
 							"datatable.button.length" : "Size ({0})",
 							"datatable.totalNumberRecords" : "{0} Result(s)",
 							"datatable.button.exportCSV" : "CSV Export",
@@ -4148,8 +4169,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save": "Opslaan",
 							"datatable.button.add": "Toevoegen",
 							"datatable.button.remove": "Verwijderen",
-							"datatable.button.searchLocal": "Zoek",
-							"datatable.button.resetSearchLocal": "Annuleer",
+							"datatable.button.localSearch": "Zoek",
+							"datatable.button.resetLocalSearch": "Annuleer",
 							"datatable.button.length": "Grote ({0})",
 							"datatable.totalNumberRecords": "{0} Resultaten",
 							"datatable.button.exportCSV": "CSV Export",
@@ -4239,9 +4260,9 @@ run(['$templateCache', function($templateCache) {
    +                    '</tr>'
    +                '</thead>'
    +                '<tbody udt-tbody>'
-   +                    '<tr ng-if="udtTable.config.filter.columnMode && !udtTable.config.edit.start" class="filter">'
+   +                    '<tr ng-if="udtTable.config.localSearch.columnMode && !udtTable.config.edit.start" class="filter">'
    +                        '<td ng-repeat="col in udtTable.config.columns" ng-if="!udtTable.isHide(col.id)">'
-   +                            '<div ng-if="col.showFilter" udt-cell-filter/>'
+   +                            '<div ng-if="col.localSearch" udt-cell-filter/>'
    +                        '</td>'
    +                    '</tr>'
    +                    '<tr ng-if="udtTable.isEdit()" class="editParent">'
@@ -4445,28 +4466,28 @@ run(['$templateCache', function($templateCache) {
    +            '<div class="btn-group" ng-if="udtTable.isShowOtherButtons() && !udtTable.config.otherButtons.complex" udt-compile="udtTable.config.otherButtons.template"></div>'
    +			'<div style="display:inline-block; margin-left:5px" ng-if="udtTable.isShowOtherButtons() && udtTable.config.otherButtons.complex" udt-compile="udtTable.config.otherButtons.template"></div>'
    +        '</div>'
-   +        '<div class="col-xs-2 .col-sm-3 col-md-3 col-lg-3" name="udt-toolbar-filter" ng-if="udtTable.config.filter.active === true">'
+   +        '<div class="col-xs-2 .col-sm-3 col-md-3 col-lg-3" name="udt-toolbar-filter" ng-if="udtTable.config.localSearch.active === true">'
    +            '<div class="col-xs-12 .col-sm-6 col-md-7 col-lg-8 input-group" ng-if="udtTable.isCompactMode()">'
-   +                '<input class="form-control input-compact" udt-change="udtTable.searchLocal(udtTable.searchTerms)" type="text" ng-model="udtTable.searchTerms.$" ng-keydown="$event.keyCode==13 ? udtTable.searchLocal(udtTable.searchTerms) : \'\'">'
+   +                '<input class="form-control input-compact" udt-change="udtTable.localSearch(udtTable.searchTerms)" type="text" ng-model="udtTable.searchTerms.$" ng-keydown="$event.keyCode==13 ? udtTable.localSearch(udtTable.searchTerms) : \'\'">'
    +                '<span class="input-group-btn">'
-   +                    '<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchLocal(udtTable.searchTerms)" title="{{udtHelpers.messages.Messages(\'datatable.button.searchLocal\')}}">'
+   +                    '<button ng-if="udtTable.config.localSearch.active === true" class="btn btn-default search-button" ng-click="udtTable.localSearch(udtTable.searchTerms)" title="{{udtHelpers.messages.Messages(\'datatable.button.localSearch\')}}">'
    +                        '<i class="fa fa-search"></i>'
    +                    '</button>'
-   +                    '<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchTerms={};udtTable.searchLocal()" title="{{udtHelpers.messages.Messages(\'datatable.button.resetSearchLocal\')}}">'
+   +                    '<button ng-if="udtTable.config.localSearch.active === true" class="btn btn-default search-button" ng-click="udtTable.resetLocalSearch()" title="{{udtHelpers.messages.Messages(\'datatable.button.resetLocalSearch\')}}">'
    +                        '<i class="fa fa-times"></i>'
    +                    '</button>'
    +                '</span>'
    +            '</div>'
    +            '<div class="col-xs-12 .col-sm-12 col-md-12 col-lg-12 input-group" ng-if="!udtTable.isCompactMode()">'
-   +                '<input class="form-control" utd-change="udtTable.searchLocal(udtTable.searchTerms)" type="text" ng-model="udtTable.searchTerms.$">'
+   +                '<input class="form-control" utd-change="udtTable.localSearch(udtTable.searchTerms)" type="text" ng-model="udtTable.searchTerms.$">'
    +                '<span class="input-group-btn">'
-   +                    '<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchLocal(udtTable.searchTerms)" title="{{udtHelpers.messages.Messages(\'datatable.button.searchLocal\')}}">'
+   +                    '<button ng-if="udtTable.config.localSearch.active === true" class="btn btn-default search-button" ng-click="udtTable.localSearch(udtTable.searchTerms)" title="{{udtHelpers.messages.Messages(\'datatable.button.localSearch\')}}">'
    +                        '<i class="fa fa-search"></i>'
-   +                        '<span> {{udtHelpers.messages.Messages(\'datatable.button.searchLocal\')}} </span>'
+   +                        '<span> {{udtHelpers.messages.Messages(\'datatable.button.localSearch\')}} </span>'
    +                    '</button>'
-   +                    '<button ng-if="udtTable.config.filter.active === true" class="btn btn-default search-button" ng-click="udtTable.searchTerms={};udtTable.searchLocal()" title="{{udtHelpers.messages.Messages(\'datatable.button.resetSearchLocal\')}}">'
+   +                    '<button ng-if="udtTable.config.localSearch.active === true" class="btn btn-default search-button" ng-click="udtTable.searchTerms={};udtTable.localSearch()" title="{{udtHelpers.messages.Messages(\'datatable.button.resetLocalSearch\')}}">'
    +                        '<i class="fa fa-times"></i>'
-   +                        '<span> {{udtHelpers.messages.Messages(\'datatable.button.resetSearchLocal\')}} </span>'
+   +                        '<span> {{udtHelpers.messages.Messages(\'datatable.button.resetLocalSearch\')}} </span>'
    +                    '</button>'
    +                '</span>'
    +            '</div>'

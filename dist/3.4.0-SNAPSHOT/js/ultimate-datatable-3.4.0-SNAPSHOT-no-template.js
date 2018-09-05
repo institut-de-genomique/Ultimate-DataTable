@@ -1,4 +1,4 @@
-/*! ultimate-datatable version 3.4.0-SNAPSHOT 2018-08-20 
+/*! ultimate-datatable version 3.4.0-SNAPSHOT 2018-09-05 
  Ultimate DataTable is distributed open-source under CeCILL FREE SOFTWARE LICENSE. Check out http://www.cecill.info/ for more information about the contents of this license.
 */
 "use strict";
@@ -59,7 +59,7 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     mode: 'remote',
                     url: undefined
                 },
-                filter: {
+                localSearch: {
                     active: false,
                     highlight: false,
                     columnMode: false,
@@ -286,8 +286,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
             /**
              * local search
              */
-            searchLocal: function(searchTerms) {
-                if (this.config.filter.active === true) {
+            localSearch : function(searchTerms) {
+                if (this.config.localSearch.active === true) {
                     //Set the properties "" or null to undefined because we don't want to filter this
                     this.setSpinner(true);
                     for (var p in searchTerms) {
@@ -296,15 +296,16 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                         }
                     }
 
-                    var _allResult = angular.copy(this.allResult);
-                    _allResult = $filter('filter')(this.allResult, searchTerms, false);
+					if(this.backupAllResult === undefined){
+						this.backupAllResult = angular.copy(this.allResult);
+					}else{
+						this.allResult = angular.copy(this.backupAllResult);
+					}
+					
+                    this.allResult = $filter('filter')(this.allResult, searchTerms, false);
 
-                    this._getAllResult = function() {
-                        return _allResult;
-                    };
-
-                    this.totalNumberRecords = _allResult.length;
-                    //this.sortAllResult();
+                    this.totalNumberRecords = this.allResult.length;
+                    this.sortAllResult();
                     this.computePaginationList();
                     this.computeDisplayResult();
                     var that = this;
@@ -313,6 +314,20 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     });
                 }
             },
+			resetLocalSearch : function(){
+				this.searchTerms = {};
+				if(this.backupAllResult !== undefined){
+						this.allResult = angular.copy(this.backupAllResult);
+						this.totalNumberRecords = this.allResult.length;
+						this.sortAllResult();
+						this.computePaginationList();
+						this.computeDisplayResult();
+						var that = this;
+						this.computeDisplayResultTimeOut.then(function() {
+							that.setSpinner(false);
+						});
+				}
+			},
             _getAllResult: function() {
                 return this.allResult;
             },
@@ -2063,8 +2078,8 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                             throw "Columns config error: " + columns[i].property + " convertValue=active but convertValue.displayMeasureValue or convertValue.saveMeasureValue is missing";
                         }
 
-                        if(null === columns[i].showFilter || undefined === columns[i].showFilter){
-                            columns[i].showFilter = false;
+                        if(null === columns[i].localSearch || undefined === columns[i].localSearch){
+                            columns[i].localSearch = false;
                         }
 						
 						if(null === columns[i].edit || undefined === columns[i].edit){
@@ -2111,6 +2126,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                 var settings = $.extend(true, {}, this.configDefault, config);
                 this.config = angular.copy(settings);
 
+				if(this.config.filter !== undefined){
+					this.config.localSearch = this.config.filter;
+					this.config.filter = undefined;
+					console.log("config filter is deprecated used localSearch");
+				}
+				
                 if(!this.config.pagination.numberRecordsPerPageList){
                 	this.config.pagination.numberRecordsPerPageList = [{
                         number: 10,
@@ -3498,7 +3519,7 @@ directive("udtTbody", function(){
     			    		//we need used udt-change when we used typehead directive
     			    		ngChange = '" udt-change="udtTable.updateColumn(col.property, col.id)"';
 						}else if(filter){
-							ngChange = '" udt-change="udtTable.searchLocal(udtTable.searchTerms)"';
+							ngChange = '" udt-change="udtTable.localSearch(udtTable.searchTerms)"';
     			    	}else if(col.defaultValues){
     			    		defaultValueDirective = 'udt-default-value="col"';
     			    	}else if(col.choiceInList){
@@ -3621,7 +3642,7 @@ directive("udtTbody", function(){
     						}
 	    				}else{
 	    					if(col.type !== "boolean" && col.type !== "img" && col.type !=="file"){
-	    						//return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.filter.highlight"></span>';
+	    						//return '<span udt-highlight="cellValue" keywords="udtTable.searchTerms.$" active="udtTable.config.localSearch.highlight"></span>';
 								return '<span ng-bind="cellValue"></span>'
 	    					}else if(col.type === "boolean"){
 	    						return '<div ng-switch on="cellValue"><i ng-switch-when="true" class="fa fa-check-square-o"></i><i ng-switch-default class="fa fa-square-o"></i></div>';
@@ -4068,8 +4089,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save":"Sauvegarder",
 							"datatable.button.add":"Ajouter",
 							"datatable.button.remove":"Supprimer",
-							"datatable.button.searchLocal":"Rechercher",
-							"datatable.button.resetSearchLocal":"Annuler",
+							"datatable.button.localSearch":"Rechercher",
+							"datatable.button.resetLocalSearch":"Annuler",
 							"datatable.button.length" : "Taille ({0})",
 							"datatable.totalNumberRecords" : "{0} R\u00e9sultat(s)",
 							"datatable.button.exportCSV" : "Export CSV",
@@ -4108,8 +4129,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save":"Save",
 							"datatable.button.add":"Add",
 							"datatable.button.remove":"Remove",
-							"datatable.button.searchLocal":"Search",
-							"datatable.button.resetSearchLocal":"Cancel",
+							"datatable.button.localSearch":"Search",
+							"datatable.button.resetLocalSearch":"Cancel",
 							"datatable.button.length" : "Size ({0})",
 							"datatable.totalNumberRecords" : "{0} Result(s)",
 							"datatable.button.exportCSV" : "CSV Export",
@@ -4148,8 +4169,8 @@ factory('udtI18n', [function() {
 							"datatable.button.save": "Opslaan",
 							"datatable.button.add": "Toevoegen",
 							"datatable.button.remove": "Verwijderen",
-							"datatable.button.searchLocal": "Zoek",
-							"datatable.button.resetSearchLocal": "Annuleer",
+							"datatable.button.localSearch": "Zoek",
+							"datatable.button.resetLocalSearch": "Annuleer",
 							"datatable.button.length": "Grote ({0})",
 							"datatable.totalNumberRecords": "{0} Resultaten",
 							"datatable.button.exportCSV": "CSV Export",
