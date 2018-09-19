@@ -395,6 +395,12 @@ factory('datatable', ['$http', '$filter', '$parse', '$window', '$q', 'udtI18n', 
                     return this.allResult;
                 };
             },
+			 /**
+             * Return if data
+             */
+            isData: function() {
+                return (this.allResult !== null && this.allResult !== undefined && this.allResult.length > 0) ;
+            },			
             /**
              * Return all the data
              */
